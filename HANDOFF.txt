@@ -1,0 +1,241 @@
+HEALTHMITRA - DIGITAL ASSIGNMENT 2 (SOFTWARE DESIGN) - HANDOFF NOTES
+=====================================================================
+Written: 7 Sep 2026. Repo: https://github.com/Nisarg10-leo/HealthMitra
+Branch: main (all work below is UNCOMMITTED in the working tree - commit it first!)
+
+---------------------------------------------------------------------
+1. WHAT IS DONE
+---------------------------------------------------------------------
+
+A) SERVER REFACTOR (server/src) - COMPLETE AND TESTED
+   Old: index.js (416 lines, every route + scheduler + symptom data) and
+        store.js (data + domain logic + notifications mixed together).
+   New layered structure (same endpoints, same JSON shapes, same errors):
+
+   server/src/
+     index.js                 bootstrap only (createApp, startScheduler, listen)
+     app.js                   Express assembly: public routers, then requireUser,
+                              then protected routers, 404, errorHandler
+     config.js                all env vars in one frozen object
+     lib/time.js              localDateKey/today/isoAt/isValidClockTime
+     lib/password.js          scrypt hash/verify
+     lib/httpError.js         HttpError + badRequest/forbidden/notFound/conflict...
+     middleware/requireUser.js   x-user-id header -> req.actor (swap to JWT here)
+     middleware/errorHandler.js  HttpError -> {error} JSON; asyncRoute wrapper
+     data/memoryStore.js      seeded in-memory tables (mirror of sql/schema.sql)
+     data/repository.js       ASYNC repository API (users, links, medications,
+                              doseLogs, alerts, notifications, sosEvents, contacts).
+                              Only file that touches memoryStore. A Postgres
+                              implementation with the same method names replaces
+                              it without touching services/routes.
+     services/accessService.js       accessFor / assertCanView / assertCanEdit /
+                                     patientIdsFor / resolvePatientId
+     services/authService.js         register, login, publicUser
+     services/linkService.js         inviteCaregiver, joinWithCode
+     services/medicationService.js   add/update/remove/list + validation
+     services/doseService.js         ensureTodayLogs (idempotent), listDoseLogs,
+                                     confirmDose
+     services/adherenceService.js    patientSummary (read model), currentStreak
+     services/notificationService.js pushNotification, raiseAlert (fan-out),
+                                     list/mark-read for alerts + notifications
+     services/sosService.js          triggerSos, listSosEvents, updateSosStatus
+     services/contactService.js      doctors/chemists
+     services/symptomService.js      curated 5-symptom lookup (EN/HI) + disclaimer
+     services/voiceIntentService.js  detectIntent (FIXED: Hindi keywords now match;
+                                     old \b regex was ASCII-only)
+     notifications/channels.js       channel interface {name, deliver()};
+                                     consoleChannel now; add FCM/SMS here
+     scheduler/reminderScheduler.js  cron every minute; reminders + missed doses
+     routes/{system,auth,patients,medications,doseLogs,alerts,sos,support}.js
+                                     thin routers, no business logic
+
+   Verified: ~40 curl checks on every endpoint (auth, 401/403/404/409 paths,
+   CRUD, confirm, SOS, links, symptoms, voice, contacts) match old behaviour.
+   Dashboard JSON shape identical to pre-refactor baseline.
+   server/src/store.js was deleted (git rm --cached done; file removed).
+
+B) CLIENT REFACTOR (client/src) - COMPLETE AND TESTED
+   Old: App.jsx 440 lines with all screens, modals, api calls, formatting.
+   New (styles.css and i18n.js untouched; all CSS class names preserved):
+
+   client/src/
+     App.jsx                        session gate only (AuthPage vs Workspace)
+     api/client.js                  fetch wrapper + setSessionToken (x-user-id)
+     api/index.js                   authApi, patientsApi, medicationsApi, dosesApi,
+                                    alertsApi, sosApi, contactsApi, guidanceApi
+     utils/format.js                Intl date/time helpers (en-IN / hi-IN)
+     hooks/useSession.js            SessionContext + useSessionState (localStorage)
+     hooks/useToast.js, useSpeech.js (useSpeechInput, useSpokenText),
+     hooks/useAsyncAction.js (busy/error), hooks/useWorkspaceData.js (loads
+                                    patients/dashboard/alerts/notifications, refresh())
+     components/ui/  Empty, Stat, SectionHeading, ModalShell, ErrorText
+     components/layout/  Sidebar, Topbar, NavButtons, ReminderBanner
+     workspace/Workspace.jsx        shell; provides WorkspaceContext
+     workspace/WorkspaceContext.jsx useWorkspace() -> dashboard, alerts, patients,
+                                    selectedPatientId, selectPatient, refresh,
+                                    notify, listen, openModal
+     workspace/navigation.js        nav items per role
+     workspace/screens.js           tab id -> page component registry
+     workspace/ModalHost.jsx        modal kind -> component registry
+     features/auth/AuthPage.jsx
+     features/today/TodayPage.jsx, DoseCard.jsx
+     features/dashboard/DashboardPage.jsx, AdherenceChart.jsx
+     features/medications/MedicinesPage.jsx, MedicineFormModal.jsx
+     features/history/HistoryPage.jsx
+     features/alerts/AlertsPage.jsx
+     features/symptoms/SymptomsPage.jsx
+     features/contacts/ContactsPage.jsx, ContactFormModal.jsx
+     features/sos/SosModal.jsx
+     features/linking/JoinModal.jsx, LinkCaregiverModal.jsx
+
+   Verified: `npm run build` passes. Playwright (real Chrome) end-to-end run:
+   16/16 checks pass (login both roles, add medicine, confirm dose, SOS send,
+   symptom guidance, Hindi toggle, contacts, caregiver dashboard + 7-bar chart,
+   alerts, SOS acknowledge, mark read, edit modal, history, mobile nav).
+   Only console error is the missing favicon 404 (pre-existing, harmless).
+
+C) UI SCREENSHOTS - DONE  (docs/design/ui/)
+   01-sign-in.png, 02-patient-today.png, 03-patient-sos.png,
+   04-patient-symptoms.png, 05-caregiver-dashboard.png, 06-caregiver-alerts.png,
+   07-mobile-caregiver.png (bonus). 1366x860 @2x, captured from the real app.
+   These are the "improved versions" of the 6 Figma screens for the report.
+
+D) TOOLING (work/ is gitignored - not part of repo)
+   work/tooling/e2e.js   Playwright script (channel: 'chrome') that reruns the
+                         checks and regenerates the screenshots.
+   To rerun:  terminal 1: PORT=4000 REMINDER_WINDOW_MINUTES=600 node server/src/index.js
+              terminal 2: npx vite --port 5173 client
+              terminal 3: cd work/tooling && node e2e.js
+   (REMINDER_WINDOW_MINUTES=600 just keeps some doses "pending" late in the day
+    so the Today screenshot shows taken + pending + missed. Not needed normally.)
+
+---------------------------------------------------------------------
+2. WHAT IS LEFT (in priority order)
+---------------------------------------------------------------------
+
+[ ] 0. COMMIT + PUSH (do first, 2 min)
+      git switch -c feature/software-design
+      git add -A
+      git commit -m "Restructure server/client into layered, feature-based design; add design docs"
+      git push -u origin feature/software-design
+      (then open PR and merge to main, per README's GitHub Flow section)
+
+[x] 1. DRAW.IO DIAGRAMS - DONE  (docs/design/diagrams/)
+      Generated by work/tooling/diagrams.js (one definition -> .drawio + .svg),
+      PNGs rendered by work/tooling/svg2png.js (headless Chrome). To change a
+      diagram: edit diagrams.js, run `node diagrams.js && node svg2png.js`,
+      OR simply open the .drawio in app.diagrams.net and re-export PNG.
+        01-high-level-architecture  (.drawio/.svg/.png) layered client-server
+        02-server-modules           allowed dependency directions
+        03-client-components        App -> Workspace -> registries -> features
+        04-sequence-missed-dose     cron -> scheduler -> services -> caregiver
+        05-data-model               ER view of schema.sql
+      Old DA1 diagram kept at docs/architecture/healthmitra-architecture.drawio.
+
+[ ] 2. FIGMA
+      Import docs/wireframes/healthmitra-wireframes.svg (DA1 low-fi) AND drop
+      the 6 PNGs from docs/design/ui/ into a new Figma page "v2 Hi-fi".
+      Copy the share link (Share > Anyone with link > Copy link).
+      Put the link in: docs/design/README.md and the report.
+      Save the 6 PNGs also as docs/design/figma/ (or just reference ui/).
+
+[ ] 3. docs/design/README.md  (short index)
+      - list diagrams (drawio + png), link Figma, link ui/ screenshots,
+        3-5 bullet summary of design decisions (see section 3 below).
+
+[ ] 4. README.md - add section "## Software Design" (after "Architecture")
+      - 2-3 sentences: layered client-server; server = routes/services/repository
+        with async repository + notification channel seams; client = feature
+        folders + workspace shell with context registries.
+      - Embed: ![Architecture](docs/design/diagrams/01-high-level-architecture.png)
+        and link the other PNGs/drawio files + Figma link + docs/design/README.md.
+      - Update "Folder structure" block to the new tree (see section 1 above).
+      - In "API overview" nothing changes.
+
+[ ] 5. PDF REPORT (6-10 pages) -> docs/design/HealthMitra-Software-Design-Document.pdf
+      Easiest path: write docs/design/report.html (or Google Docs) then print to
+      PDF. Headless Chrome works too:
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+          --headless --print-to-pdf=docs/design/HealthMitra-SDD.pdf \
+          --no-pdf-header-footer file://$PWD/docs/design/report.html
+      Structure (map 1:1 to the brief):
+        p1  Title, name/reg no, GitHub link, 1-paragraph overview, page list
+        p2-3 Design Principles Applied (with code snippets - see section 3)
+        p4-5 High-Level Architecture (diagram 01 + module diagram 02, style +
+             why, maintainability/future changes)
+        p6-7 User Interface Design (6 screenshots in 2x3 grid + Figma link;
+             how it is user-friendly: large tap targets, 3 actions per dose,
+             voice alternative, always-visible SOS, EN/HI toggle, plain
+             reassurance copy, colour+text status (not colour only),
+             read-only notice for view caregivers, persistent medical disclaimer,
+             responsive mobile nav)
+        p8  Design Decisions & Why (5 items - section 3)
+        p9  Sequence diagram 04 + data model 05 (optional)
+        p10 Maintainability & future changes + repo link again
+      Upload to Moodle.
+
+---------------------------------------------------------------------
+3. CONTENT TO PUT IN THE REPORT (ready to paste/adapt)
+---------------------------------------------------------------------
+
+DESIGN PRINCIPLES (quote these files as snippets):
+ * Abstraction
+   - data/repository.js: async methods hide storage; memoryStore is private.
+   - notifications/channels.js: {name, deliver()} interface hides delivery.
+   - api/client.js + api/index.js: components call medicationsApi.create(),
+     never fetch/URLs; session header handled in one place.
+   - hooks/useSpeech.js wraps Web Speech API -> features only see transcripts.
+ * Modularity
+   - one router per resource, one service per domain concept, one folder per
+     feature on the client; registries (workspace/screens.js, ModalHost.jsx)
+     mean adding a screen/dialog = 1 file + 1 line.
+ * High cohesion
+   - accessService.js is the single place for "who may see/edit a patient";
+     doseService.js owns dose lifecycle; symptomService.js only knows the
+     curated list; DoseCard.jsx is purely presentational.
+ * Low coupling
+   - dependency direction: routes -> services -> repository (never reversed);
+     services do not import express; scheduler only calls services.
+   - client features depend on WorkspaceContext/useSession, not on each other
+     or on parent props; Workspace never imports a feature directly (registries).
+   - errors: services throw HttpError; a single errorHandler middleware maps to
+     JSON, so routes have no try/catch.
+ * Separation of concerns: config.js (env), lib/ (pure helpers), middleware/
+   (HTTP cross-cutting), services/ (rules), data/ (storage).
+
+KEY DESIGN DECISIONS & WHY (pick 5):
+ 1. Layered client-server with server-side cron scheduler - reminders/missed
+    detection must not depend on an elderly user's browser being open.
+ 2. Async repository over an in-memory store - lets the 10-day prototype run
+    with zero setup while keeping the exact seam for PostgreSQL (schema already
+    in server/sql/schema.sql); no service changes when swapping.
+ 3. Notification "channels" fan-out - alerts are recorded durably in-app and
+    delivered through pluggable channels; FCM/SMS added later without touching
+    business logic; every caregiver linked to a patient gets each alert.
+ 4. Permission model centralised in accessService (owner / edit / view) -
+    one place to audit; every route calls assertCanView/assertCanEdit.
+ 5. Client feature folders + WorkspaceContext + registries - removed 10-prop
+    drilling, each screen is independently understandable; CSS classes
+    unchanged so redesign risk was zero (verified by 16 browser checks).
+ 6. Rule-based, curated symptom checker (static lookup, mandatory disclaimer,
+    severe flag always escalates) - safety over cleverness.
+
+MAINTAINABILITY / FUTURE CHANGES (how each is done now):
+ - Postgres: implement data/repository.js methods with pg; nothing else moves.
+ - Real auth (JWT): change middleware/requireUser.js + api/client.js header.
+ - Push/SMS: add a channel object to notifications/channels.js.
+ - Groq Whisper: add transcription before detectIntent in voiceIntentService.
+ - New screen: features/<name>/Page.jsx + 1 line in workspace/screens.js +
+   navigation.js. New dialog: 1 line in ModalHost.jsx.
+ - Tests: services are plain async functions -> unit-testable without HTTP;
+   e2e script already exists in work/tooling/e2e.js.
+
+---------------------------------------------------------------------
+4. TIPS TO SAVE CREDITS / TIME
+---------------------------------------------------------------------
+ - Do diagrams and Figma by hand in the browser (no AI needed).
+ - For the PDF, ask the AI only for the report.html text; render with Chrome.
+ - Screenshots are already done - do not regenerate.
+ - Before pushing: `npm run build` must pass (it does now) and run the API once
+   (`npm run start`) to be sure nothing is broken by later edits.
+ - docker-compose.yml still works unchanged (entry is server/src/index.js).

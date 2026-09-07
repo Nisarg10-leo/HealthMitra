@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HealthMitra – Software Design Document</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { font-size: 11pt; }
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* page break helpers */
+  .page-break { page-break-before: always; }
+  h1, h2, h3 { page-break-after: avoid; }
+  pre, .screenshot-grid, table { page-break-inside: avoid; }
+
+  /* title page */
+  .title-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    text-align: center;
+  }
+  .title-page h1 {
+    font-size: 2em;
+    margin: 0 0 0.3em;
+    color: #0d6efd;
+    letter-spacing: -0.5px;
+  }
+  .title-page .subtitle {
+    font-size: 1.15em;
+    color: #555;
+    margin-bottom: 2em;
+  }
+  .title-page .meta { font-size: 0.95em; color: #444; line-height: 2; }
+  .title-page .meta strong { color: #1a1a1a; }
+
+  /* headings */
+  h2 {
+    font-size: 1.35em;
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 4px;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+  }
+  h3 {
+    font-size: 1.1em;
+    color: #333;
+    margin-top: 1.2em;
+    margin-bottom: 0.4em;
+  }
+
+  /* code */
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #dfe2e5;
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 0.82em;
+    line-height: 1.45;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    background: #f0f2f4;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* images */
+  .diagram { text-align: center; margin: 1em 0; }
+  .diagram img { max-width: 100%; border: 1px solid #dfe2e5; border-radius: 4px; }
+  .diagram figcaption { font-size: 0.85em; color: #666; margin-top: 4px; font-style: italic; }
+
+  /* screenshot grid */
+  .screenshot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 1em 0;
+  }
+  .screenshot-grid figure {
+    margin: 0;
+    text-align: center;
+  }
+  .screenshot-grid img {
+    width: 100%;
+    border: 1px solid #dfe2e5;
+    border-radius: 4px;
+  }
+  .screenshot-grid figcaption {
+    font-size: 0.78em;
+    color: #555;
+    margin-top: 3px;
+  }
+
+  /* tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8em 0;
+    font-size: 0.92em;
+  }
+  th, td {
+    border: 1px solid #dfe2e5;
+    padding: 6px 10px;
+    text-align: left;
+  }
+  th { background: #f0f4ff; font-weight: 600; }
+
+  /* numbered decision list */
+  ol.decisions > li {
+    margin-bottom: 0.6em;
+  }
+  ol.decisions > li strong {
+    color: #0d6efd;
+  }
+
+  /* toc */
+  .toc { margin: 1.5em 0; }
+  .toc ol { padding-left: 1.5em; }
+  .toc li { margin-bottom: 0.25em; }
+
+  /* footer */
+  .doc-footer {
+    margin-top: 3em;
+    padding-top: 0.8em;
+    border-top: 1px solid #dfe2e5;
+    font-size: 0.82em;
+    color: #777;
+    text-align: center;
+  }
+
+  p { margin: 0.5em 0; }
+  ul, ol { margin: 0.5em 0; padding-left: 1.6em; }
+  li { margin-bottom: 0.3em; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- PAGE 1: TITLE PAGE                                           -->
+<!-- ============================================================ -->
+<div class="title-page">
+  <h1>HealthMitra</h1>
+  <div class="subtitle">Software Design Document<br>Digital Assignment 2</div>
+  <div class="meta">
+    <strong>Name:</strong> Nisarg Shah<br>
+    <strong>Registration No:</strong> 22BCE3492<br>
+    <strong>Course:</strong> Software Engineering (SWE2001)<br>
+    <strong>Faculty:</strong> Dr. Anto S<br>
+    <strong>Date:</strong> September 2026<br><br>
+    <strong>GitHub:</strong> <a href="https://github.com/Nisarg10-leo/HealthMitra">github.com/Nisarg10-leo/HealthMitra</a>
+  </div>
+
+  <div class="toc" style="margin-top:2.5em; text-align:left; max-width:400px;">
+    <h3 style="text-align:center;">Contents</h3>
+    <ol>
+      <li>Overview</li>
+      <li>Design Principles Applied</li>
+      <li>High-Level Architecture</li>
+      <li>User Interface Design</li>
+      <li>Design Decisions &amp; Rationale</li>
+      <li>Key Interactions (Sequence &amp; Data Model)</li>
+      <li>Maintainability &amp; Future Changes</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 2: OVERVIEW + DESIGN PRINCIPLES                          -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h2>1. Overview</h2>
+<p>
+  <strong>HealthMitra</strong> is a full-stack health companion application for elderly patients
+  managing daily medication and the family caregivers who support them remotely. It is built with
+  <strong>React + Vite</strong> on the client and <strong>Express + node-cron</strong> on the server,
+  backed by a PostgreSQL-ready data layer. The prototype runs on seeded in-memory data with zero
+  infrastructure, while the architecture provides clean seams for production deployment.
+</p>
+<p>
+  The primary user experience loop is: <em>schedule a reminder → record a tap or voice confirmation
+  → flag a missed dose after a configurable window → alert linked caregivers</em>. A prominent SOS
+  path adds a fast way to request help. The interface is bilingual (English / Hindi) with large,
+  accessible controls designed for elderly use.
+</p>
+<p>
+  This document describes the software design principles, architecture, user interface, key design
+  decisions, and maintainability strategy applied in Digital Assignment&nbsp;2.
+</p>
+
+<h2>2. Design Principles Applied</h2>
+
+<h3>2.1 Abstraction</h3>
+<p>
+  Each layer exposes a clear interface that hides implementation details:
+</p>
+<ul>
+  <li><strong>Data access</strong> – <code>data/repository.js</code> exposes async methods (<code>findById</code>,
+    <code>insert</code>, <code>where</code>, etc.). The in-memory store is a private implementation detail;
+    a PostgreSQL version with identical method names replaces it without touching services or routes.</li>
+  <li><strong>Notifications</strong> – <code>notifications/channels.js</code> defines a
+    <code>{ name, deliver() }</code> interface. Adding FCM or SMS means adding a channel object; no
+    service changes required.</li>
+  <li><strong>HTTP client</strong> – <code>api/client.js</code> wraps <code>fetch</code> and attaches the
+    session header in one place. Components call domain-specific functions like
+    <code>medicationsApi.create()</code>, never raw URLs.</li>
+  <li><strong>Voice input</strong> – <code>hooks/useSpeech.js</code> wraps the Web Speech API; feature
+    components only see text transcripts.</li>
+</ul>
+
+<pre><code>// server/src/data/repository.js – every method is async
+const byId = (table) =&gt; (id) =&gt;
+  Promise.resolve(tables[table].find(item =&gt; item.id === id) || null);
+
+export const repository = {
+  users: { findById: byId('users'), findByEmail: ..., insert: ... },
+  medications: { forPatient: ..., findById: ..., insert: ..., update: ..., remove: ... },
+  // ...same contract for links, doseLogs, alerts, notifications, sosEvents, contacts
+};</code></pre>
+
+<pre><code>// server/src/notifications/channels.js – pluggable delivery
+export const consoleChannel = {
+  name: 'in-app (push adapter placeholder)',
+  deliver(notification, recipient) {
+    console.log(`[notification:${notification.type}] ${recipient?.name}: ${notification.title}`);
+  }
+};
+export const channels = [consoleChannel];
+// To add FCM: export const fcmChannel = { name: 'fcm', deliver(n, u) { ... } };
+// then: export const channels = [consoleChannel, fcmChannel];</code></pre>
+
+<!-- ============================================================ -->
+<!-- PAGE 3: DESIGN PRINCIPLES (continued)                        -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h3>2.2 Modularity</h3>
+<p>
+  The codebase is decomposed into small, independently understandable units:
+</p>
+<ul>
+  <li><strong>Server:</strong> one router per resource (<code>routes/auth.js</code>, <code>routes/medications.js</code>, …),
+    one service per domain concept (<code>services/doseService.js</code>, <code>services/sosService.js</code>, …),
+    and a single repository file for data access.</li>
+  <li><strong>Client:</strong> one folder per feature (<code>features/today/</code>, <code>features/dashboard/</code>, …),
+    with registries (<code>workspace/screens.js</code>, <code>workspace/ModalHost.jsx</code>) that mean adding a
+    new screen or dialog is <strong>one file + one line of registration</strong>.</li>
+</ul>
+
+<pre><code>// client/src/workspace/screens.js – adding a screen = 1 import + 1 line
+export const SCREENS = {
+  today:       TodayPage,
+  dashboard:   DashboardPage,
+  medications: MedicinesPage,
+  history:     HistoryPage,
+  alerts:      AlertsPage,
+  symptoms:    SymptomsPage,
+  contacts:    ContactsPage
+};</code></pre>
+
+<h3>2.3 High Cohesion</h3>
+<ul>
+  <li><code>accessService.js</code> is the <em>single place</em> for "who may see or edit a patient's data" –
+    owner/edit/view decided in one function.</li>
+  <li><code>doseService.js</code> owns the entire dose lifecycle: ensuring today's logs, listing, confirming.</li>
+  <li><code>symptomService.js</code> only knows the curated symptom lookup list and disclaimer.</li>
+  <li><code>DoseCard.jsx</code> is purely presentational – it receives props and renders; no API calls, no state management.</li>
+</ul>
+
+<pre><code>// server/src/services/accessService.js – single source of truth
+export async function accessFor(actor, patientId) {
+  if (actor.role === 'patient' &amp;&amp; actor.id === patientId)
+    return { allowed: true, canEdit: true, permissionLevel: 'owner' };
+  const link = await repository.links.find(patientId, actor.id);
+  if (!link) return { allowed: false, canEdit: false, permissionLevel: null };
+  return { allowed: true, canEdit: link.permissionLevel === 'edit', permissionLevel: link.permissionLevel };
+}
+
+export async function assertCanView(actor, patientId, message) {
+  const access = await accessFor(actor, patientId);
+  if (!patientId || !access.allowed) throw forbidden(message);
+  return access;
+}</code></pre>
+
+<h3>2.4 Low Coupling</h3>
+<ul>
+  <li><strong>Dependency direction:</strong> routes → services → repository (never reversed).
+    Services do not import Express. The scheduler only calls services.</li>
+  <li><strong>Client features</strong> depend on <code>WorkspaceContext</code> / <code>useSession</code>,
+    not on each other or on parent props. The Workspace shell never imports a feature directly (registries).</li>
+  <li><strong>Error handling:</strong> services throw <code>HttpError</code>; a single
+    <code>errorHandler</code> middleware maps to JSON. Routes have no try/catch.</li>
+</ul>
+
+<pre><code>// server/src/middleware/errorHandler.js – routes never catch errors
+export function errorHandler(error, _req, res, _next) {
+  if (error instanceof HttpError)
+    return res.status(error.status).json({ error: error.message });
+  console.error(error);
+  return res.status(500).json({ error: 'Something went wrong on the server.' });
+}
+export const asyncRoute = (handler) =&gt;
+  (req, res, next) =&gt; Promise.resolve(handler(req, res, next)).catch(next);</code></pre>
+
+<h3>2.5 Separation of Concerns</h3>
+<p>
+  Each module has a single responsibility:
+  <code>config.js</code> (environment variables),
+  <code>lib/</code> (pure helpers – time, password, HTTP errors),
+  <code>middleware/</code> (HTTP cross-cutting concerns),
+  <code>services/</code> (business rules),
+  <code>data/</code> (storage),
+  <code>notifications/</code> (delivery),
+  <code>scheduler/</code> (cron orchestration).
+</p>
+
+<!-- ============================================================ -->
+<!-- PAGE 4: HIGH-LEVEL ARCHITECTURE                               -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h2>3. High-Level Architecture</h2>
+
+<p>
+  HealthMitra follows a <strong>layered client-server architecture</strong>. The React single-page
+  application talks JSON to an Express REST API. The server is organised into four dependency layers:
+  thin HTTP routers, cohesive domain services, a single async data repository, and cross-cutting
+  infrastructure (middleware, scheduler, notification channels). Each layer only depends on the layer
+  below it.
+</p>
+
+<figure class="diagram">
+  <img src="diagrams/01-high-level-architecture.png" alt="High-level architecture diagram">
+  <figcaption>Figure 1 – Layered client-server architecture</figcaption>
+</figure>
+
+<p>
+  <strong>Why this architecture:</strong>
+</p>
+<ul>
+  <li>Clear layer boundaries make the dependency direction explicit: routes never contain business
+    logic; services never know about HTTP; the repository never calls a service.</li>
+  <li>The server-side cron scheduler ensures reminders and missed-dose alerts are generated reliably,
+    independent of whether any user has a browser open.</li>
+  <li>The async repository interface is the seam for swapping the in-memory prototype store for
+    PostgreSQL (whose schema already exists at <code>server/sql/schema.sql</code>).</li>
+</ul>
+
+<figure class="diagram">
+  <img src="diagrams/02-server-modules.png" alt="Server module dependencies">
+  <figcaption>Figure 2 – Server modules and allowed dependency directions</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<!-- PAGE 5: ARCHITECTURE (CLIENT) + UI INTRO                     -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h3>3.1 Client Architecture</h3>
+
+<p>
+  The client follows a <strong>feature-based folder structure</strong> with a central workspace shell.
+  The shell provides shared state through React Contexts (<code>useWorkspace()</code> for dashboard data,
+  alerts, and patient selection; <code>useSession()</code> for authentication state). Each screen is a
+  self-contained feature folder that registers itself via <code>workspace/screens.js</code>; modal
+  dialogs register via <code>workspace/ModalHost.jsx</code>.
+</p>
+
+<figure class="diagram">
+  <img src="diagrams/03-client-components.png" alt="Client component structure">
+  <figcaption>Figure 3 – Client: App → Workspace → registries → feature screens</figcaption>
+</figure>
+
+<p>
+  This structure eliminated 10-prop drilling from the original monolithic <code>App.jsx</code> (440&nbsp;lines).
+  Each feature screen is independently understandable, and all CSS class names were preserved during the
+  refactor (verified by 16 Playwright end-to-end checks).
+</p>
+
+<h2>4. User Interface Design</h2>
+
+<p>
+  HealthMitra's interface is designed for elderly primary users and busy caregiver secondary users.
+  The six screens below are captured from the running application and represent the v2 high-fidelity
+  design.
+</p>
+
+<div class="screenshot-grid">
+  <figure>
+    <img src="ui/01-sign-in.png" alt="Sign in screen">
+    <figcaption>1. Sign in / demo role selection</figcaption>
+  </figure>
+  <figure>
+    <img src="ui/02-patient-today.png" alt="Patient today screen">
+    <figcaption>2. Patient – today's medicines</figcaption>
+  </figure>
+  <figure>
+    <img src="ui/03-patient-sos.png" alt="Patient SOS screen">
+    <figcaption>3. Patient – emergency SOS</figcaption>
+  </figure>
+  <figure>
+    <img src="ui/04-patient-symptoms.png" alt="Patient symptoms screen">
+    <figcaption>4. Patient – symptom checker</figcaption>
+  </figure>
+  <figure>
+    <img src="ui/05-caregiver-dashboard.png" alt="Caregiver dashboard">
+    <figcaption>5. Caregiver – adherence dashboard</figcaption>
+  </figure>
+  <figure>
+    <img src="ui/06-caregiver-alerts.png" alt="Caregiver alerts screen">
+    <figcaption>6. Caregiver – care updates &amp; SOS follow-up</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 6-7: UI DESIGN RATIONALE                                 -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h3>4.1 User-Friendliness &amp; Accessibility</h3>
+
+<p>The interface applies the following design strategies for the elderly patient persona and the busy caregiver persona:</p>
+
+<table>
+  <thead>
+    <tr><th>Design Strategy</th><th>Implementation</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Large tap targets</strong></td>
+      <td>Dose confirmation buttons (Taken / Skipped / Undo) are full-width cards with generous padding, easy to tap on a phone.</td>
+    </tr>
+    <tr>
+      <td><strong>Three-action dose model</strong></td>
+      <td>Each dose has exactly three actions: <em>Taken</em>, <em>Skipped</em>, <em>Undo</em>. No ambiguity; the patient never needs to type or select from a menu.</td>
+    </tr>
+    <tr>
+      <td><strong>Voice alternative</strong></td>
+      <td>A microphone button lets the patient confirm a dose by saying <em>"yes, I took it"</em> or <em>"haan, le liya"</em> (Hindi). The Web Speech API is abstracted behind <code>useSpeech.js</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Always-visible SOS</strong></td>
+      <td>The red SOS button is persistent in the sidebar / mobile navigation. One tap opens the confirmation modal; a second tap sends the alert with optional browser geolocation.</td>
+    </tr>
+    <tr>
+      <td><strong>English / Hindi toggle</strong></td>
+      <td>A single tap in the top bar switches all copy and voice prompts between English and Hindi, powered by i18next.</td>
+    </tr>
+    <tr>
+      <td><strong>Plain, reassuring copy</strong></td>
+      <td>Status messages use calm, non-medical language: <em>"All done for today!"</em>, <em>"Your caregiver has been notified."</em></td>
+    </tr>
+    <tr>
+      <td><strong>Colour + text status</strong></td>
+      <td>Dose status uses both colour and a text label (e.g., green "Taken", amber "Pending", red "Missed"), never colour alone — important for users with reduced colour vision.</td>
+    </tr>
+    <tr>
+      <td><strong>Read-only caregiver notice</strong></td>
+      <td>View-only caregivers see a persistent badge and disabled edit buttons. The restriction is enforced server-side by <code>assertCanEdit</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Persistent medical disclaimer</strong></td>
+      <td>The symptom checker always displays: <em>"This is not a diagnosis. Please consult your doctor."</em> Severe or unlisted symptoms immediately escalate to "See a doctor".</td>
+    </tr>
+    <tr>
+      <td><strong>Responsive mobile layout</strong></td>
+      <td>Below 768px, the sidebar collapses to a bottom navigation bar. All touch targets remain large.</td>
+    </tr>
+  </tbody>
+</table>
+
+<figure class="diagram" style="max-width:350px; margin:0.8em auto;">
+  <img src="ui/07-mobile-caregiver.png" alt="Mobile responsive layout">
+  <figcaption>Figure 4 – Mobile layout with bottom navigation</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<!-- PAGE 8: DESIGN DECISIONS                                      -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h2>5. Design Decisions &amp; Rationale</h2>
+
+<ol class="decisions">
+  <li>
+    <strong>Layered client-server with server-side cron scheduler.</strong><br>
+    Reminders and missed-dose detection must not depend on an elderly patient's browser being open.
+    The <code>scheduler/reminderScheduler.js</code> runs every minute on the server, iterates over all
+    patients, and delegates to <code>doseService</code> and <code>notificationService</code>.
+  </li>
+  <li>
+    <strong>Async repository over an in-memory store.</strong><br>
+    The prototype runs with zero setup while keeping the exact seam for PostgreSQL. Every repository
+    method returns a <code>Promise</code>, even though the memory store is synchronous. The production
+    schema already exists at <code>server/sql/schema.sql</code>. No service changes are needed when
+    swapping the data layer.
+  </li>
+  <li>
+    <strong>Notification "channels" fan-out.</strong><br>
+    Alerts are recorded durably as in-app notifications and delivered through pluggable
+    <code>{ name, deliver() }</code> channels. FCM push or SMS can be added later without touching
+    business logic. Every caregiver linked to a patient receives each alert automatically.
+  </li>
+  <li>
+    <strong>Centralised permission model in <code>accessService</code>.</strong><br>
+    Owner / edit / view permissions are decided in one place (<code>accessFor()</code>). Every protected
+    route calls <code>assertCanView()</code> or <code>assertCanEdit()</code>. This makes the permission
+    model auditable and ensures no route accidentally bypasses access checks.
+  </li>
+  <li>
+    <strong>Client feature folders + WorkspaceContext + registries.</strong><br>
+    The original monolithic <code>App.jsx</code> (440 lines, 10+ prop chains) was decomposed into
+    independent feature folders. Shared state flows through <code>WorkspaceContext</code> and
+    <code>SessionContext</code>. The screen and modal registries mean no feature imports another feature.
+    All CSS class names were preserved, so the visual risk was zero (verified by 16 automated browser checks).
+  </li>
+  <li>
+    <strong>Rule-based, curated symptom checker.</strong><br>
+    Safety over cleverness: the symptom checker uses a static lookup for five common minor symptoms only,
+    with a mandatory medical disclaimer and a severe-flag escalation path. No AI-generated medical advice.
+    Every unlisted or severe symptom immediately routes to "Please consult your doctor."
+  </li>
+</ol>
+
+<pre><code>// server/src/scheduler/reminderScheduler.js – pure orchestration
+export async function schedulerTick(now = Date.now()) {
+  for (const patient of await repository.users.listPatients()) {
+    await ensureTodayLogs(patient.id);
+    const todayLogs = (await logsForPatient(patient.id))
+      .filter(log =&gt; log.scheduledTime.startsWith(today()));
+    for (const log of todayLogs) {
+      if (log.status !== 'pending') continue;
+      const scheduledAt = new Date(log.scheduledTime).getTime();
+      // Send reminder when time arrives
+      if (!log.reminderSentAt &amp;&amp; now &gt;= scheduledAt) { /* pushNotification(...) */ }
+      // Flag missed after configurable window
+      if (now - scheduledAt &gt; config.reminderWindowMinutes * 60_000) { /* raiseAlert(...) */ }
+    }
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<!-- PAGE 9: SEQUENCE + DATA MODEL                                 -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h2>6. Key Interactions</h2>
+
+<h3>6.1 Sequence: Missed Dose → Caregiver Alert</h3>
+<p>
+  The sequence diagram below shows the complete flow when a patient misses a scheduled dose.
+  The server-side scheduler detects the missed dose after the configurable window, marks the dose
+  log as "missed", raises an alert through <code>notificationService</code>, and fans out to every
+  linked caregiver.
+</p>
+
+<figure class="diagram">
+  <img src="diagrams/04-sequence-missed-dose.png" alt="Missed dose sequence diagram">
+  <figcaption>Figure 5 – Sequence: cron tick → missed dose detection → caregiver alert fan-out</figcaption>
+</figure>
+
+<h3>6.2 Data Model</h3>
+<p>
+  The entity-relationship diagram shows the PostgreSQL production schema. The same structure is mirrored
+  in the in-memory store for the prototype. Key relationships: a <strong>user</strong> is either a patient
+  or caregiver; <strong>patient_caregiver_links</strong> connect them with permission levels;
+  <strong>medications</strong> belong to a patient and generate <strong>dose_logs</strong> daily;
+  <strong>notifications</strong> target individual users with patient context.
+</p>
+
+<figure class="diagram">
+  <img src="diagrams/05-data-model.png" alt="Data model (ER diagram)">
+  <figcaption>Figure 6 – Entity-relationship view of the production data model</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<!-- PAGE 10: MAINTAINABILITY                                      -->
+<!-- ============================================================ -->
+<div class="page-break"></div>
+
+<h2>7. Maintainability &amp; Future Changes</h2>
+
+<p>
+  The layered, interface-driven architecture ensures that each anticipated change touches exactly
+  one module:
+</p>
+
+<table>
+  <thead>
+    <tr><th>Change</th><th>What to modify</th><th>What stays unchanged</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Switch to PostgreSQL</td>
+      <td>Implement <code>data/repository.js</code> methods using <code>pg</code></td>
+      <td>All services, routes, scheduler, client</td>
+    </tr>
+    <tr>
+      <td>Real authentication (JWT)</td>
+      <td><code>middleware/requireUser.js</code> + <code>api/client.js</code> header</td>
+      <td>All services, all feature screens</td>
+    </tr>
+    <tr>
+      <td>FCM push / SMS notifications</td>
+      <td>Add a channel object to <code>notifications/channels.js</code></td>
+      <td>All services, routes, scheduler</td>
+    </tr>
+    <tr>
+      <td>Groq Whisper transcription</td>
+      <td>Add transcription step before <code>detectIntent</code> in <code>voiceIntentService.js</code></td>
+      <td>Routes, client, other services</td>
+    </tr>
+    <tr>
+      <td>Add a new screen</td>
+      <td><code>features/&lt;name&gt;/Page.jsx</code> + 1 line in <code>workspace/screens.js</code> + 1 line in <code>navigation.js</code></td>
+      <td>All existing features, workspace shell</td>
+    </tr>
+    <tr>
+      <td>Add a new modal dialog</td>
+      <td>Component file + 1 line in <code>workspace/ModalHost.jsx</code></td>
+      <td>Everything else</td>
+    </tr>
+    <tr>
+      <td>Unit testing</td>
+      <td>Services are plain async functions – testable without HTTP or DOM. End-to-end script already exists.</td>
+      <td>No production code changes needed</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>7.1 Folder Structure (Final)</h3>
+<pre><code>client/src/
+  App.jsx                 # Session gate: AuthPage or Workspace
+  api/                    # fetch wrapper + one function per backend capability
+  hooks/                  # useSession, useWorkspaceData, useSpeech, useToast, useAsyncAction
+  components/ui|layout/   # SectionHeading, ModalShell, Sidebar, Topbar, ReminderBanner…
+  workspace/              # Shell, WorkspaceContext, screen + modal registries, navigation
+  features/&lt;screen&gt;/      # auth, today, dashboard, medications, history, alerts, symptoms,
+                          # contacts, sos, linking
+
+server/src/
+  index.js                # Bootstrap: createApp + startScheduler + listen
+  app.js                  # Express assembly (public → requireUser → protected routers)
+  config.js               # Environment → frozen config object
+  routes/                 # Thin HTTP adapters per resource
+  middleware/             # requireUser, errorHandler/asyncRoute
+  services/               # Business rules (access, dose, medication, notification, sos…)
+  data/                   # repository.js (async interface) + memoryStore.js (seeded prototype)
+  notifications/          # Delivery channels: { name, deliver() }
+  scheduler/              # node-cron reminder / missed-dose tick
+  lib/                    # time, password, httpError helpers</code></pre>
+
+<p>
+  The full source code is available at
+  <a href="https://github.com/Nisarg10-leo/HealthMitra">github.com/Nisarg10-leo/HealthMitra</a>.
+</p>
+
+<div class="doc-footer">
+  HealthMitra – Software Design Document · Digital Assignment 2 · September 2026
+</div>
+
+</body>
+</html>

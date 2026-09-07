@@ -2,7 +2,7 @@
 
 > A voice-friendly health companion that helps elderly patients stay on top of their medicines while keeping remote family caregivers calmly informed.
 
-HealthMitra is an academic full-stack prototype built for **Digital Assignment 1**. It focuses on low-friction medication adherence, timely caregiver awareness, and an accessible experience for elderly users.
+HealthMitra is an academic full-stack prototype built for **Digital Assignment 1** (requirements) and **Digital Assignment 2** (software design). It focuses on low-friction medication adherence, timely caregiver awareness, and an accessible experience for elderly users.
 
 ## Demo credentials
 
@@ -126,6 +126,39 @@ PostgreSQL schema / prototype memory adapter
 Docker Compose -> local development -> Render/Railway + Vercel/Netlify deployment
 ```
 
+## Software Design
+
+Design deliverables for Review 2 live in [`docs/design/`](docs/design/README.md) together with the
+[Software Design Document (PDF)](docs/design/HealthMitra-Software-Design-Document.pdf).
+
+**Main design choices.** HealthMitra is a layered client-server application: a React SPA talks JSON to an
+Express API whose modules are split into thin `routes/`, cohesive `services/` (business rules), and a single
+async `data/repository.js` seam that hides the in-memory prototype store and can be swapped for PostgreSQL
+without touching any service. Cross-cutting concerns are isolated behind small interfaces – `requireUser`
+middleware for identity, `notifications/channels.js` for delivery (console now, FCM/SMS later), and a
+server-side cron `scheduler/` so reminders and missed-dose alerts never depend on the patient's browser being
+open. On the client each screen is a feature folder that reads shared state through `useWorkspace()` and
+`useSession()` contexts and is wired via registries (`workspace/screens.js`, `workspace/ModalHost.jsx`), so
+adding a screen or dialog is one file plus one line.
+
+### Diagrams (Draw.io sources + PNG exports)
+
+![High-level architecture](docs/design/diagrams/01-high-level-architecture.png)
+
+| Diagram | Source | PNG |
+| --- | --- | --- |
+| High-level architecture (layered client-server) | [drawio](docs/design/diagrams/01-high-level-architecture.drawio) | [png](docs/design/diagrams/01-high-level-architecture.png) |
+| Server modules and allowed dependencies | [drawio](docs/design/diagrams/02-server-modules.drawio) | [png](docs/design/diagrams/02-server-modules.png) |
+| Client component structure | [drawio](docs/design/diagrams/03-client-components.drawio) | [png](docs/design/diagrams/03-client-components.png) |
+| Sequence: reminder → missed dose → caregiver alert | [drawio](docs/design/diagrams/04-sequence-missed-dose.drawio) | [png](docs/design/diagrams/04-sequence-missed-dose.png) |
+| Data model (ER) | [drawio](docs/design/diagrams/05-data-model.drawio) | [png](docs/design/diagrams/05-data-model.png) |
+
+### User interface (v2)
+
+The six screens, captured from the running app, are in [`docs/design/ui/`](docs/design/ui/):
+sign in · patient today · patient SOS · patient symptom checker · caregiver dashboard · caregiver alerts & SOS
+follow-up. The Figma board link is listed in [`docs/design/README.md`](docs/design/README.md).
+
 ## Figma wireframes (six screens)
 
 The six-screen wireframe board is an editable SVG designed for direct import to a free Figma account:
@@ -162,20 +195,37 @@ Create a **Table** or **Board** GitHub Project named `HealthMitra - Digital Assi
 
 ```text
 .
-├── client/                    # React + Vite + i18next accessible web client
-│   ├── src/App.jsx            # Patient and caregiver experiences
-│   ├── src/i18n.js            # English/Hindi copy
-│   └── src/styles.css          # Responsive, high-contrast interface
+├── client/                          # React + Vite + i18next accessible web client
+│   └── src/
+│       ├── App.jsx                  # Session gate: AuthPage or Workspace
+│       ├── api/                     # fetch wrapper + one function per backend capability
+│       ├── hooks/                   # useSession, useWorkspaceData, useSpeech, useToast, useAsyncAction
+│       ├── components/ui|layout/    # SectionHeading, ModalShell, Sidebar, Topbar, ReminderBanner…
+│       ├── workspace/               # Shell, WorkspaceContext, screens + modal registries, navigation
+│       ├── features/<screen>/       # auth, today, dashboard, medications, history, alerts, symptoms, contacts, sos, linking
+│       ├── utils/format.js          # Intl date/time helpers (en-IN / hi-IN)
+│       ├── i18n.js                  # English/Hindi copy
+│       └── styles.css               # Responsive, high-contrast interface
 ├── server/
-│   ├── src/index.js           # Express REST API and cron scheduler
-│   ├── src/store.js           # Prototype data adapter and seeded demo data
-│   └── sql/schema.sql         # PostgreSQL production data model
+│   ├── src/
+│   │   ├── index.js                 # Bootstrap: createApp + startScheduler + listen
+│   │   ├── app.js                   # Express assembly (public routers → requireUser → protected routers)
+│   │   ├── config.js                # Environment → frozen config object
+│   │   ├── routes/                  # Thin HTTP adapters per resource
+│   │   ├── middleware/              # requireUser, errorHandler/asyncRoute
+│   │   ├── services/                # Business rules (access, dose, medication, notification, sos…)
+│   │   ├── data/                    # repository.js (async interface) + memoryStore.js (seeded prototype)
+│   │   ├── notifications/           # Delivery channels ({ name, deliver() })
+│   │   ├── scheduler/               # node-cron reminder / missed-dose tick
+│   │   └── lib/                     # time, password, httpError helpers
+│   └── sql/schema.sql               # PostgreSQL production data model
 ├── docs/
-│   ├── architecture/          # Draw.io diagram + preview
-│   ├── wireframes/            # Figma-importable six-screen board
-│   ├── github/                # 25 stories and publishing guide
-│   └── evidence/              # Screenshot checklist and capture notes
-├── docker-compose.yml         # Client + API + PostgreSQL local stack
+│   ├── design/                      # DA2: diagrams (drawio + png), UI screens, design README, SDD PDF
+│   ├── architecture/                # DA1 Draw.io diagram + preview
+│   ├── wireframes/                  # Figma-importable six-screen board
+│   ├── github/                      # 25 stories and publishing guide
+│   └── evidence/                    # Screenshot checklist and capture notes
+├── docker-compose.yml               # Client + API + PostgreSQL local stack
 └── README.md
 ```
 
