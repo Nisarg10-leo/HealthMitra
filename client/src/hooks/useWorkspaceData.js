@@ -12,6 +12,12 @@ export function useWorkspaceData(session, notify) {
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((value) => value + 1), []);
 
+  // Periodic polling every 30s to keep schedule, alerts, and reminders in sync
+  useEffect(() => {
+    const interval = setInterval(refresh, 30_000);
+    return () => clearInterval(interval);
+  }, [refresh]);
+
   useEffect(() => {
     let active = true;
     const load = async () => {

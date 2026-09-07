@@ -10,10 +10,20 @@ import { DoseCard } from './DoseCard.jsx';
 
 export function TodayPage() {
   const { t } = useTranslation();
-  const { dashboard, refresh, notify, listen, openModal } = useWorkspace();
+  const { dashboard, refresh, notify, listen, openModal, triggerAlarm } = useWorkspace();
   const [reassuranceSent, setReassuranceSent] = useState(false);
   const logs = dashboard.logs.filter((log) => isToday(log.scheduledTime)).sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
   const medicationById = (id) => dashboard.medications.find((medication) => medication.id === id);
+
+  const testAlarm = () => {
+    const firstPending = logs.find((l) => l.status === 'pending') || logs[0] || {
+      id: 'demo-alarm-dose',
+      medicationId: dashboard.medications[0]?.id,
+      scheduledTime: new Date().toISOString(),
+      status: 'pending'
+    };
+    triggerAlarm(firstPending);
+  };
 
   const confirm = async (log, status, method = 'tap') => {
     try {
@@ -109,6 +119,7 @@ export function TodayPage() {
     <div className="dose-list">{logs.length ? logs.map((log) => <DoseCard key={log.id} log={log} medication={medicationById(log.medicationId)} onConfirm={confirm} onSpeak={confirmByVoice} />) : <Empty text={t('noMeds')} />}</div>
 
     <section className="quick-actions">
+      <button className="quick-action" onClick={testAlarm}><span className="quick-icon" style={{ background: '#fee2e2', color: '#ef4444' }}>🔔</span><span><strong>{t('testAlarmBtn')}</strong><small>{t('testAlarmDesc')}</small></span></button>
       <button className="quick-action" onClick={() => openModal({ kind: 'sos' })}><span className="quick-icon danger-icon">⚠</span><span><strong>{t('needHelp')}</strong><small>{t('sosDescription')}</small></span></button>
       <button className="quick-action" onClick={() => openModal({ kind: 'medicine' })}><span className="quick-icon">＋</span><span><strong>{t('addMedicine')}</strong><small>{t('keepScheduleCurrent')}</small></span></button>
     </section>

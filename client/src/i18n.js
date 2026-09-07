@@ -43,7 +43,9 @@ const en = {
   scanMedicineBtn: '📷 Scan Medicine Strip / Box',
   scanningPackaging: 'Analyzing packaging…',
   scanSuccess: 'Details extracted from packaging!',
-  scanTip: 'Upload or snap a photo of the medicine strip or box label.'
+  scanTip: 'Upload or snap a photo of the medicine strip or box label.',
+  testAlarmBtn: 'Test Medicine Alarm',
+  testAlarmDesc: 'Listen to chime & voice announcement.'
 };
 
 const hi = {
@@ -89,7 +91,9 @@ const hi = {
   scanMedicineBtn: '📷 दवा का पत्ता / डिब्बा स्कैन करें',
   scanningPackaging: 'पैकेट का विश्लेषण हो रहा है…',
   scanSuccess: 'दवा की जानकारी सफलतापूर्वक प्राप्त हुई!',
-  scanTip: 'दवा की पट्टी या डिब्बे के लेबल की तस्वीर लें या अपलोड करें।'
+  scanTip: 'दवा की पट्टी या डिब्बे के लेबल की तस्वीर लें या अपलोड करें।',
+  testAlarmBtn: 'दवा का अलार्म चलाकर देखें',
+  testAlarmDesc: 'घंटी और आवाज़ की घोषणा सुनें।'
 };
 
 i18n.use(initReactI18next).init({ resources: { en: { translation: en }, hi: { translation: hi } }, lng: 'en', fallbackLng: 'en', interpolation: { escapeValue: false }, returnNull: false });
