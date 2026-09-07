@@ -35,8 +35,7 @@ export const listNotifications = async (userId) => (await repository.notificatio
 export async function markNotificationRead(id, userId) {
   const item = await repository.notifications.findForUser(id, userId);
   if (!item) return null;
-  item.readAt = nowIso();
-  return item;
+  return repository.notifications.update(id, { readAt: nowIso() });
 }
 
 export async function listAlerts(patientIds) {
@@ -46,6 +45,9 @@ export async function listAlerts(patientIds) {
 
 export async function markAlertRead(id, actorId) {
   const item = await repository.alerts.findById(id);
-  if (item && !item.readBy.includes(actorId)) item.readBy.push(actorId);
+  if (!item) return null;
+  if (!item.readBy.includes(actorId)) {
+    return repository.alerts.update(id, { readBy: [...item.readBy, actorId] });
+  }
   return item;
 }

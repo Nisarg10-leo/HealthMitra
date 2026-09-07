@@ -8,5 +8,5 @@ export const config = Object.freeze({
   reminderWindowMinutes: Number(process.env.REMINDER_WINDOW_MINUTES || 15),
   allowedOrigins: csv(process.env.CLIENT_ORIGIN),
   voiceProvider: process.env.GROQ_API_KEY ? 'groq-whisper-ready' : 'browser-speech-fallback',
-  storeMode: 'prototype-memory-store'
+  databaseUrl: process.env.DATABASE_URL || null
 });

@@ -16,7 +16,8 @@ function validateSchedule(times, startDate, endDate) {
 export const listMedications = (patientId) => repository.medications.forPatient(patientId);
 
 export async function addMedication(actor, body) {
-  const { patientId, name, dosage, startDate, endDate = null, color } = body || {};
+  const patientId = body?.patientId || (actor.role === 'patient' ? actor.id : null);
+  const { name, dosage, startDate, endDate = null, color } = body || {};
   const times = normalizeTimes(body?.times);
   await assertCanEdit(actor, patientId, 'Only the patient or an edit-enabled caregiver can change the schedule.');
   if (!String(name || '').trim() || !String(dosage || '').trim() || !times.length || times.some((time) => !isValidClockTime(time))) {
