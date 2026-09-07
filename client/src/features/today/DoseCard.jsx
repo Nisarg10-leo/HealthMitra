@@ -9,7 +9,17 @@ export function DoseCard({ log, medication, onConfirm, onSpeak }) {
   const { t, i18n } = useTranslation();
   return <article className={`dose-card ${log.status}`}>
     <div className="pill" style={{ background: medication?.color }} aria-hidden="true" />
-    <div className="dose-main"><p>{formatTime(log.scheduledTime, i18n.language)}</p><h3>{medication?.name || t('medication')}</h3><span>{medication?.dosage}</span></div>
+    <div className="dose-main">
+      <p>{formatTime(log.scheduledTime, i18n.language)}</p>
+      <h3>{medication?.name || t('medication')}</h3>
+      <span>{medication?.dosage}</span>
+      {medication?.safety && (
+        <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82em', color: '#555', background: 'rgba(0,0,0,0.03)', padding: '3px 8px', borderRadius: '4px' }}>
+          <span>{medication.safety.icon}</span>
+          <span>{medication.safety.instruction}</span>
+        </div>
+      )}
+    </div>
     <div className="dose-action">
       {log.status === 'pending'
         ? <>

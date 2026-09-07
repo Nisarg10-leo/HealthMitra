@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import { repository } from '../data/repository.js';
 import { asyncRoute } from '../middleware/errorHandler.js';
-import { assertCanView, patientIdsFor, resolvePatientId } from '../services/accessService.js';
+import { assertCanView, patientIdsFor, resolveId, resolvePatientId } from '../services/accessService.js';
 import { patientSummary } from '../services/adherenceService.js';
 import { inviteCaregiver, joinWithCode } from '../services/linkService.js';
+import { raiseAlert } from '../services/notificationService.js';
 
 export const patientsRouter = Router();
 
@@ -22,4 +24,14 @@ patientsRouter.get('/dashboard', asyncRoute(async (req, res) => {
   const patientId = await resolvePatientId(req, req.actor);
   await assertCanView(req.actor, patientId);
   res.json(await patientSummary(patientId, req.actor));
+}));
+
+// Inactivity Guardian: patient confirms they are active and safe
+patientsRouter.post('/patients/:id/reassure', asyncRoute(async (req, res) => {
+  const patientId = resolveId(req.params.id);
+  await assertCanView(req.actor, patientId);
+  const patient = await repository.users.findById(patientId);
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  await raiseAlert(patientId, 'reassurance', `${patient?.name || 'Patient'} confirmed they are active and safe at ${timeStr}.`, {}, 'caregivers');
+  res.json({ ok: true, message: 'Reassurance sent to caregivers.' });
 }));

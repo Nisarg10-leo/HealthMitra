@@ -12,7 +12,8 @@ export const patientsApi = {
   list: () => get('/patients'),
   dashboard: (patientId) => get(`/dashboard${patientQuery(patientId)}`),
   linkCaregiver: (patientId, email, permissionLevel) => post(`/patients/${patientId}/link-caregiver`, { email, permissionLevel }),
-  joinWithCode: (code) => post('/links/join', { code })
+  joinWithCode: (code) => post('/links/join', { code }),
+  reassure: (patientId) => post(`/patients/${patientId}/reassure`)
 };
 
 export const medicationsApi = {
@@ -41,6 +42,10 @@ export const sosApi = {
 export const contactsApi = {
   list: (type, patientId) => get(`/${type}${patientQuery(patientId)}`),
   create: (type, payload) => post(`/${type}`, payload)
+};
+
+export const safetyApi = {
+  advisory: (patientId, language = 'en') => get(`/safety/advisory?language=${encodeURIComponent(language)}${patientId ? `&patient_id=${encodeURIComponent(patientId)}` : ''}`)
 };
 
 export const guidanceApi = {
