@@ -30,12 +30,13 @@ export function SosModal({ onClose }) {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const caregiverName = 'Arjun Shah';
-  const caregiverPhone = '919810000002';
+  const caregiverName = session?.emergencyContactName || 'Family Caregiver';
+  const caregiverPhone = session?.emergencyContactPhone ? session.emergencyContactPhone.replace(/[^0-9]/g, '') : '';
+  const patientName = session?.name || 'Patient';
   const waMessage = encodeURIComponent(
-    `EMERGENCY MEDICAL SOS: Patient ${session?.name || 'Meera Shah'} needs immediate medical assistance! Please check HealthMitra immediately.`
+    `EMERGENCY MEDICAL SOS: Patient ${patientName} needs immediate medical assistance! Please check HealthMitra immediately.`
   );
-  const waUrl = `https://wa.me/${caregiverPhone}?text=${waMessage}`;
+  const waUrl = caregiverPhone ? `https://wa.me/${caregiverPhone}?text=${waMessage}` : `https://wa.me/?text=${waMessage}`;
 
   const send = async () => {
     setBusy(true);

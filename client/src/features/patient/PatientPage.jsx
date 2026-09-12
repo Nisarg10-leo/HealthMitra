@@ -36,18 +36,18 @@ export function PatientPage() {
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
 
-  const activePatient = dashboard?.patient || {
-    id: 'patient-1',
-    name: 'Meera Shah',
-    phone: '+919810000001',
-    email: 'meera@demo.health',
-    age: 68,
-    bloodGroup: 'O+',
-    conditions: ['Type 2 Diabetes', 'Hypertension (High BP)'],
-    allergies: ['Sulfa Drugs']
+  const activePatient = dashboard?.patient || patients?.find((p) => p.patient?.id === selectedPatientId)?.patient || {
+    id: selectedPatientId || '',
+    name: 'Patient',
+    phone: '',
+    email: '',
+    age: null,
+    bloodGroup: null,
+    conditions: [],
+    allergies: []
   };
 
-  const patientId = activePatient.id || selectedPatientId || 'patient-1';
+  const patientId = activePatient.id || selectedPatientId;
 
   const loadCheckups = async () => {
     if (!patientId) return;

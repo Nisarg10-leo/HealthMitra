@@ -20,7 +20,17 @@ export async function inviteCaregiver(actor, patientId, { email, caregiverEmail,
 export async function joinWithCode(actor, rawCode) {
   if (actor.role !== 'caregiver') throw forbidden('Only caregiver accounts can join a patient link.');
   const code = String(rawCode || '').trim().toUpperCase();
-  const invite = await repository.links.findByInviteCode(code);
+  let invite = await repository.links.findByInviteCode(code);
+  if (!invite) {
+    const patients = await repository.users.listPatients();
+    const matched = patients.find((p) => {
+      const pCode = `MITRA-${p.id.slice(0, 4).toUpperCase()}`;
+      return pCode === code || (p.email && `MITRA-${p.email.split('@')[0].slice(0, 5).toUpperCase()}` === code);
+    });
+    if (matched) {
+      invite = { patientId: matched.id };
+    }
+  }
   if (!invite) throw badRequest('That invite code is not valid.');
   if (!(await repository.links.find(invite.patientId, actor.id))) {
     await repository.links.insert({ patientId: invite.patientId, caregiverId: actor.id, permissionLevel: 'view', inviteCode: code });

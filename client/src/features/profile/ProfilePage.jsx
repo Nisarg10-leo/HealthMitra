@@ -1066,6 +1066,11 @@ function CaregiverProfileView({
   const [whatsappAlerts, setWhatsappAlerts] = useState(true);
   const [relation, setRelation] = useState('Son');
 
+  const { dashboard } = useWorkspace();
+  const linkedPatient = dashboard?.patient;
+  const pName = linkedPatient?.name || 'Connected Patient';
+  const pInitial = pName.charAt(0).toUpperCase();
+
   return (
     <div style={{ maxWidth: '860px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px', paddingBottom: '80px' }}>
       {/* Header Banner */}
@@ -1302,12 +1307,12 @@ function CaregiverProfileView({
               }}
               className="font-mono"
             >
-              M
+              {pInitial}
             </div>
             <div>
-              <strong style={{ fontSize: '1rem', color: '#ffffff' }}>Meera Shah</strong>
+              <strong style={{ fontSize: '1rem', color: '#ffffff' }}>{pName}</strong>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                Mother • Age 68 • Blood Group O+ • Type 2 Diabetes, Hypertension
+                {relation} • Active Health Plan Synchronized
               </div>
             </div>
           </div>

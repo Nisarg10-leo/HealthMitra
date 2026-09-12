@@ -3,6 +3,7 @@ export const navigationFor = (role, t) => (role === 'patient'
     { id: 'today', iconKey: 'calendar', label: t('today') },
     { id: 'medications', iconKey: 'pill', label: t('medications') },
     { id: 'caregiver', iconKey: 'shield', label: t('caregiver') || 'My Caregiver' },
+    { id: 'alerts', iconKey: 'bell', label: t('alerts') || 'Alerts' },
     { id: 'symptoms', iconKey: 'heart', label: t('symptoms') },
     { id: 'contacts', iconKey: 'phone', label: t('contacts') },
     { id: 'profile', iconKey: 'user', label: t('profile') || 'Profile' }

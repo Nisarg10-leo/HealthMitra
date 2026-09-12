@@ -48,16 +48,18 @@ export function AlertsPage() {
     }
   };
 
+  const activePatientName = dashboard?.patient?.name || session?.name || 'Patient';
+
   const getWhatsAppAlertUrl = (type, message) => {
     const text = encodeURIComponent(
-      `HealthMitra Caregiver Alert\nPatient: ${dashboard.patient.name || 'Meera Shah'}\nEvent: ${type.toUpperCase()}\nDetails: ${message}\nTime: ${new Date().toLocaleTimeString()}`
+      `HealthMitra Alert\nPatient: ${activePatientName}\nEvent: ${type.toUpperCase()}\nDetails: ${message || 'Please check HealthMitra portal.'}\nTime: ${new Date().toLocaleTimeString()}`
     );
     return `https://wa.me/?text=${text}`;
   };
 
   const getWhatsAppSosUrl = (event) => {
     const text = encodeURIComponent(
-      `CRITICAL EMERGENCY SOS: ${dashboard.patient.name || 'Meera Shah'} triggered an SOS!\nStatus: ${event.status.toUpperCase()}\nTime: ${formatDateTime(event.triggeredAt, i18n.language)}${event.locationUrl ? `\nMap: ${event.locationUrl}` : ''}`
+      `CRITICAL EMERGENCY SOS: ${activePatientName} triggered an SOS!\nStatus: ${event.status.toUpperCase()}\nTime: ${formatDateTime(event.triggeredAt, i18n.language)}${event.locationUrl ? `\nMap: ${event.locationUrl}` : ''}`
     );
     return `https://wa.me/?text=${text}`;
   };
@@ -70,7 +72,7 @@ export function AlertsPage() {
       <section className="page-intro-header">
         <div>
           <span className="chip-telemetry chip-cyan">
-            {t('caregiverView')}
+            {session?.role === 'caregiver' ? (t('caregiverView') || 'Caregiver Telemetry') : (t('patientMode') || 'Patient Telemetry')}
           </span>
           <h1 className="page-intro-title">
             {t('careUpdates')}
@@ -98,6 +100,7 @@ export function AlertsPage() {
         <div className="alerts-feed-stack">
           {alerts.map((item) => {
             const isSos = item.type === 'sos';
+            const alertText = item.message || item.body || '';
             return (
               <article
                 key={item.id}
@@ -116,9 +119,14 @@ export function AlertsPage() {
                       <span className="chip-telemetry chip-neutral font-mono">
                         {item.type}
                       </span>
+                      {activePatientName && (
+                        <span className="chip-telemetry chip-cyan font-mono" style={{ fontSize: '0.72rem' }}>
+                          {activePatientName}
+                        </span>
+                      )}
                     </div>
                     <p className="alert-body">
-                      {item.body}
+                      {alertText}
                     </p>
                     <span className="alert-timestamp font-mono">
                       {formatDateTime(item.createdAt, i18n.language)}
@@ -128,7 +136,7 @@ export function AlertsPage() {
 
                 <div className="alert-item-actions">
                   <a
-                    href={getWhatsAppAlertUrl(item.type, item.body)}
+                    href={getWhatsAppAlertUrl(item.type, alertText)}
                     target="_blank"
                     rel="noreferrer"
                     className="whatsapp-btn"

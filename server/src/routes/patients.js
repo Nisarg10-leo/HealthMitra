@@ -58,6 +58,15 @@ patientsRouter.get('/caregivers', asyncRoute(async (req, res) => {
   res.json(caregivers);
 }));
 
+patientsRouter.get('/patients/:id/invite-code', asyncRoute(async (req, res) => {
+  const patientId = resolveId(req.params.id);
+  await assertCanView(req.actor, patientId);
+  const links = await repository.links.forPatient(patientId);
+  const existingCode = links.find((l) => l.inviteCode)?.inviteCode;
+  const inviteCode = existingCode || `MITRA-${patientId.slice(0, 4).toUpperCase()}`;
+  res.json({ inviteCode });
+}));
+
 // Everyday Checkup routes
 patientsRouter.get('/patients/:id/checkups', asyncRoute(async (req, res) => {
   const patientId = resolveId(req.params.id);

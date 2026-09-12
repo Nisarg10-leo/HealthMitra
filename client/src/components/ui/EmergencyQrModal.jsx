@@ -6,8 +6,14 @@ import { CrossIcon, ShieldAlertIcon, PhoneIcon, PrinterIcon } from './Icons.jsx'
 export function EmergencyQrModal({ patient, medications, onClose }) {
   const { t } = useTranslation();
 
-  const medNames = (medications || []).map((m) => `${m.name} ${m.dosage}`).join(', ') || 'Metformin 500mg, Amlodipine 5mg';
-  const emergencyText = `HEALTHMITRA EMERGENCY MEDICAL ID\nPatient: ${patient?.name || 'Meera Shah'}\nBlood Group: O+\nKnown Allergies: Penicillin, Sulfa\nActive Prescriptions: ${medNames}\nPrimary Contact: Arjun Shah (+919810000002)\nDoctor: Dr. R. Nair (+919812345678)\nEmergency Hospital: Lilavati Hospital, Mumbai`;
+  const patientName = patient?.name || 'Patient';
+  const bloodGroup = patient?.bloodGroup || 'O+';
+  const allergies = patient?.allergies?.length ? patient.allergies.join(', ') : 'None listed';
+  const contactName = patient?.emergencyContactName || 'Family Caregiver';
+  const contactPhone = patient?.emergencyContactPhone || '+91 98100 00002';
+  const contactRel = patient?.emergencyContactRelation ? ` (${patient.emergencyContactRelation})` : '';
+  const medNames = (medications || []).map((m) => `${m.name} ${m.dosage}`).join(', ') || 'None scheduled';
+  const emergencyText = `HEALTHMITRA EMERGENCY MEDICAL ID\nPatient: ${patientName}\nBlood Group: ${bloodGroup}\nKnown Allergies: ${allergies}\nActive Prescriptions: ${medNames}\nPrimary Contact: ${contactName}${contactRel} (${contactPhone})`;
 
   const qrSvg = generateQrSvg(emergencyText, 160);
 
@@ -170,11 +176,11 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
                 <div>
-                  <strong style={{ color: '#ffffff', display: 'block' }}>Arjun Shah (Son)</strong>
-                  <span style={{ color: '#00f2fe' }}>+91 98100 00002</span>
+                  <strong style={{ color: '#ffffff', display: 'block' }}>{contactName}{contactRel}</strong>
+                  <span style={{ color: '#00f2fe' }}>{contactPhone}</span>
                 </div>
                 <a
-                  href="tel:+919810000002"
+                  href={`tel:${contactPhone.replace(/[^0-9+]/g, '')}`}
                   style={{
                     width: '32px',
                     height: '32px',
@@ -187,7 +193,7 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
                     color: '#00f2fe',
                     textDecoration: 'none'
                   }}
-                  title="Call Arjun Shah"
+                  title={`Call ${contactName}`}
                 >
                   <PhoneIcon size={16} />
                 </a>

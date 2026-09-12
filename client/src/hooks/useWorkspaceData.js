@@ -32,7 +32,7 @@ export function useWorkspaceData(session, notify) {
           setAlerts([]);
           return;
         }
-        const [nextDashboard, nextAlerts, nextNotifications] = await Promise.all([patientsApi.dashboard(patientId), alertsApi.list(), alertsApi.notifications()]);
+        const [nextDashboard, nextAlerts, nextNotifications] = await Promise.all([patientsApi.dashboard(patientId), alertsApi.list(patientId), alertsApi.notifications()]);
         if (!active) return;
         setDashboard(nextDashboard);
         setAlerts(nextAlerts);

@@ -18,10 +18,10 @@ import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 
 const MOODS = [
-  { id: 'great', label: 'Feeling Great', labelHi: 'बहुत अच्छा', color: 'var(--mint-bright)', icon: '😄' },
-  { id: 'good', label: 'Good & Active', labelHi: 'अच्छा और सक्रिय', color: 'var(--cyan)', icon: '🙂' },
-  { id: 'okay', label: 'Just Okay', labelHi: 'ठीक-ठाक', color: 'var(--amber)', icon: '😐' },
-  { id: 'unwell', label: 'Feeling Unwell', labelHi: 'अस्वस्थ', color: 'var(--coral)', icon: '🙁' }
+  { id: 'great', label: 'Feeling Great', labelHi: 'बहुत अच्छा', color: 'var(--mint-bright)' },
+  { id: 'good', label: 'Good & Active', labelHi: 'अच्छा और सक्रिय', color: 'var(--cyan)' },
+  { id: 'okay', label: 'Just Okay', labelHi: 'ठीक-ठाक', color: 'var(--amber)' },
+  { id: 'unwell', label: 'Feeling Unwell', labelHi: 'अस्वस्थ', color: 'var(--coral)' }
 ];
 
 export function CaregiverPage() {
@@ -48,17 +48,21 @@ export function CaregiverPage() {
   const [inviting, setInviting] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const connectCode = 'MITRA-4821';
+  const [connectCode, setConnectCode] = useState(() => `MITRA-${session.id.slice(0, 4).toUpperCase()}`);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [cgList, chkList] = await Promise.all([
+      const [cgList, chkList, codeRes] = await Promise.all([
         caregiversApi.list().catch(() => []),
-        checkupApi.list(session.id).catch(() => [])
+        checkupApi.list(session.id).catch(() => []),
+        patientsApi.getInviteCode(session.id).catch(() => null)
       ]);
       setCaregivers(cgList);
       setCheckups(chkList);
+      if (codeRes?.inviteCode) {
+        setConnectCode(codeRes.inviteCode);
+      }
     } catch (err) {
       console.error('Failed loading caregiver data:', err);
     } finally {
@@ -176,7 +180,7 @@ export function CaregiverPage() {
               Daily Well-Being & Checkup
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', margin: 0 }}>
-              Keep Arjun & Kavya informed with your daily mood, vitals, and comfort level.
+              Keep your connected caregivers informed with your daily mood, vitals, and comfort level.
             </p>
           </div>
 
@@ -212,9 +216,15 @@ export function CaregiverPage() {
           <div style={{ background: 'var(--paper)', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '16px', marginTop: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '1.5rem' }}>
-                  {MOODS.find((m) => m.id === todayCheckup.mood)?.icon || '😄'}
-                </span>
+                <span
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background: MOODS.find((m) => m.id === todayCheckup.mood)?.color || 'var(--mint-bright)',
+                    boxShadow: `0 0 10px ${MOODS.find((m) => m.id === todayCheckup.mood)?.color || 'var(--mint-bright)'}`
+                  }}
+                />
                 <div>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Mood</span>
                   <strong style={{ display: 'block', fontSize: '0.95rem', color: '#ffffff' }}>
@@ -292,7 +302,16 @@ export function CaregiverPage() {
                       transition: 'all 120ms ease'
                     }}
                   >
-                    <span style={{ fontSize: '1.2rem' }}>{m.icon}</span>
+                    <span
+                      style={{
+                        width: '9px',
+                        height: '9px',
+                        borderRadius: '50%',
+                        background: m.color,
+                        boxShadow: isSelected ? `0 0 8px ${m.color}` : 'none',
+                        flexShrink: 0
+                      }}
+                    />
                     <span>{i18n.language === 'hi' ? m.labelHi : m.label}</span>
                   </button>
                 );
@@ -393,9 +412,9 @@ export function CaregiverPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {caregivers.map((cg) => {
-            const isArjun = cg.email === 'arjun@demo.health' || cg.name?.includes('Arjun');
-            const relation = isArjun ? 'Son' : 'Daughter';
+          {caregivers.map((cg, idx) => {
+            const isAlt = idx % 2 === 1;
+            const relation = cg.relation || (cg.email === 'arjun@demo.health' ? 'Son' : cg.email === 'kavya@demo.health' ? 'Daughter' : 'Caregiver');
 
             return (
               <div
@@ -416,8 +435,8 @@ export function CaregiverPage() {
                       width: '44px',
                       height: '44px',
                       borderRadius: '50%',
-                      background: isArjun ? 'rgba(0, 242, 254, 0.12)' : 'rgba(139, 92, 246, 0.12)',
-                      color: isArjun ? 'var(--cyan)' : 'var(--violet)',
+                      background: isAlt ? 'rgba(139, 92, 246, 0.12)' : 'rgba(0, 242, 254, 0.12)',
+                      color: isAlt ? 'var(--violet)' : 'var(--cyan)',
                       display: 'grid',
                       placeItems: 'center',
                       fontSize: '1.1rem',

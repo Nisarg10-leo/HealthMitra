@@ -15,7 +15,8 @@ export const patientsApi = {
   dashboard: (patientId) => get(`/dashboard${patientQuery(patientId)}`),
   linkCaregiver: (patientId, email, permissionLevel) => post(`/patients/${patientId}/link-caregiver`, { email, permissionLevel }),
   joinWithCode: (code) => post('/links/join', { code }),
-  reassure: (patientId) => post(`/patients/${patientId}/reassure`)
+  reassure: (patientId) => post(`/patients/${patientId}/reassure`),
+  getInviteCode: (patientId) => get(`/patients/${patientId}/invite-code`)
 };
 
 export const medicationsApi = {
@@ -29,7 +30,7 @@ export const dosesApi = {
 };
 
 export const alertsApi = {
-  list: () => get('/alerts'),
+  list: (patientId) => get(`/alerts${patientId ? patientQuery(patientId) : ''}`),
   markRead: (id) => post(`/alerts/${id}/read`),
   notifications: () => get('/notifications'),
   markNotificationRead: (id) => post(`/notifications/${id}/read`)

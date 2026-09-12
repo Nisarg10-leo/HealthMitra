@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { guidanceApi } from '../../api/index.js';
+import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 import {
   AlertCircleIcon,
@@ -37,6 +38,7 @@ const HINDI_HINTS = {
 
 export function SymptomsPage() {
   const { t, i18n } = useTranslation();
+  const session = useSession();
   const { dashboard, notify, listen } = useWorkspace();
   const [symptom, setSymptom] = useState('');
   const [customText, setCustomText] = useState('');
@@ -45,8 +47,8 @@ export function SymptomsPage() {
   const [loading, setLoading] = useState(false);
   const [speaking, setSpeaking] = useState(false);
 
-  const caregiverName = 'Arjun Shah';
-  const caregiverPhone = '919810000002';
+  const caregiverName = session?.emergencyContactName || 'Family Caregiver';
+  const caregiverPhone = session?.emergencyContactPhone ? session.emergencyContactPhone.replace(/[^0-9]/g, '') : '';
   const patientId = dashboard?.patient?.id;
 
   const choosePreset = (value) => {
@@ -108,11 +110,11 @@ export function SymptomsPage() {
   };
 
   const getWhatsAppShareUrl = () => {
-    const pName = dashboard?.patient?.name || 'Meera Shah';
+    const pName = dashboard?.patient?.name || session?.name || 'Patient';
     const text = encodeURIComponent(
       `HealthMitra Clinical AI Update\nPatient: ${pName}\nReported Symptom: ${result?.symptom || symptom}\nSeverity: ${severe ? 'SEVERE' : 'MILD'}\n\nClinical Guidance:\n${result?.suggestion || ''}\n\nTime: ${new Date().toLocaleTimeString()}`
     );
-    return `https://wa.me/${caregiverPhone}?text=${text}`;
+    return caregiverPhone ? `https://wa.me/${caregiverPhone}?text=${text}` : `https://wa.me/?text=${text}`;
   };
 
   return (

@@ -49,8 +49,9 @@ export function TodayPage() {
       await sosApi.trigger(dashboard.patient.id, null);
       notify('Emergency assistance request sent to family caregivers');
       refresh();
+      const pName = dashboard?.patient?.name || 'Patient';
       const text = encodeURIComponent(
-        `EMERGENCY: Impact sensor registered a potential fall for ${dashboard.patient.name || 'Meera Shah'}. Immediate caregiver attention requested.`
+        `EMERGENCY: Impact sensor registered a potential fall for ${pName}. Immediate caregiver attention requested.`
       );
       window.open(`https://wa.me/?text=${text}`, '_blank');
     } catch (err) {
