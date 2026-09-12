@@ -113,18 +113,24 @@ Age: ${patient.age || 'Unknown'}
 Conditions: ${patient.conditions?.join(', ') || 'None recorded'}
 Allergies: ${patient.allergies?.join(', ') || 'None recorded'}` : '';
 
-  // 1. If GROQ_API_KEY is configured in environment, call Groq Llama 3.3 70B
+  // 1. Call AI model if GROQ_API_KEY is configured
   if (process.env.GROQ_API_KEY) {
     try {
-      const systemPrompt = `You are Mitra, an empathetic, conversational, and clinically rigorous geriatric medical assistant for elderly Indian patients. 
-Your goal is to provide thorough, detailed, and reassuring answers. Do not limit your responses to 100 words—take the space you need to explain things clearly.
+      const systemPrompt = `You are Mitra, an empathetic, warm, and clear medical assistant for patients.
+Patient Name: ${patient?.name || 'Patient'}
 ${patientProfile}
 Active Medications: ${medsSummary}
 
-Answer in simple, reassuring words in ${language === 'hi' ? 'Hindi' : 'English'}. Address food/drug safety, potential side effects, and practical tips. Always include a brief medical disclaimer to consult their doctor at the end.`;
+CRITICAL FORMATTING RULES:
+1. Do NOT use markdown symbols like hashtags (### or ##), divider lines (---), bold or italic asterisks (** or *), or pipe tables (|).
+2. Present all information in clean, natural, plain conversational paragraphs and simple numbered lists (1. 2. 3.) or clean bullet dashes (- ).
+3. Give thorough, clear, reassuring explanations without technical jargon or formatting symbols.
+4. Address food/drug safety, side effects, and practical home measures.
+5. Answer in ${language === 'hi' ? 'Hindi' : 'English'}.
+6. End with a simple, gentle reminder to check with their doctor.`;
 
       let answer = null;
-      const modelsToTry = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'llama-3.3-70b-versatile'];
+      const modelsToTry = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
 
       for (const model of modelsToTry) {
         try {
@@ -140,7 +146,7 @@ Answer in simple, reassuring words in ${language === 'hi' ? 'Hindi' : 'English'}
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: question }
               ],
-              temperature: 0.3,
+              temperature: 0.2,
               max_tokens: 1024
             })
           });
@@ -149,20 +155,34 @@ Answer in simple, reassuring words in ${language === 'hi' ? 'Hindi' : 'English'}
             const json = await response.json();
             answer = json.choices?.[0]?.message?.content;
             if (answer) {
+              // Strip any stray markdown symbols (###, ---, **, tables)
+              let cleanAnswer = answer
+                .replace(/^#{1,6}\s+/gm, '')
+                .replace(/^\s*[-*_]{3,}\s*$/gm, '')
+                .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+                .replace(/^[|\s]+|[|\s]+$/gm, '')
+                .replace(/\|\s*/g, ' - ')
+                .replace(/^[-\s]{4,}$/gm, '')
+                .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+
               return {
-                source: `groq-${model}`,
+                source: 'Mitra AI',
                 question,
-                answer,
-                disclaimer: language === 'hi' ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल सहायता के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।' : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
+                answer: cleanAnswer,
+                disclaimer: language === 'hi'
+                  ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल मार्गदर्शन के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
+                  : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
               };
             }
           }
         } catch (mErr) {
-          console.warn(`[groq] Model ${model} failed, trying next:`, mErr.message);
+          console.warn('[ai] Model attempt failed, trying fallback:', mErr.message);
         }
       }
     } catch (err) {
-      console.error('[groq] Groq API call failed:', err);
+      console.error('[ai] Service error:', err);
     }
   }
 
