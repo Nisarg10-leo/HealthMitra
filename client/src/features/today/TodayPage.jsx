@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dosesApi, guidanceApi, patientsApi, sosApi } from '../../api/index.js';
 import { DoseCelebration } from '../../components/ui/DoseCelebration.jsx';
-import { AdherenceHealthOrb } from '../../components/ui/AdherenceHealthOrb.jsx';
 import { useFallDetector } from '../../hooks/useFallDetector.js';
 import { useVoiceCompanion } from '../../hooks/useSpeech.js';
 import { isToday } from '../../utils/format.js';
@@ -128,44 +127,77 @@ export function TodayPage() {
         </div>
       )}
 
-      {/* ── 2. 3D Biometric Adherence Core ── */}
-      <AdherenceHealthOrb
-        score={adherenceScore}
-        streak={dashboard?.streak || 1}
-        weeklyLogs={dashboard?.logs || []}
-      />
-
-      {/* ── 3. Daily Schedule Telemetry & Quick Actions ── */}
-      <section className="hm-card" style={{ padding: '20px 22px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+      {/* ── 2. Senior-First Daily Medication Progress ── */}
+      <section
+        className="hm-card"
+        style={{
+          padding: '24px 26px',
+          background: 'linear-gradient(135deg, rgba(0, 210, 211, 0.08) 0%, var(--surface) 100%)',
+          border: '1px solid var(--surface-border)'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '18px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: '700' }}>
-                Daily Schedule Telemetry
-              </h3>
-              <span
-                className={`chip-telemetry ${complete ? 'chip-mint' : 'chip-cyan'}`}
-                style={{ fontSize: '0.68rem', padding: '2px 8px' }}
-              >
-                {complete ? 'COMPLETE' : 'IN PROGRESS'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span className={`chip-telemetry ${complete ? 'chip-mint' : 'chip-cyan'}`} style={{ fontSize: '0.8rem', padding: '3px 10px', fontWeight: '600' }}>
+                {complete ? '✓ All Doses Completed' : '⏳ Today\'s Doses in Progress'}
+              </span>
+              <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
+                {new Date().toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
             </div>
-            <p style={{ margin: '3px 0 0', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-              {today.taken} of {today.total} doses recorded for today
+            <h2 style={{ fontSize: '1.6rem', margin: '4px 0 6px', color: '#ffffff', fontWeight: '700' }}>
+              {t('patientToday') || 'Today\'s Medicine Schedule'}
+            </h2>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
+              {today.taken} of {today.total} medicines recorded for today.
+              {pendingDoses > 0 ? ` ${pendingDoses} dose${pendingDoses > 1 ? 's' : ''} remaining.` : ' All medicines completed on time!'}
             </p>
           </div>
 
           <button
             type="button"
             className="btn-glass"
-            style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+            style={{ padding: '10px 16px', fontSize: '0.9rem', borderRadius: '10px' }}
             onClick={() => openModal({ kind: 'emergencyQr', patient: dashboard.patient, medications: dashboard.medications })}
           >
-            🪪 {t('emergencyQrBtn')}
+            🪪 {t('emergencyQrBtn') || 'Show Medical Card'}
           </button>
         </div>
 
-        {/* Key Metrics Strip */}
+        {/* Clear High-Contrast Progress Bar */}
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
+            <span style={{ fontSize: '2rem', fontWeight: '700', color: complete ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
+              {adherenceScore}%
+            </span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              {complete ? '100% Target Met' : `${pendingDoses} more to go`}
+            </span>
+          </div>
+
+          <div
+            style={{
+              height: '12px',
+              width: '100%',
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '9999px',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${adherenceScore}%`,
+                background: complete ? 'var(--emerald)' : 'var(--cyan)',
+                borderRadius: '9999px',
+                transition: 'width 0.5s ease'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Big, Clear Metric Cards */}
         <div
           style={{
             display: 'grid',
@@ -174,38 +206,38 @@ export function TodayPage() {
           }}
         >
           <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
               Doses Taken
             </span>
-            <strong style={{ fontSize: '1.2rem', color: '#ffffff' }} className="font-mono">
-              {today.taken} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ {today.total}</span>
+            <strong style={{ fontSize: '1.3rem', color: '#ffffff' }} className="font-mono">
+              {today.taken} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ {today.total}</span>
             </strong>
           </div>
 
           <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Pending Doses
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Remaining Today
             </span>
-            <strong style={{ fontSize: '1.2rem', color: pendingDoses === 0 ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
+            <strong style={{ fontSize: '1.3rem', color: pendingDoses === 0 ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
               {pendingDoses}
             </strong>
           </div>
 
           <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Active Streak
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Routine Streak
             </span>
-            <strong style={{ fontSize: '1.2rem', color: '#ffffff' }} className="font-mono">
-              {dashboard.streak || 1} {t('dayStreak')}
+            <strong style={{ fontSize: '1.3rem', color: '#ffffff' }} className="font-mono">
+              🔥 {dashboard.streak || 1} {t('dayStreak')}
             </strong>
           </div>
 
           <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Regimen Safety
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Safety Check
             </span>
-            <strong style={{ fontSize: '0.92rem', color: 'var(--mint-bright)', fontWeight: '600' }}>
-              ✓ Verified Safe
+            <strong style={{ fontSize: '0.95rem', color: 'var(--mint-bright)', fontWeight: '600' }}>
+              ✓ All Safe
             </strong>
           </div>
         </div>

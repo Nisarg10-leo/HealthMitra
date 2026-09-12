@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { medicationsApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
@@ -23,6 +23,8 @@ export function MedicinesPage() {
       notify(requestError.message);
     }
   };
+
+  const [activeSlot, setActiveSlot] = useState('all');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>

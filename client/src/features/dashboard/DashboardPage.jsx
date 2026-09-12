@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AdherenceHealthOrb } from '../../components/ui/AdherenceHealthOrb.jsx';
 import { formatTime, isToday } from '../../utils/format.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 import { AdherenceChart } from './AdherenceChart.jsx';
@@ -273,12 +272,50 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* ── 3. Adherence Centerpiece ── */}
-      <AdherenceHealthOrb
-        score={dashboard.today.score}
-        streak={dashboard.streak}
-        weeklyLogs={dashboard.logs}
-      />
+      {/* ── 3. Patient Routine & Adherence Overview ── */}
+      <section
+        className="hm-card"
+        style={{
+          padding: '22px 26px',
+          background: 'linear-gradient(135deg, rgba(0, 210, 211, 0.06) 0%, var(--surface) 100%)'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              DAILY CAREGIVER MONITORING
+            </span>
+            <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', color: '#ffffff', fontWeight: '700' }}>
+              {activePatient.name}'s Routine Compliance
+            </h3>
+          </div>
+          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.78rem', padding: '3px 10px' }}>
+            ✓ {dashboard.streak} Days Routine Active
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Daily Score</span>
+            <strong style={{ fontSize: '1.8rem', color: 'var(--cyan)' }} className="font-mono">{dashboard.today.score}%</strong>
+            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Optimal adherence threshold</small>
+          </div>
+          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Today's Doses</span>
+            <strong style={{ fontSize: '1.8rem', color: '#ffffff' }} className="font-mono">{dashboard.today.taken} / {dashboard.today.total}</strong>
+            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Recorded by patient</small>
+          </div>
+          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Next Scheduled Dose</span>
+            <strong style={{ fontSize: '1.8rem', color: '#34d399' }} className="font-mono">
+              {dashboard.logs?.find(l => l.status === 'pending')?.scheduledTime
+                ? formatTime(dashboard.logs.find(l => l.status === 'pending').scheduledTime, i18n.language)
+                : 'All Done'}
+            </strong>
+            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Automated reminder active</small>
+          </div>
+        </div>
+      </section>
 
       {/* ── 4. Clinical Safety & Polypharmacy Matrix ── */}
       <section className="hm-card" style={{ padding: '20px 24px' }}>

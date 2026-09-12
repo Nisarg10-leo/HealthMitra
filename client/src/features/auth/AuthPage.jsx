@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authApi } from '../../api/index.js';
-import { CinematicSunHero } from '../../components/ui/CinematicSunHero.jsx';
 import { ErrorText } from '../../components/ui/ErrorText.jsx';
 import { useAsyncAction } from '../../hooks/useAsyncAction.js';
 
@@ -144,31 +143,29 @@ export function AuthPage({ onLogin }) {
 
   return (
     <main className="auth">
-      {/* Sub-surface Ambient Luminescence */}
-      <div className="sub-luminescence-cyan" />
-      <div className="sub-luminescence-violet" />
-
       <section className="brand-panel">
-        <CinematicSunHero />
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <p className="eyebrow" style={{ color: '#00f2fe', letterSpacing: '0.14em', fontWeight: '700' }}>
-            HEALTHMITRA • VITALIS NEURAL PLATFORM
-          </p>
-          <h1 style={{ fontSize: '3rem', lineHeight: '1.08', margin: '8px 0 16px', color: '#ffffff' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(0, 210, 211, 0.12)', border: '1px solid var(--cyan-border)', borderRadius: '999px', marginBottom: '18px' }}>
+            <span style={{ fontSize: '1.2rem', color: 'var(--cyan)' }}>✚</span>
+            <span style={{ color: 'var(--cyan)', letterSpacing: '0.06em', fontWeight: '700', fontSize: '0.85rem' }}>
+              HEALTHMITRA : FAMILY CARE
+            </span>
+          </div>
+          <h1 style={{ fontSize: '2.5rem', lineHeight: '1.18', margin: '8px 0 16px', color: '#ffffff', fontWeight: '700' }}>
             {t('brandTitle')}<br />
-            <em style={{ color: '#00f2fe', fontStyle: 'normal' }}>{t('brandTitleAccent')}</em>
+            <span style={{ color: 'var(--cyan)', fontWeight: '700' }}>{t('brandTitleAccent')}</span>
           </h1>
-          <p style={{ color: '#b9cacb', fontSize: '1.05rem', lineHeight: '1.6', maxWidth: '480px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6', maxWidth: '480px' }}>
             {t('brandDescription')}
           </p>
-          <div className="trust" style={{ color: '#6ffbbe', marginTop: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span aria-hidden="true" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6ffbbe', display: 'inline-block', boxShadow: '0 0 8px #6ffbbe' }} />
-            256-bit HIPAA compliant family health network
+          <div style={{ color: '#34d399', marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
+            <span aria-hidden="true" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
+            Private & Secure Family Health Network
           </div>
-          <div className="brand-pills" style={{ marginTop: '24px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="chip-telemetry chip-cyan">Voice-assisted</span>
-            <span className="chip-telemetry chip-violet">Caregiver loop</span>
-            <span className="chip-telemetry chip-mint">English + हिन्दी</span>
+          <div className="brand-pills" style={{ marginTop: '22px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>🎙️ Voice-assisted for Seniors</span>
+            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>👨‍👩‍👧 Family Caregiver Alerts</span>
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>🇮🇳 English + हिन्दी</span>
           </div>
         </div>
       </section>
