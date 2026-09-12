@@ -9,7 +9,7 @@ import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 import { DoseCard } from './DoseCard.jsx';
 
 export function TodayPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { dashboard, refresh, notify, listen, openModal, triggerAlarm } = useWorkspace();
   const [reassuranceSent, setReassuranceSent] = useState(false);
   const [celebratingMed, setCelebratingMed] = useState(null);
