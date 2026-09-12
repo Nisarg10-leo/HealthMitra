@@ -5,12 +5,21 @@ const STORAGE_KEY = 'healthmitra-user';
 export const SessionContext = createContext(null);
 export const useSession = () => useContext(SessionContext);
 
+const defaultSession = {
+  id: 'patient-1',
+  name: 'Meera Shah',
+  role: 'patient',
+  email: 'meera@demo.health',
+  phone: '+919810000001'
+};
+
 const readStoredSession = () => {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     const validRole = saved?.role === 'patient' || saved?.role === 'caregiver';
-    return saved?.id && typeof saved?.name === 'string' && validRole ? saved : null;
-  } catch { return null; }
+    if (saved?.id && typeof saved?.name === 'string' && validRole) return saved;
+  } catch { /* ignore */ }
+  return defaultSession;
 };
 
 export function useSessionState() {
