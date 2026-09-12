@@ -594,19 +594,38 @@ export function TodayPage() {
 
       {/* ── 5. Chronological Health Timeline Spine (Prescription Schedule) ── */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: '#00f2fe', fontSize: '1.1rem' }}>⏱</span>
             <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>
               {t('today')}
             </h3>
           </div>
-          <span
-            className="chip-telemetry"
-            style={{ fontSize: '0.72rem', color: '#94a3b8' }}
-          >
-            {logs.length} DOSES LOGGED
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              className="chip-telemetry"
+              style={{ fontSize: '0.72rem', color: '#94a3b8' }}
+            >
+              {logs.length} DOSES LOGGED
+            </span>
+            <button
+              type="button"
+              className="btn-glass"
+              style={{
+                padding: '6px 12px',
+                fontSize: '0.8rem',
+                color: '#00f2fe',
+                borderColor: 'rgba(0, 242, 254, 0.3)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              onClick={() => openModal({ kind: 'medicine' })}
+            >
+              <span>＋</span>
+              <span>{t('addMedicine')}</span>
+            </button>
+          </div>
         </div>
 
         {/* Timeline List */}
@@ -633,7 +652,31 @@ export function TodayPage() {
               />
             ))
           ) : (
-            <Empty text="No medicines scheduled for today." />
+            <div
+              className="glass-matrix"
+              style={{
+                padding: '36px 20px',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px'
+              }}
+            >
+              <span style={{ fontSize: '2rem' }}>💊</span>
+              <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.9rem' }}>
+                No medicines scheduled for today.
+              </p>
+              <button
+                type="button"
+                className="btn-cyber"
+                style={{ padding: '10px 18px', fontSize: '0.88rem' }}
+                onClick={() => openModal({ kind: 'medicine' })}
+              >
+                <span>＋</span>
+                <span>{t('addMedicine')}</span>
+              </button>
+            </div>
           )}
         </div>
       </section>

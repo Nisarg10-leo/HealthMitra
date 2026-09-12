@@ -1,4 +1,5 @@
 import React from 'react';
+import { ErrorBoundary } from './components/ui/ErrorBoundary.jsx';
 import { AuthPage } from './features/auth/AuthPage.jsx';
 import { SessionContext, useSessionState } from './hooks/useSession.js';
 import { Workspace } from './workspace/Workspace.jsx';
@@ -7,5 +8,11 @@ import { Workspace } from './workspace/Workspace.jsx';
 export default function App() {
   const { session, signIn, signOut } = useSessionState();
   if (!session) return <AuthPage onLogin={signIn} />;
-  return <SessionContext.Provider value={session}><Workspace onLogout={signOut} /></SessionContext.Provider>;
+  return (
+    <ErrorBoundary>
+      <SessionContext.Provider value={session}>
+        <Workspace onLogout={signOut} />
+      </SessionContext.Provider>
+    </ErrorBoundary>
+  );
 }
