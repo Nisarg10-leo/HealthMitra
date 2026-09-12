@@ -26,11 +26,9 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
   };
 
   useEffect(() => {
-    // 1. Play immediate chime + announce
     playAlarmChime();
     setTimeout(announceAlarm, 700);
 
-    // 2. Repeat gentle chime every 10 seconds while alarm is active
     intervalRef.current = setInterval(() => {
       playAlarmChime();
     }, 10_000);
@@ -47,12 +45,9 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
       aria-modal="true"
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.75)',
-        backdropFilter: 'blur(6px)',
+        inset: 0,
+        backgroundColor: 'rgba(5, 8, 14, 0.88)',
+        backdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -61,52 +56,126 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
       }}
     >
       <div
+        className="glass-matrix"
         style={{
-          background: '#ffffff',
-          borderRadius: '20px',
           maxWidth: '460px',
           width: '100%',
-          padding: '28px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          padding: '32px 28px',
           textAlign: 'center',
-          animation: 'popIn 0.3s ease-out'
+          position: 'relative',
+          border: '1px solid rgba(239, 68, 68, 0.4)',
+          boxShadow: '0 0 50px rgba(239, 68, 68, 0.25)',
+          overflow: 'hidden'
         }}
       >
-        {/* Pulsing Alarm Header */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '72px', height: '72px', borderRadius: '50%', background: '#fee2e2', color: '#ef4444', fontSize: '32px', marginBottom: '16px', boxShadow: '0 0 0 8px rgba(239, 68, 68, 0.15)' }}>
-          🔔
+        {/* Radiating Concentric Sonar Ripple Rings */}
+        <div style={{ position: 'relative', width: '100px', height: '100px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="sonar-ring ring-1" />
+          <span className="sonar-ring ring-2" />
+          <span className="sonar-ring ring-3" />
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '76px',
+              height: '76px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1))',
+              border: '2px solid #ef4444',
+              color: '#ffb4ab',
+              fontSize: '34px',
+              boxShadow: '0 0 24px rgba(239, 68, 68, 0.5)',
+              animation: 'bellTink 1.2s ease-in-out infinite'
+            }}
+          >
+            🔔
+          </div>
         </div>
 
-        <span style={{ display: 'inline-block', background: '#fee2e2', color: '#b91c1c', fontSize: '0.8em', fontWeight: '700', padding: '4px 12px', borderRadius: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+        <span className="chip-telemetry chip-error" style={{ fontSize: '0.74rem', marginBottom: '8px', padding: '3px 12px' }}>
           Medicine Reminder Alarm
         </span>
 
-        <h2 style={{ fontSize: '1.6em', color: '#0f172a', margin: '4px 0 6px' }}>
+        <style>{`
+          .sonar-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, 0.45);
+            pointer-events: none;
+            animation: sonarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+          }
+          .ring-1 { width: 76px; height: 76px; animation-delay: 0s; }
+          .ring-2 { width: 76px; height: 76px; animation-delay: 0.6s; }
+          .ring-3 { width: 76px; height: 76px; animation-delay: 1.2s; }
+          @keyframes sonarPulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            100% { transform: scale(2.2); opacity: 0; }
+          }
+          @keyframes bellTink {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            15% { transform: rotate(-10deg) scale(1.05); }
+            30% { transform: rotate(10deg) scale(1.05); }
+            45% { transform: rotate(-5deg); }
+            60% { transform: rotate(5deg); }
+            75% { transform: rotate(0deg); }
+          }
+        `}</style>
+
+        <h2 style={{ fontSize: '1.6rem', color: '#ffffff', margin: '4px 0 6px' }}>
           {medication?.name || t('medication')}
         </h2>
-        <p style={{ fontSize: '1.15em', color: '#475569', fontWeight: '500', margin: '0 0 12px' }}>
+        <p style={{ fontSize: '1.1rem', color: '#00f2fe', fontWeight: '600', margin: '0 0 14px' }}>
           {medication?.dosage} · {formatTime(dose?.scheduledTime, i18n.language)}
         </p>
 
-        {/* Pill pill preview tag */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: medication?.color || '#4f67d8' }} />
-          <span style={{ fontSize: '0.88em', color: '#334155' }}>Prescribed Dose</span>
+        {/* Pill color preview tag */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            background: 'rgba(10, 14, 23, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            marginBottom: '16px'
+          }}
+        >
+          <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: medication?.color || '#00f2fe', boxShadow: `0 0 8px ${medication?.color || '#00f2fe'}` }} />
+          <span style={{ fontSize: '0.84rem', color: '#dfe2ef' }}>Prescribed Dose</span>
         </div>
 
         {/* Dietary note if available */}
         {medication?.safety && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px', margin: '0 0 20px', fontSize: '0.88em', color: '#166534', textAlign: 'left', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '1.2em' }}>{medication.safety.icon}</span>
+          <div
+            style={{
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: '10px',
+              padding: '10px 14px',
+              margin: '0 0 20px',
+              fontSize: '0.88rem',
+              color: '#6ffbbe',
+              textAlign: 'left',
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'flex-start'
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>{medication.safety.icon}</span>
             <span>{medication.safety.instruction}</span>
           </div>
         )}
 
-        {/* Large Accessible Action Buttons */}
+        {/* Action Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
           <button
             type="button"
-            style={{ background: '#16a34a', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '1.1em', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(22, 163, 74, 0.3)' }}
+            className="btn-cyber"
+            style={{ width: '100%', padding: '14px', fontSize: '1.05rem' }}
             onClick={() => {
               if (intervalRef.current) clearInterval(intervalRef.current);
               onConfirm(dose, 'taken');
@@ -118,7 +187,8 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               type="button"
-              style={{ flex: 1, background: '#f8fafc', color: '#475569', border: '1px solid #cbd5e1', padding: '11px', borderRadius: '10px', fontSize: '0.95em', fontWeight: '600', cursor: 'pointer' }}
+              className="btn-glass"
+              style={{ flex: 1, padding: '12px' }}
               onClick={() => {
                 if (intervalRef.current) clearInterval(intervalRef.current);
                 onSnooze(dose);
@@ -126,9 +196,11 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             >
               ⏰ Snooze 5m
             </button>
+
             <button
               type="button"
-              style={{ flex: 1, background: '#f8fafc', color: '#64748b', border: '1px solid #cbd5e1', padding: '11px', borderRadius: '10px', fontSize: '0.95em', fontWeight: '600', cursor: 'pointer' }}
+              className="btn-glass"
+              style={{ flex: 1, padding: '12px', color: '#94a3b8' }}
               onClick={() => {
                 if (intervalRef.current) clearInterval(intervalRef.current);
                 onConfirm(dose, 'skipped');

@@ -1,0 +1,556 @@
+/* Vitalis Neural Health Design System for HealthMitra */
+
+:root {
+  --canvas: #080c15;
+  --canvas-deep: #05080e;
+  --surface: #0f131c;
+  --surface-dim: #0a0e17;
+  --surface-container-low: #181b25;
+  --surface-container: #1c1f29;
+  --surface-container-high: #262a34;
+  --surface-container-highest: #31353f;
+  
+  --on-surface: #dfe2ef;
+  --on-surface-variant: #94a3b8;
+  --outline: #849495;
+  --outline-variant: #3a494b;
+
+  --cyan: #00f2fe;
+  --cyan-grad: #4facfe;
+  --cyan-dim: #00dce6;
+  --cyan-container: rgba(0, 242, 254, 0.15);
+  
+  --violet: #8b5cf6;
+  --violet-dim: #d0bcff;
+  --violet-container: rgba(139, 92, 246, 0.15);
+
+  --mint: #10b981;
+  --mint-bright: #6ffbbe;
+  --mint-dim: #4edea3;
+  --mint-container: rgba(16, 185, 129, 0.15);
+
+  --error: #ffb4ab;
+  --error-container: rgba(255, 180, 171, 0.15);
+  --error-solid: #ef4444;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--on-surface);
+  background-color: var(--canvas);
+}
+
+/* Base Body & Reset */
+body.bg-vitalis, body {
+  margin: 0;
+  background-color: var(--canvas);
+  color: var(--on-surface);
+  font-family: 'Inter', sans-serif;
+  font-feature-settings: 'tnum' on, 'cv02' on, 'cv03' on, 'cv04' on;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-top: 0;
+}
+
+/* Material Symbols alignment */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Keyframe Animations */
+@keyframes orbRotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ecgScroll {
+  0% { stroke-dashoffset: 240; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes pingPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.04); }
+}
+
+.animate-orb {
+  animation: orbRotate 12s linear infinite;
+}
+
+.animate-ecg {
+  stroke-dasharray: 240;
+  animation: ecgScroll 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-ping {
+  animation: pingPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Ambient Luminescence Sub-surface Orbs */
+.sub-luminescence-cyan {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, rgba(0, 242, 254, 0) 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sub-luminescence-violet {
+  position: fixed;
+  top: 35%;
+  right: -100px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.09) 0%, rgba(139, 92, 246, 0) 70%);
+  filter: blur(110px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sub-luminescence-mint {
+  position: fixed;
+  bottom: 50px;
+  left: -80px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.07) 0%, rgba(16, 185, 129, 0) 70%);
+  filter: blur(110px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glass Matrix Containers */
+.glass-matrix {
+  background: rgba(13, 21, 39, 0.72) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+  border-radius: 20px !important;
+  color: var(--on-surface) !important;
+}
+
+.glass-matrix-active {
+  background: rgba(20, 30, 55, 0.85) !important;
+  border: 1px solid rgba(0, 242, 254, 0.35) !important;
+  box-shadow: 0 0 24px rgba(0, 242, 254, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.glass-matrix-hover:hover {
+  border-color: rgba(0, 242, 254, 0.35) !important;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.12) !important;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Cyber Gradient Buttons */
+.btn-cyber {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
+  color: #090d16 !important;
+  font-weight: 700 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 10px 18px !important;
+  font-size: 0.92rem !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-cyber:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(0, 242, 254, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-cyber:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+.btn-cyber:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* Secondary Glass Button */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  padding: 10px 18px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-glass:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(0, 242, 254, 0.3) !important;
+  color: var(--cyan) !important;
+}
+
+/* Danger / SOS Red Button */
+.btn-emergency {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #ffb4ab !important;
+  border: 1px solid rgba(255, 180, 171, 0.35) !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.25) !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-emergency:hover {
+  background: rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Telemetry Chips */
+.chip-telemetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.chip-cyan {
+  background: rgba(0, 242, 254, 0.12);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+}
+
+.chip-mint {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--mint-bright);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.chip-violet {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--violet-dim);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.chip-error {
+  background: rgba(255, 180, 171, 0.15);
+  color: var(--error);
+  border: 1px solid rgba(255, 180, 171, 0.3);
+}
+
+/* Dark Form Controls */
+input, select, textarea {
+  background: rgba(9, 13, 22, 0.7) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  outline: none !important;
+  font-family: inherit !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--cyan) !important;
+  box-shadow: 0 0 0 1px var(--cyan), 0 0 12px rgba(0, 242, 254, 0.25) !important;
+}
+
+/* App Shell Overrides */
+.shell {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--canvas) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  width: 260px;
+  background: rgba(10, 14, 23, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.sidebar .logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 8px 36px;
+}
+
+.sidebar .logo b {
+  color: var(--cyan);
+}
+
+.sidebar nav {
+  display: grid;
+  gap: 6px;
+}
+
+.sidebar nav button {
+  position: relative;
+  text-align: left;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+}
+
+.sidebar nav button:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+
+.sidebar nav button.selected {
+  background: rgba(0, 242, 254, 0.12) !important;
+  color: var(--cyan) !important;
+  border: 1px solid rgba(0, 242, 254, 0.3) !important;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.15) !important;
+}
+
+.sidebar nav button i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffb4ab;
+  position: absolute;
+  right: 14px;
+  top: 18px;
+  box-shadow: 0 0 6px #ffb4ab;
+}
+
+.content {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 40px 90px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  margin-bottom: 28px;
+  background: rgba(13, 21, 39, 0.7) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Auth Page Overrides */
+.auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: var(--canvas) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-panel {
+  background: linear-gradient(135deg, #090e18 0%, #0d1527 50%, #16122f 100%) !important;
+  color: #ffffff !important;
+  padding: 8vh 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-card {
+  width: min(460px, calc(100% - 48px));
+  margin: auto;
+  padding: 2.5rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 242, 254, 0.4);
+}
+
+/* Universal Modals in Vitalis Dark Glass */
+.overlay {
+  background: rgba(5, 8, 14, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  z-index: 1000 !important;
+}
+
+.modal {
+  background: rgba(13, 21, 39, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  color: var(--on-surface) !important;
+}
+
+.modal h2, .modal h3 {
+  color: #ffffff !important;
+}
+
+.modal .close {
+  color: #94a3b8 !important;
+}
+
+.modal .close:hover {
+  color: var(--cyan) !important;
+}
+
+/* Secondary Pages: Medicines, Contacts, Alerts, Symptoms */
+.medicine,
+.symptom-card,
+.contact-sections section,
+.alerts article,
+.sos-history article,
+.hero-card,
+.tip,
+.patient-banner,
+.compact-list > div,
+.history-list > div,
+.linked-patients {
+  background: rgba(13, 21, 39, 0.72) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  color: var(--on-surface) !important;
+}
+
+.medicine h3,
+.symptom-card h3,
+.contact-sections section h3,
+.alerts article h3,
+.patient-banner h2 {
+  color: #ffffff !important;
+}
+
+.contact {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.contact a {
+  color: var(--cyan) !important;
+}
+
+.time-chips span {
+  background: rgba(0, 242, 254, 0.1) !important;
+  color: var(--cyan) !important;
+  border: 1px solid rgba(0, 242, 254, 0.25) !important;
+}
+
+.symptom-options button {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--on-surface) !important;
+}
+
+.symptom-options .chosen {
+  background: rgba(0, 242, 254, 0.15) !important;
+  border-color: var(--cyan) !important;
+  color: var(--cyan) !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2) !important;
+}
+
+.guidance {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #6ffbbe !important;
+}
+
+.guidance.urgent {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #ffb4ab !important;
+}
+
+.toast {
+  background: rgba(13, 21, 39, 0.95) !important;
+  border: 1px solid var(--cyan) !important;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.3) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(16px) !important;
+}
+

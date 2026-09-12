@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 
 const en = {
   brandTitle: 'Health support,', brandTitleAccent: 'close to home.', brandDescription: 'Simple medicine care for you. Quiet confidence for the people who love you.', privacyNote: 'Private, family-only health updates', pillVoice: 'Voice-friendly', pillCare: 'Caregiver loop', pillBilingual: 'English + हिन्दी',
-  welcomeLabel: 'Welcome back', newAccountLabel: 'Get started', welcomeBack: 'Welcome back', createAccount: 'Create your account', signInSubtitle: 'Sign in to your health companion.', accountSubtitle: 'Choose how you will use HealthMitra.', chooseRole: 'Choose a role', patient: 'Patient', caregiver: 'Caregiver', name: 'Your name', namePlaceholder: 'Full name', phone: 'Phone number', email: 'Email address', password: 'Password', pleaseWait: 'Please wait…', signIn: 'Sign in', tryDemo: 'Try the demo', patientDemo: 'Patient: Meera', caregiverDemo: 'Caregiver: Arjun', newToHealthMitra: 'New to HealthMitra?', alreadyAccount: 'Already have an account?', prototypeNote: 'Academic prototype · Demo data only',
+  welcomeLabel: 'Welcome back', newAccountLabel: 'Get started', welcomeBack: 'Welcome back', createAccount: 'Create your account', signInSubtitle: 'Sign in to your health companion.', accountSubtitle: 'Choose how you will use HealthMitra.', chooseRole: 'Choose a role', patient: 'Patient', caregiver: 'Caregiver', name: 'Your name', namePlaceholder: 'Full name', phone: 'Phone number', email: 'Email address', password: 'Password', pleaseWait: 'Please wait…', signIn: 'Sign in', newToHealthMitra: 'New to HealthMitra?', alreadyAccount: 'Already have an account?',
   patientMode: 'Patient mode', caregiverMode: 'Caregiver mode', mainNavigation: 'Main navigation', language: 'Language', logout: 'Log out', greeting: 'Good morning', watching: 'Watching', sos: 'Emergency SOS', noLinkedPatients: 'No linked patients yet.', loadingPlan: 'Loading your health plan…', joinWithCode: 'Join with code', dismiss: 'Dismiss',
   voiceUnsupported: 'Voice recognition is not supported by this browser.', voiceTryAgain: 'I could not hear that. Please try again.', listening: 'Listening…', voiceUnclear: 'I could not understand a yes or no response.', today: "Today's medicines", medications: 'Medicines', symptoms: 'Symptoms', contacts: 'Contacts', dashboard: 'Dashboard', history: 'History', alerts: 'Alerts', patientToday: 'Your routine', reassurance: 'You are doing great. One step at a time.', allCaughtUp: 'All caught up for today!', dosesComplete: '{{taken}} of {{total}} doses complete', tapAfterTaking: 'Tap a medicine after you take it.', complete: 'complete', missedDoseTitle: 'A dose needs attention', missedDoseBody: 'A caregiver has been notified so they can check in.', noMeds: 'No medicines scheduled', needHelp: 'Need urgent help?', sosDescription: 'Alert connected caregivers and share location.', addMedicine: 'Add medicine', keepScheduleCurrent: 'Keep the schedule current.', consistencyTipTitle: 'A little consistency goes a long way.', consistencyTipBody: 'Taking medicines at the same time each day helps build a healthy routine.', medication: 'Medication', sayIt: 'Say it', taken: 'Taken', skipped: 'Skipped', missed: 'Missed', pending: 'Pending', voice: 'voice',
   caregiverView: 'Caregiver view', dashboardSubtitle: 'A calm, clear view of your loved one’s routine.', linkedPatients: 'Linked patients', selectPatient: 'Select a patient to view their plan.', todayAdherence: 'today adherence', yourLovedOne: 'YOUR LOVED ONE', needsAttention: 'Needs attention', doingWell: 'Doing well today', dayStreak: 'day streak', todaysAdherence: "Today's adherence", dosesTaken: 'Doses taken', openAlerts: 'Open alerts', weeklyAdherence: 'Weekly adherence', weeklySubtitle: 'A simple view of the last 7 days.', todaysSchedule: "Today's schedule", liveSchedule: 'Live status from the patient plan.',
@@ -45,13 +45,22 @@ const en = {
   scanSuccess: 'Details extracted from packaging!',
   scanTip: 'Upload or snap a photo of the medicine strip or box label.',
   testAlarmBtn: 'Test Medicine Alarm',
-  testAlarmDesc: 'Listen to chime & voice announcement.'
+  testAlarmDesc: 'Listen to chime & voice announcement.',
+  askMitraBtn: '🧠 Ask Mitra Anything',
+  askMitraDesc: 'Clinical AI Medical & Food Safety Reasoning',
+  emergencyQrBtn: '🪪 Emergency QR ID',
+  emergencyQrDesc: 'Printable fridge card with blood group & allergies',
+  fallGuardBtn: '🛡️ Fall & Distress Guard',
+  fallGuardActive: 'Listening for ambient impact spikes or distress cries...',
+  fallGuardInactive: 'Real-time Web Audio FFT acoustic monitoring',
+  verifyPill: 'Verify Pill',
+  whatsappEscalate: 'WhatsApp'
 };
 
 const hi = {
   ...en,
   brandTitle: 'स्वास्थ्य सहायता,', brandTitleAccent: 'घर के पास।', brandDescription: 'आपके लिए आसान दवा देखभाल। परिवार के लिए मन की शांति।', privacyNote: 'निजी, केवल परिवार के स्वास्थ्य अपडेट', pillVoice: 'आवाज़ से आसान', pillCare: 'परिवार जुड़ा', pillBilingual: 'English + हिन्दी',
-  welcomeLabel: 'वापस स्वागत है', newAccountLabel: 'शुरू करें', welcomeBack: 'वापस स्वागत है', createAccount: 'खाता बनाएँ', signInSubtitle: 'अपने हेल्थ कम्पैनियन में साइन इन करें।', accountSubtitle: 'चुनें कि आप HealthMitra का उपयोग कैसे करेंगे।', chooseRole: 'भूमिका चुनें', patient: 'मरीज़', caregiver: 'देखभालकर्ता', name: 'आपका नाम', namePlaceholder: 'पूरा नाम', phone: 'फ़ोन नंबर', email: 'ईमेल पता', password: 'पासवर्ड', pleaseWait: 'कृपया प्रतीक्षा करें…', signIn: 'साइन इन', tryDemo: 'डेमो आज़माएँ', patientDemo: 'मरीज़: मीरा', caregiverDemo: 'देखभालकर्ता: अर्जुन', newToHealthMitra: 'HealthMitra में नए हैं?', alreadyAccount: 'पहले से खाता है?', prototypeNote: 'शैक्षणिक प्रोटोटाइप · केवल डेमो डेटा',
+  welcomeLabel: 'वापस स्वागत है', newAccountLabel: 'शुरू करें', welcomeBack: 'वापस स्वागत है', createAccount: 'खाता बनाएँ', signInSubtitle: 'अपने हेल्थ कम्पैनियन में साइन इन करें।', accountSubtitle: 'चुनें कि आप HealthMitra का उपयोग कैसे करेंगे।', chooseRole: 'भूमिका चुनें', patient: 'मरीज़', caregiver: 'देखभालकर्ता', name: 'आपका नाम', namePlaceholder: 'पूरा नाम', phone: 'फ़ोन नंबर', email: 'ईमेल पता', password: 'पासवर्ड', pleaseWait: 'कृपया प्रतीक्षा करें…', signIn: 'साइन इन', newToHealthMitra: 'HealthMitra में नए हैं?', alreadyAccount: 'पहले से खाता है?',
   patientMode: 'मरीज़ मोड', caregiverMode: 'देखभालकर्ता मोड', mainNavigation: 'मुख्य नेविगेशन', language: 'भाषा', logout: 'लॉग आउट', greeting: 'सुप्रभात', watching: 'देख रहे हैं', sos: 'आपातकालीन SOS', noLinkedPatients: 'अभी कोई मरीज़ लिंक नहीं है।', loadingPlan: 'आपका हेल्थ प्लान लोड हो रहा है…', joinWithCode: 'कोड से जुड़ें', dismiss: 'हटाएँ',
   voiceUnsupported: 'इस ब्राउज़र में आवाज़ पहचान उपलब्ध नहीं है।', voiceTryAgain: 'मैं सुन नहीं पाया। कृपया फिर प्रयास करें।', listening: 'सुन रहे हैं…', voiceUnclear: 'हाँ या नहीं समझ नहीं आया।', today: 'आज की दवाइयाँ', medications: 'दवाइयाँ', symptoms: 'लक्षण', contacts: 'संपर्क', dashboard: 'डैशबोर्ड', history: 'इतिहास', alerts: 'सूचनाएँ', patientToday: 'आपकी दिनचर्या', reassurance: 'आप बहुत अच्छा कर रहे हैं। एक कदम एक समय पर।', allCaughtUp: 'आज की सभी दवाएँ पूरी!', dosesComplete: '{{total}} में से {{taken}} खुराक पूरी', tapAfterTaking: 'दवा लेने के बाद उस पर टैप करें।', complete: 'पूरा', missedDoseTitle: 'एक खुराक पर ध्यान दें', missedDoseBody: 'देखभालकर्ता को सूचित कर दिया गया है।', noMeds: 'कोई दवा निर्धारित नहीं है', needHelp: 'तुरंत मदद चाहिए?', sosDescription: 'देखभालकर्ताओं को सूचना और स्थान भेजें।', addMedicine: 'दवा जोड़ें', keepScheduleCurrent: 'समय-सारणी अपडेट रखें।', consistencyTipTitle: 'नियमितता से बहुत मदद मिलती है।', consistencyTipBody: 'हर दिन एक ही समय पर दवा लेना अच्छी आदत बनाने में मदद करता है।', medication: 'दवा', sayIt: 'बोलें', taken: 'ले ली', skipped: 'छोड़ दी', missed: 'छूट गई', pending: 'बाकी', voice: 'आवाज़',
   caregiverView: 'देखभालकर्ता दृश्य', dashboardSubtitle: 'आपके प्रियजन की दिनचर्या का साफ़ और शांत दृश्य।', linkedPatients: 'लिंक किए गए मरीज़', selectPatient: 'प्लान देखने के लिए मरीज़ चुनें।', todayAdherence: 'आज का पालन', yourLovedOne: 'आपके प्रियजन', needsAttention: 'ध्यान चाहिए', doingWell: 'आज सब अच्छा है', dayStreak: 'दिन की लड़ी', todaysAdherence: 'आज का पालन', dosesTaken: 'ली गई खुराक', openAlerts: 'खुली सूचनाएँ', weeklyAdherence: 'साप्ताहिक पालन', weeklySubtitle: 'पिछले 7 दिनों का सरल दृश्य।', todaysSchedule: 'आज की समय-सारणी', liveSchedule: 'मरीज़ प्लान की ताज़ा स्थिति।',
@@ -93,7 +102,16 @@ const hi = {
   scanSuccess: 'दवा की जानकारी सफलतापूर्वक प्राप्त हुई!',
   scanTip: 'दवा की पट्टी या डिब्बे के लेबल की तस्वीर लें या अपलोड करें।',
   testAlarmBtn: 'दवा का अलार्म चलाकर देखें',
-  testAlarmDesc: 'घंटी और आवाज़ की घोषणा सुनें।'
+  testAlarmDesc: 'घंटी और आवाज़ की घोषणा सुनें।',
+  askMitraBtn: '🧠 मित्रा से कुछ भी पूछें',
+  askMitraDesc: 'दवा व खानपान सुरक्षा सम्बन्धी सवाल पूछें',
+  emergencyQrBtn: '🪪 इमरजेंसी मेडिकल क्यूआर',
+  emergencyQrDesc: 'फ्रिज पर लगाने योग्य आपातकालीन मेडिकल कार्ड',
+  fallGuardBtn: '🛡️ फॉल व आपातकालीन रक्षक',
+  fallGuardActive: 'आपातकालीन आवाज़ व झटके की निगरानी जारी...',
+  fallGuardInactive: 'ध्वनि आधारित आपातकालीन सुरक्षा',
+  verifyPill: 'दवा जाँचें',
+  whatsappEscalate: 'व्हाट्सएप'
 };
 
 i18n.use(initReactI18next).init({ resources: { en: { translation: en }, hi: { translation: hi } }, lng: 'en', fallbackLng: 'en', interpolation: { escapeValue: false }, returnNull: false });

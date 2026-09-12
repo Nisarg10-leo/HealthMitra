@@ -102,6 +102,11 @@ export function Workspace({ onLogout }) {
 
   return <WorkspaceContext.Provider value={workspace}>
     <div className="shell">
+      {/* Vitalis Sub-surface Ambient Luminescence Orbs */}
+      <div className="sub-luminescence-cyan" />
+      <div className="sub-luminescence-violet" />
+      <div className="sub-luminescence-mint" />
+
       <Sidebar session={session} items={navItems} activeTab={tab} onSelect={setTab} unreadAlerts={unreadAlerts} onToggleLanguage={toggleLanguage} onLogout={onLogout} />
       <main className="content">
         <Topbar session={session} patients={data.patients} selectedPatient={data.dashboard?.patient} selectedPatientId={data.selectedPatientId} onSelectPatient={data.setSelectedPatientId} onToggleLanguage={toggleLanguage} onSos={() => setModal({ kind: 'sos' })} />

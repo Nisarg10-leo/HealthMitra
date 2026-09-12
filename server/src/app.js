@@ -1,5 +1,8 @@
 import cors from 'cors';
 import express from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { requireUser } from './middleware/requireUser.js';
@@ -13,7 +16,9 @@ import { sosRouter } from './routes/sos.js';
 import { supportRouter } from './routes/support.js';
 import { systemRouter } from './routes/system.js';
 
-// Assembles the HTTP layer. Nothing here knows about business rules or storage.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export function createApp() {
   const app = express();
   app.use(cors({ origin: config.allowedOrigins.length ? config.allowedOrigins : true }));
@@ -24,6 +29,17 @@ export function createApp() {
   // Protected: everything that reads or changes patient data.
   app.use('/api', requireUser, patientsRouter, medicationsRouter, doseLogsRouter, alertsRouter, sosRouter, safetyRouter);
 
+  // Serve production client build if present
+  const clientDist = path.resolve(__dirname, '../../client/dist');
+  if (fs.existsSync(clientDist)) {
+    app.use(express.static(clientDist));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      res.sendFile(path.join(clientDist, 'index.html'));
+    });
+  }
+
+  app.use('/api', (_req, res) => res.status(404).json({ error: 'API route not found.' }));
   app.use((_req, res) => res.status(404).json({ error: 'Route not found.' }));
   app.use(errorHandler);
   return app;

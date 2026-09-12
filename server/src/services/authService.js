@@ -8,12 +8,23 @@ export function publicUser(user) {
   return publicFields;
 }
 
+export function validatePasswordStrength(password) {
+  const str = String(password || '');
+  if (str.length < 8) return 'Password must be at least 8 characters.';
+  if (!/[A-Z]/.test(str)) return 'Password must include at least one uppercase letter.';
+  if (!/[a-z]/.test(str)) return 'Password must include at least one lowercase letter.';
+  if (!/[0-9]/.test(str)) return 'Password must include at least one number.';
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(str)) return 'Password must include at least one special character.';
+  return null;
+}
+
 export async function register({ name, email, phone = '', password, role, preferredLanguage = 'en' }) {
   const normalizedEmail = String(email || '').trim().toLowerCase();
   if (!String(name || '').trim() || !normalizedEmail || !String(password || '') || !['patient', 'caregiver'].includes(role)) {
     throw badRequest('Name, email, password, and role are required.');
   }
-  if (String(password).length < 6) throw badRequest('Password must be at least 6 characters.');
+  const passwordError = validatePasswordStrength(password);
+  if (passwordError) throw badRequest(passwordError);
   if (await repository.users.findByEmail(normalizedEmail)) throw conflict('An account with this email already exists.');
   const user = await repository.users.insert({
     name: String(name).trim(),

@@ -50,5 +50,6 @@ export const safetyApi = {
 
 export const guidanceApi = {
   symptom: (symptom, severe, language) => get(`/symptom-suggestions?symptom=${encodeURIComponent(symptom)}&severe=${severe}&language=${language}`),
-  voiceIntent: (transcript) => post('/voice/intent', { transcript })
+  voiceIntent: (transcript) => post('/voice/intent', { transcript }),
+  askMitra: (question, language = 'en') => post('/support/ask-mitra', { question, language })
 };

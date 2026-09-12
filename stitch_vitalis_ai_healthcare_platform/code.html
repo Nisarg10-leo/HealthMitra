@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>VITALIS - Autonomous Health Intelligence</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#00373a",
+            "primary-fixed-dim": "#00dce6",
+            "on-primary-container": "#006a70",
+            "on-error-container": "#ffdad6",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#d0bcff",
+            "outline": "#849495",
+            "surface-bright": "#353943",
+            "inverse-primary": "#00696f",
+            "surface-dim": "#0f131c",
+            "surface-tint": "#00dce6",
+            "on-background": "#dfe2ef",
+            "inverse-on-surface": "#2c303a",
+            "surface-container-high": "#262a34",
+            "on-tertiary-container": "#006e4b",
+            "primary-container": "#00f2fe",
+            "tertiary": "#e1ffec",
+            "tertiary-fixed": "#6ffbbe",
+            "on-secondary-fixed-variant": "#5516be",
+            "surface-container-highest": "#31353f",
+            "surface-container": "#1c1f29",
+            "surface-variant": "#31353f",
+            "tertiary-container": "#67f4b7",
+            "error-container": "#93000a",
+            "on-tertiary": "#003824",
+            "on-surface-variant": "#b9cacb",
+            "on-secondary": "#3c0091",
+            "primary": "#e0fdff",
+            "surface": "#0f131c",
+            "tertiary-fixed-dim": "#4edea3",
+            "background": "#0f131c",
+            "secondary-fixed": "#e9ddff",
+            "inverse-surface": "#dfe2ef",
+            "on-secondary-container": "#c4abff",
+            "on-surface": "#dfe2ef",
+            "on-tertiary-fixed": "#002113",
+            "surface-container-lowest": "#0a0e17",
+            "on-primary-fixed": "#002022",
+            "on-secondary-fixed": "#23005c",
+            "on-error": "#690005",
+            "primary-fixed": "#6ff6ff",
+            "outline-variant": "#3a494b",
+            "on-primary-fixed-variant": "#004f53",
+            "secondary-container": "#571bc1",
+            "surface-container-low": "#181b25",
+            "on-tertiary-fixed-variant": "#005236",
+            "secondary": "#d0bcff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-2xs": "0.25rem",
+            "margin-desktop": "3rem",
+            "space-3xl": "4rem",
+            "space-2xl": "3rem",
+            "space-md": "1rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.5rem",
+            "margin-mobile": "1rem",
+            "space-xl": "2rem",
+            "gutter": "1.5rem"
+          },
+          "fontFamily": {
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "telemetry-mono": ["Inter"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "telemetry-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.05); }
+    }
+    @keyframes ecgScroll {
+      0% { stroke-dashoffset: 240; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes orbRotate {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.08); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .animate-ecg {
+      stroke-dasharray: 240;
+      animation: ecgScroll 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .animate-orb {
+      animation: orbRotate 12s linear infinite;
+    }
+    .glass-matrix {
+      background: rgba(13, 21, 39, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    }
+    .glass-matrix-active {
+      background: rgba(20, 30, 55, 0.85);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      box-shadow: 0 0 24px rgba(0, 242, 254, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    }
+    /* Hide scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-[#080C15] text-on-surface antialiased selection:bg-primary-container selection:text-on-primary min-h-screen pb-28 relative overflow-x-hidden">
+<!-- Ambient Sub-surface Luminescence Orbs -->
+<div class="fixed top-0 left-1/2 -translate-x-1/2 w-[480px] h-[340px] bg-primary-container/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+<div class="fixed top-1/3 -right-24 w-[360px] h-[360px] bg-secondary-container/15 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-24 -left-20 w-[380px] h-[380px] bg-tertiary-fixed-dim/10 rounded-full blur-[110px] pointer-events-none -z-10"></div>
+<!-- TopAppBar Component (Rendered strictly according to Shared Components JSON) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 py-3 w-full bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm">
+<div class="flex items-center space-x-3">
+<!-- Profile Avatar with Status Ring -->
+<div class="relative cursor-pointer" onclick="toggleModal('medical-modal')">
+<div class="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-tertiary-container via-primary-container to-secondary">
+<img class="w-full h-full object-cover rounded-full" data-alt="Sophisticated cinematic portrait of Alex Morgan, a 32-year-old patient with sharp focus, gentle confident expression, neutral modern studio lighting, high tech aesthetic, calm luxury background with deep navy and cyan ambient hues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHwzLmhYiizcfIq4E2aYD8FUCVjeJXWs6CDh5BhJ5PkLCOIZKEZsvqlLuAN7WfXFwIh8uGxrYw4wZbmw_qYTV7mPSpd6deYOwxtU0_7uDZMn-EiSu8q0OEJSbxNrvqCnggOM1-YJRx6A634EJhr5o-7vmknwJg0kzsfJ8AufQS0iOdSNhC1hjJcRbvKpPztKJx2HmXVVGDJDtw7MFzCK3ppERpaavpFolGSdhDY3mOONbDfFpuRXMRgA"/>
+</div>
+<span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-tertiary-fixed border-2 border-surface shadow-[0_0_8px_#6ffbbe]"></span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary dark:text-primary">Good morning, Alex</h1>
+</div>
+<div class="flex items-center space-x-2 mt-0.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-telemetry-mono font-telemetry-mono bg-tertiary-container/15 text-tertiary-fixed-dim border border-tertiary-container/30">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed animate-ping"></span>
+            All systems nominal
+          </span>
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-telemetry-mono font-telemetry-mono text-outline border border-outline-variant/30">
+<span class="material-symbols-outlined text-[10px]" data-icon="lock">lock</span>
+            256-bit HIPAA
+          </span>
+</div>
+</div>
+</div>
+<!-- Right Controls: SOS Quick Trigger & Notifications -->
+<div class="flex items-center space-x-2">
+<button class="px-2.5 py-1 rounded-full text-telemetry-mono font-telemetry-mono bg-error-container/40 text-error border border-error/30 hover:bg-error-container/70 transition-colors flex items-center gap-1 shadow-[0_0_12px_rgba(255,180,171,0.2)]" onclick="toggleModal('medical-modal')">
+<span class="material-symbols-outlined text-sm" data-icon="emergency">emergency</span>
+        SOS
+      </button>
+<button aria-label="Notifications" class="relative p-2 rounded-full text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_#00f2fe]"></span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="pt-20 px-4 max-w-md mx-auto space-y-5">
+<!-- Health Score Centerpiece Card -->
+<section class="glass-matrix rounded-2xl p-5 relative overflow-hidden">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="text-telemetry-mono font-telemetry-mono text-primary-fixed uppercase tracking-widest">Biometric Diagnostic Score</span>
+<div class="flex items-center gap-2 mt-0.5">
+<h2 class="text-headline-md font-headline-md text-on-surface">Overall Health Index</h2>
+<span class="px-2 py-0.5 rounded-full text-telemetry-mono font-telemetry-mono bg-primary-container/20 text-primary-fixed border border-primary-container/30">AI SYNTHESIS</span>
+</div>
+</div>
+<button class="p-1.5 rounded-lg text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="share">share</span>
+</button>
+</div>
+<!-- Futuristic Radial Gauge -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-6 my-2">
+<div class="relative w-40 h-40 flex items-center justify-center shrink-0">
+<!-- Background SVG Gauge -->
+<svg class="w-full h-full -rotate-90" viewbox="0 0 120 120">
+<circle cx="60" cy="60" fill="none" r="50" stroke="rgba(255, 255, 255, 0.06)" stroke-width="8"></circle>
+<circle class="transition-all duration-1000 ease-out" cx="60" cy="60" fill="none" r="50" stroke="url(#cyanVioletGrad)" stroke-dasharray="314.159" stroke-dashoffset="40.84" stroke-linecap="round" stroke-width="8"></circle>
+<defs>
+<lineargradient id="cyanVioletGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#00F2FE"></stop>
+<stop offset="60%" stop-color="#4FACFE"></stop>
+<stop offset="100%" stop-color="#8B5CF6"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-display-hero-mobile font-display-hero-mobile text-primary tracking-tight font-extrabold leading-none">87</span>
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed tracking-widest mt-1 font-bold">OPTIMAL</span>
+<span class="text-[10px] text-outline font-telemetry-mono">/ 100 BASELINE</span>
+</div>
+</div>
+<!-- Metric Breakdown Mini Chips Grid -->
+<div class="grid grid-cols-2 gap-2.5 w-full">
+<div class="bg-surface-container-low/70 border border-outline-variant/30 rounded-xl p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-base" data-icon="bedtime">bedtime</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Sleep</span>
+</div>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">91</span>
+</div>
+<div class="bg-surface-container-low/70 border border-outline-variant/30 rounded-xl p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-base" data-icon="directions_run">directions_run</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Activity</span>
+</div>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">84</span>
+</div>
+<div class="bg-surface-container-low/70 border border-outline-variant/30 rounded-xl p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-base" data-icon="favorite">favorite</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Heart</span>
+</div>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">88</span>
+</div>
+<div class="bg-surface-container-low/70 border border-outline-variant/30 rounded-xl p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed text-base" data-icon="psychology">psychology</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Stress</span>
+</div>
+<span class="text-body-md font-body-md text-tertiary-fixed font-bold">Low</span>
+</div>
+<div class="col-span-2 bg-surface-container-low/70 border border-outline-variant/30 rounded-xl p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-base" data-icon="battery_charging_full">battery_charging_full</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Cellular Recovery</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-16 h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 82%"></div>
+</div>
+<span class="text-headline-sm font-headline-sm text-primary-fixed font-semibold">82%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section Title: Live Telemetry Matrix -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="sensors">sensors</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Live Telemetry Grid</h3>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">PULSE SYNC: 1s</span>
+</div>
+<!-- Live Telemetry Grid (2x3 Interactive Cards) -->
+<div class="grid grid-cols-2 gap-3">
+<!-- 1. Heart Rate Card with Animated Glowing ECG -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-primary-container/40 transition-all cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-error text-lg" data-icon="vital_signs">vital_signs</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Heart Rate</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-lg-mobile font-headline-lg-mobile text-primary font-bold">72</span>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">BPM</span>
+</div>
+<p class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed mt-0.5">Resting • Normal range</p>
+</div>
+<!-- Real-time SVG ECG Waveform -->
+<div class="w-full h-9 overflow-hidden relative pt-1">
+<svg class="w-full h-full" fill="none" viewbox="0 0 140 32">
+<path class="animate-ecg" d="M0 16 L25 16 L32 4 L38 28 L45 8 L52 22 L58 16 L85 16 L92 2 L98 29 L106 10 L112 20 L118 16 L140 16" stroke="#ffb4ab" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- 2. Sleep Card with Multi-phase Bars -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-secondary/40 transition-all cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="hotel">hotel</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Sleep</span>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed bg-tertiary-container/10 px-1.5 py-0.5 rounded">+14%</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-lg-mobile font-headline-lg-mobile text-primary font-bold">7h 48m</span>
+</div>
+<p class="text-telemetry-mono font-telemetry-mono text-outline mt-0.5">Efficiency: 94%</p>
+</div>
+<!-- Multi-phase Sleep Bar Breakdown -->
+<div class="space-y-1.5 pt-1">
+<div class="w-full h-2 rounded-full flex overflow-hidden bg-surface-container-highest">
+<div class="h-full bg-secondary" style="width: 25%" title="Deep 2h 05m"></div>
+<div class="h-full bg-primary-container" style="width: 35%" title="REM 2h 45m"></div>
+<div class="h-full bg-outline" style="width: 40%" title="Core 2h 58m"></div>
+</div>
+<div class="flex justify-between text-[9px] text-outline font-telemetry-mono">
+<span>Deep 25%</span>
+<span>REM 35%</span>
+<span>Core 40%</span>
+</div>
+</div>
+</div>
+<!-- 3. Steps Metric with Circular Arc Progress -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-primary-container/40 transition-all cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="footprint">footprint</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Activity</span>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">Goal 10k</span>
+</div>
+<div class="my-2 flex items-center justify-between">
+<div>
+<div class="text-headline-lg-mobile font-headline-lg-mobile text-primary font-bold">8,426</div>
+<p class="text-telemetry-mono font-telemetry-mono text-outline mt-0.5">Burned 540 kcal</p>
+</div>
+<!-- Mini SVG Progress Arc -->
+<div class="relative w-11 h-11 shrink-0">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-primary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="84, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-primary-fixed">84%</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1 mt-1">
+<div class="bg-primary-container h-1 rounded-full" style="width: 84%"></div>
+</div>
+</div>
+<!-- 4. Stress Card with Sinusoidal Wave Graphic -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-tertiary-fixed/40 transition-all cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary-fixed text-lg" data-icon="self_improvement">self_improvement</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Stress Level</span>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed bg-tertiary-container/10 px-1.5 py-0.5 rounded">Calm</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-lg-mobile font-headline-lg-mobile text-tertiary-fixed font-bold">24</span>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">/ 100</span>
+</div>
+<p class="text-telemetry-mono font-telemetry-mono text-outline mt-0.5">Vagal tone stabilized</p>
+</div>
+<!-- Sinusoidal Wave Graphic -->
+<div class="w-full h-8 overflow-hidden pt-1">
+<svg class="w-full h-full" fill="none" viewbox="0 0 120 28">
+<path d="M0 14 Q 15 2, 30 14 T 60 14 T 90 14 T 120 14" fill="none" opacity="0.8" stroke="#4edea3" stroke-linecap="round" stroke-width="2"></path>
+<path d="M0 14 Q 15 6, 30 14 T 60 14 T 90 14 T 120 14" fill="none" opacity="0.4" stroke="#67f4b7" stroke-linecap="round" stroke-width="1"></path>
+</svg>
+</div>
+</div>
+<!-- 5. Recovery Card with Electric Cyan Radial Fill -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-primary-fixed/40 transition-all cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-fixed text-lg" data-icon="battery_horiz_075">battery_horiz_075</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Recovery</span>
+</div>
+<span class="material-symbols-outlined text-primary text-sm" data-icon="bolt">bolt</span>
+</div>
+<div class="my-2 flex items-center justify-between">
+<div>
+<div class="text-headline-lg-mobile font-headline-lg-mobile text-primary font-bold">82%</div>
+<p class="text-telemetry-mono font-telemetry-mono text-outline mt-0.5">Ready for strain</p>
+</div>
+<!-- Gauge Mini Disc -->
+<div class="w-10 h-10 rounded-full border-2 border-primary-container flex items-center justify-center bg-primary-container/10 shadow-[0_0_12px_rgba(0,242,254,0.3)]">
+<span class="material-symbols-outlined text-primary-fixed text-base" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1 mt-1">
+<div class="bg-gradient-to-r from-primary-container to-tertiary-fixed h-1 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<!-- 6. Hydration Card with Animated Wave Fill -->
+<div class="glass-matrix rounded-2xl p-3.5 flex flex-col justify-between hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="water_drop">water_drop</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Hydration</span>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-primary-container">68%</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-lg-mobile font-headline-lg-mobile text-primary font-bold">2.1L</span>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">/ 3.0L</span>
+</div>
+<p class="text-telemetry-mono font-telemetry-mono text-outline mt-0.5">+500ml 12:15 PM</p>
+</div>
+<!-- Water Level Indicator -->
+<div class="w-full h-3 rounded-full bg-surface-container-highest overflow-hidden relative">
+<div class="h-full bg-gradient-to-r from-primary-container to-primary-fixed rounded-full" style="width: 68%"></div>
+</div>
+</div>
+</div>
+<!-- VITALIS AI 'VITA' Neural Insight Card -->
+<section class="relative rounded-2xl p-5 overflow-hidden border border-primary-container/30 bg-gradient-to-br from-[#0D1527]/90 via-[#101932]/85 to-[#16122F]/90 shadow-[0_4px_30px_rgba(0,242,254,0.12)]">
+<!-- Ambient Glow Behind Orb -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-start gap-3.5 relative z-10">
+<!-- Glowing Multi-color AI Orb Avatar -->
+<div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full bg-gradient-to-tr from-primary-container via-secondary to-tertiary-fixed blur-sm animate-orb opacity-80"></div>
+<div class="relative w-10 h-10 rounded-full bg-[#080C15] flex items-center justify-center border border-white/20">
+<span class="material-symbols-outlined text-primary-container text-xl" data-icon="neurology">neurology</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-telemetry-mono font-telemetry-mono text-primary-fixed uppercase tracking-wider">VITA Neural Engine 4.2</span>
+<span class="text-[10px] text-outline font-telemetry-mono">2m ago</span>
+</div>
+<h4 class="text-headline-sm font-headline-sm text-primary font-semibold mt-0.5">VITALIS AI noticed something</h4>
+<p class="text-body-md font-body-md text-on-surface-variant mt-2 leading-relaxed">
+            Your sleep quality improved <span class="text-tertiary-fixed font-semibold">14%</span> this week, but your recovery score dropped slightly after 3 consecutive high-intensity workout days.
+          </p>
+<!-- Interactive Metric Trend Chips -->
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-telemetry-mono font-telemetry-mono bg-tertiary-container/15 text-tertiary-fixed border border-tertiary-container/30">
+<span class="material-symbols-outlined text-xs" data-icon="north">north</span>
+              Sleep ↑ 14%
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-telemetry-mono font-telemetry-mono bg-error-container/25 text-error border border-error/30">
+<span class="material-symbols-outlined text-xs" data-icon="south">south</span>
+              Recovery ↓ 6%
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-telemetry-mono font-telemetry-mono bg-secondary-container/30 text-secondary border border-secondary/30">
+<span class="material-symbols-outlined text-xs" data-icon="fitness_center">fitness_center</span>
+              Cardio Strain High
+            </span>
+</div>
+<!-- Dual Action Buttons -->
+<div class="grid grid-cols-2 gap-2.5 mt-4">
+<button class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-primary-container to-[#4FACFE] text-[#090D16] font-semibold text-body-md flex items-center justify-center gap-1.5 shadow-[0_0_16px_rgba(0,242,254,0.35)] hover:shadow-[0_0_24px_rgba(0,242,254,0.5)] transition-all">
+<span class="material-symbols-outlined text-base" data-icon="lightbulb">lightbulb</span>
+              Understand this
+            </button>
+<button class="w-full py-2.5 px-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/40 text-on-surface hover:border-primary-container/40 text-body-md font-medium transition-all text-center">
+              View actions
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Telemedicine Consultation Card -->
+<section class="glass-matrix rounded-2xl p-4.5 relative overflow-hidden border border-outline-variant/40">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error animate-ping"></span>
+<span class="text-telemetry-mono font-telemetry-mono text-error uppercase font-bold tracking-wider">Upcoming Appointment</span>
+</div>
+<span class="px-2 py-0.5 rounded-full text-telemetry-mono font-telemetry-mono bg-error-container/20 text-error border border-error/30">
+          Starts in 32m
+        </span>
+</div>
+<div class="flex items-center space-x-3.5 bg-surface-container-lowest/60 p-3 rounded-xl border border-white/5">
+<div class="relative w-14 h-14 shrink-0">
+<img class="w-full h-full object-cover rounded-xl" data-alt="Professional clinical headshot of Dr. Sarah Mitchell, a 40-year-old senior cardiologist wearing white coat and stethoscope, warm confident expression, soft clinic lighting with calm teal diagnostic interface background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ-dbjBD8ZTLJlm3KuExRiGaEGlqdDAYvkQ1HjTO6UgJjIKcsYtDiXu2uI5QsVGNM0t1St4PNQuS21hnDPf11FCX0SRmnoXr7imF1LEgn2fSfYCq8hhKvVGCjmiJSmlSz_nwMQsZod6raS_OKpVzGlJ0p9Luc1nU-lCZSAZMLLxxEH1f6EXlAcW5GeKha1ZcBOqtWiPmVIg87dpLVa7VJTV1H5ksr4sgPh1YAtcXK7BPnW6NfB4SLRNA"/>
+<span class="absolute -bottom-1 -right-1 bg-surface-container-lowest px-1 rounded text-[10px] text-tertiary-fixed font-bold border border-tertiary-container/30">★ 4.9</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-headline-sm font-headline-sm text-primary font-semibold truncate">Dr. Sarah Mitchell</h4>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant truncate">Cardiologist • 12 yrs exp</p>
+<div class="flex items-center gap-2 mt-1 text-telemetry-mono font-telemetry-mono text-outline">
+<span class="flex items-center gap-1 text-primary-fixed">
+<span class="material-symbols-outlined text-xs" data-icon="videocam">videocam</span>
+              Video consultation
+            </span>
+<span>•</span>
+<span>Today, 4:30 PM</span>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-3.5 flex items-center gap-2">
+<button class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-primary-container to-[#4FACFE] text-[#090D16] font-semibold text-body-md flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(0,242,254,0.35)] active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-base" data-icon="videocam">videocam</span>
+          Join Consultation
+        </button>
+<button class="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="clinical_notes">clinical_notes</span>
+</button>
+</div>
+</section>
+<!-- Chronological Health Timeline -->
+<section class="glass-matrix rounded-2xl p-5">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="timeline">timeline</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Today's Health Log</h3>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-outline">5 EVENTS LOGGED</span>
+</div>
+<!-- Vertical Timeline Spine -->
+<div class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-[1.5px] before:bg-gradient-to-b before:from-primary-container before:via-tertiary-fixed before:to-secondary-container">
+<!-- Event 1 -->
+<div class="relative flex items-start justify-between">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest border-2 border-tertiary-fixed flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed font-bold">08:00 AM</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">Morning Vitamin D3 + K2</span>
+</div>
+<p class="text-body-md font-body-md text-outline">5,000 IU with healthy fats</p>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed bg-tertiary-container/15 px-2 py-0.5 rounded-full border border-tertiary-container/30">Taken ✓</span>
+</div>
+<!-- Event 2 -->
+<div class="relative flex items-start justify-between">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest border-2 border-primary-container flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-telemetry-mono font-telemetry-mono text-primary-container font-bold">09:30 AM</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">Resting HR Calibrated</span>
+</div>
+<p class="text-body-md font-body-md text-outline">Bio-sensor baseline locked at 68 BPM</p>
+</div>
+<span class="text-headline-sm font-headline-sm text-primary-fixed font-semibold">68 BPM</span>
+</div>
+<!-- Event 3 -->
+<div class="relative flex items-start justify-between">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest border-2 border-primary-fixed-dim flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim"></span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-telemetry-mono font-telemetry-mono text-primary-fixed-dim font-bold">12:15 PM</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">Hydration Intake</span>
+</div>
+<p class="text-body-md font-body-md text-outline">Filtered electrolyte water logged</p>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-primary-container bg-primary-container/10 px-2 py-0.5 rounded-full">+500 ml</span>
+</div>
+<!-- Event 4 -->
+<div class="relative flex items-start justify-between">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest border-2 border-tertiary-fixed flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed font-bold">03:40 PM</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">Step Milestone Reached</span>
+</div>
+<p class="text-body-md font-body-md text-outline">8,000 steps achieved during afternoon walk</p>
+</div>
+<span class="text-telemetry-mono font-telemetry-mono text-tertiary-fixed">TARGET ✓</span>
+</div>
+<!-- Event 5 -->
+<div class="relative flex items-start justify-between">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-lowest border-2 border-secondary flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-telemetry-mono font-telemetry-mono text-secondary font-bold">06:20 PM</span>
+<span class="text-body-md font-body-md text-on-surface font-medium">VITA Recovery Computed</span>
+</div>
+<p class="text-body-md font-body-md text-outline">Night protocol: reduce blue light by 8:30 PM</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="sync">sync</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Emergency Medical ID Bottom Sheet / Modal -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-end justify-center transition-opacity duration-300" id="medical-modal">
+<div class="w-full max-w-md bg-[#0D1527] border-t border-error/40 rounded-t-3xl p-6 shadow-[0_-12px_40px_rgba(255,180,171,0.15)] relative">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full mx-auto mb-4"></div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-2xl" data-icon="emergency_home">emergency_home</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-primary font-bold">Universal Medical ID</h3>
+<p class="text-telemetry-mono font-telemetry-mono text-outline">EMERGENCY FIRST-RESPONDER DIRECT ACCESS</p>
+</div>
+</div>
+<button class="p-1 rounded-full text-outline hover:text-on-surface" onclick="toggleModal('medical-modal')">
+<span class="material-symbols-outlined text-xl" data-icon="close">close</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-3 my-4">
+<div class="bg-surface-container-lowest/80 p-3 rounded-xl border border-white/5">
+<span class="text-telemetry-mono font-telemetry-mono text-outline">BLOOD TYPE</span>
+<p class="text-headline-md font-headline-md text-error font-extrabold mt-0.5">O+ Positive</p>
+</div>
+<div class="bg-surface-container-lowest/80 p-3 rounded-xl border border-white/5">
+<span class="text-telemetry-mono font-telemetry-mono text-outline">ORGAN DONOR</span>
+<p class="text-headline-md font-headline-md text-tertiary-fixed font-bold mt-0.5">Registered Yes</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="bg-surface-container-lowest/80 p-3 rounded-xl border border-white/5">
+<span class="text-telemetry-mono font-telemetry-mono text-error font-bold">ALLERGIES &amp; ADVERSE REACTIONS</span>
+<p class="text-body-md font-body-md text-primary mt-1 font-semibold">Penicillin (Severe Anaphylaxis risk), Peanuts</p>
+</div>
+<div class="bg-surface-container-lowest/80 p-3 rounded-xl border border-white/5">
+<span class="text-telemetry-mono font-telemetry-mono text-outline">PRIMARY EMERGENCY CONTACT</span>
+<div class="flex items-center justify-between mt-1">
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Elena Morgan (Spouse)</p>
+<p class="text-body-md font-body-md text-primary-fixed">+1 (555) 392-8491</p>
+</div>
+<a class="w-9 h-9 rounded-full bg-tertiary-container/20 text-tertiary-fixed flex items-center justify-center border border-tertiary-container/40" href="tel:+15553928491">
+<span class="material-symbols-outlined text-lg" data-icon="call">call</span>
+</a>
+</div>
+</div>
+</div>
+<button class="w-full mt-5 py-3 rounded-xl bg-surface-container-high text-on-surface font-medium text-body-md border border-outline-variant/40" onclick="toggleModal('medical-modal')">
+        Dismiss Medical ID
+      </button>
+</div>
+</div>
+<!-- BottomNavBar Component (Executed strictly from Shared Components JSON) -->
+<!-- On Mobile: Shown. Active Navigation Item: 'Vitals' (Since this is the flagship Vitals Diagnostic dashboard) -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center px-4 py-2 pb-6 w-full bg-surface-container-lowest/80 dark:bg-surface-container-lowest/80 backdrop-blur-xl border-t border-outline-variant/20 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
+<!-- Tab 1: Vitals (ACTIVE: Exact match for Primary Vitals Telemetry Intent) -->
+<button class="flex flex-col items-center justify-center bg-primary-container/20 text-primary-fixed rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.25)] scale-95 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-xl" data-icon="vital_signs" style="font-variation-settings: 'FILL' 1;">vital_signs</span>
+<span class="text-label-md font-label-md mt-0.5">Vitals</span>
+</button>
+<!-- Tab 2: Analytics -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:text-primary-fixed-dim transition-all duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined text-xl" data-icon="monitoring">monitoring</span>
+<span class="text-label-md font-label-md mt-0.5">Analytics</span>
+</button>
+<!-- Tab 3: Neural AI (Prominent Center Anchor) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:text-primary-fixed-dim transition-all duration-200 scale-95 active:scale-90 relative">
+<div class="w-10 h-10 -mt-5 rounded-full bg-gradient-to-tr from-primary-container to-secondary flex items-center justify-center shadow-[0_0_16px_rgba(0,242,254,0.4)] border-2 border-surface-container-lowest">
+<span class="material-symbols-outlined text-white text-xl" data-icon="neurology">neurology</span>
+</div>
+<span class="text-label-md font-label-md mt-0.5">Neural AI</span>
+</button>
+<!-- Tab 4: Care -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:text-primary-fixed-dim transition-all duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined text-xl" data-icon="medical_services">medical_services</span>
+<span class="text-label-md font-label-md mt-0.5">Care</span>
+</button>
+<!-- Tab 5: Profile -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1.5 hover:text-primary-fixed-dim transition-all duration-200 scale-95 active:scale-90" onclick="toggleModal('medical-modal')">
+<span class="material-symbols-outlined text-xl" data-icon="person">person</span>
+<span class="text-label-md font-label-md mt-0.5">Profile</span>
+</button>
+</nav>
+<!-- Interactive Logic -->
+<script>
+    function toggleModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
+    }
+  </script>
+</body></html>
