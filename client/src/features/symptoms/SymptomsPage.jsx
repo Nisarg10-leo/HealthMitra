@@ -13,7 +13,7 @@ import {
   WhatsAppIcon
 } from '../../components/ui/Icons.jsx';
 
-export const COMMON_SYMPTOMS = [
+const COMMON_SYMPTOMS = [
   'headache',
   'mild fever',
   'common cold',
