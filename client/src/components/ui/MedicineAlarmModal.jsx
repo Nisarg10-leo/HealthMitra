@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { playAlarmChime } from '../../utils/audio.js';
+import { startCrazyAlarm, stopCrazyAlarm } from '../../utils/audio.js';
 import { formatTime } from '../../utils/format.js';
-import { BellIcon, ClockIcon } from './Icons.jsx';
+import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon } from './Icons.jsx';
 
 export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
-  const intervalRef = useRef(null);
+  const voiceTimeoutRef = useRef(null);
 
-  // Spoken voice announcement
+  // Spoken voice announcement with authoritative emergency cadence
   const announceAlarm = () => {
     if (!window.speechSynthesis) return;
     const medName = medication?.name || t('medication');
@@ -16,201 +16,383 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
     const name = patientName || 'Friend';
 
     const text = i18n.language === 'hi'
-      ? `${name} जी, ${medName} ${dosage} लेने का समय हो गया है। कृपया समय पर दवा लें।`
-      : `Attention ${name}! It is time to take your ${medName} ${dosage}. Please take it now.`;
+      ? `सावधान! ${name} जी, दवा का आवश्यक समय हो गया है। तुरंत ${medName} ${dosage} लें!`
+      : `URGENT MEDICATION ALARM! Attention ${name}, please take your scheduled dose of ${medName} ${dosage} immediately!`;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = i18n.language === 'hi' ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.95;
+    utterance.rate = 1.05;
+    utterance.pitch = 1.1;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
-    playAlarmChime();
-    setTimeout(announceAlarm, 700);
-
-    intervalRef.current = setInterval(() => {
-      playAlarmChime();
-    }, 10_000);
+    // Start continuous piercing alarm loop
+    const stopAudio = startCrazyAlarm();
+    voiceTimeoutRef.current = setTimeout(announceAlarm, 800);
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      stopAudio();
+      stopCrazyAlarm();
+      if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     };
   }, [dose?.id, medication?.name, i18n.language]);
+
+  const handleTake = () => {
+    stopCrazyAlarm();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    onConfirm(dose, 'taken');
+  };
+
+  const handleSnooze = () => {
+    stopCrazyAlarm();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    onSnooze(dose);
+  };
+
+  const handleSkip = () => {
+    stopCrazyAlarm();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    onConfirm(dose, 'skipped');
+  };
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 8, 14, 0.88)',
-        backdropFilter: 'blur(16px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '20px'
-      }}
+      className="alarm-overlay-backdrop"
     >
-      <div
-        className="glass-matrix"
-        style={{
-          maxWidth: '460px',
-          width: '100%',
-          padding: '32px 28px',
-          textAlign: 'center',
-          position: 'relative',
-          border: '1px solid rgba(239, 68, 68, 0.4)',
-          boxShadow: '0 0 50px rgba(239, 68, 68, 0.25)',
-          overflow: 'hidden'
-        }}
-      >
-        {/* Radiating Concentric Sonar Ripple Rings */}
-        <div style={{ position: 'relative', width: '100px', height: '100px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span className="sonar-ring ring-1" />
-          <span className="sonar-ring ring-2" />
-          <span className="sonar-ring ring-3" />
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '76px',
-              height: '76px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1))',
-              border: '2px solid #ef4444',
-              color: '#ffb4ab',
-              boxShadow: '0 0 24px rgba(239, 68, 68, 0.5)',
-              animation: 'bellTink 1.2s ease-in-out infinite'
-            }}
-          >
-            <BellIcon size={32} />
+      <div className="alarm-modal-container">
+        {/* Pulsing Sonar Warning Rings */}
+        <div className="alarm-bell-stage">
+          <span className="alarm-sonar-ring ring-1" />
+          <span className="alarm-sonar-ring ring-2" />
+          <span className="alarm-sonar-ring ring-3" />
+          <div className="alarm-bell-core">
+            <BellIcon size={36} />
           </div>
         </div>
 
-        <span className="chip-telemetry chip-error" style={{ fontSize: '0.74rem', marginBottom: '8px', padding: '3px 12px' }}>
-          Medicine Reminder Alarm
-        </span>
-
-        <style>{`
-          .sonar-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 2px solid rgba(239, 68, 68, 0.45);
-            pointer-events: none;
-            animation: sonarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-          }
-          .ring-1 { width: 76px; height: 76px; animation-delay: 0s; }
-          .ring-2 { width: 76px; height: 76px; animation-delay: 0.6s; }
-          .ring-3 { width: 76px; height: 76px; animation-delay: 1.2s; }
-          @keyframes sonarPulse {
-            0% { transform: scale(1); opacity: 0.9; }
-            100% { transform: scale(2.2); opacity: 0; }
-          }
-          @keyframes bellTink {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            15% { transform: rotate(-10deg) scale(1.05); }
-            30% { transform: rotate(10deg) scale(1.05); }
-            45% { transform: rotate(-5deg); }
-            60% { transform: rotate(5deg); }
-            75% { transform: rotate(0deg); }
-          }
-        `}</style>
-
-        <h2 style={{ fontSize: '1.6rem', color: '#ffffff', margin: '4px 0 6px' }}>
-          {medication?.name || t('medication')}
-        </h2>
-        <p style={{ fontSize: '1.1rem', color: '#00f2fe', fontWeight: '600', margin: '0 0 14px' }}>
-          {medication?.dosage} · {formatTime(dose?.scheduledTime, i18n.language)}
-        </p>
-
-        {/* Pill color preview tag */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            background: 'rgba(10, 14, 23, 0.8)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            marginBottom: '16px'
-          }}
-        >
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: medication?.color || '#00f2fe', boxShadow: `0 0 8px ${medication?.color || '#00f2fe'}` }} />
-          <span style={{ fontSize: '0.84rem', color: '#dfe2ef' }}>Prescribed Dose</span>
+        {/* Urgency Badge */}
+        <div className="alarm-badge-row">
+          <span className="alarm-urgent-chip font-mono">
+            <AlertTriangleIcon size={14} />
+            <span>URGENT MEDICATION ALARM</span>
+          </span>
         </div>
 
-        {/* Dietary note if available */}
+        {/* Medicine Name & Dosage */}
+        <h2 className="alarm-med-title font-display">
+          {medication?.name || t('medication')}
+        </h2>
+
+        <div className="alarm-meta-row">
+          <span className="alarm-dosage-chip font-mono">
+            {medication?.dosage}
+          </span>
+          <span className="alarm-time-chip font-mono">
+            <ClockIcon size={13} />
+            <span>Scheduled: {formatTime(dose?.scheduledTime, i18n.language)}</span>
+          </span>
+        </div>
+
+        {/* Dietary / Clinical Safety Notice */}
         {medication?.safety && (
-          <div
-            style={{
-              background: 'rgba(16, 185, 129, 0.12)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              borderRadius: '10px',
-              padding: '10px 14px',
-              margin: '0 0 20px',
-              fontSize: '0.88rem',
-              color: '#6ffbbe',
-              textAlign: 'left',
-              display: 'flex',
-              gap: '8px',
-              alignItems: 'flex-start'
-            }}
-          >
-            <span style={{ fontSize: '1.2rem' }}>{medication.safety.icon}</span>
-            <span>{medication.safety.instruction}</span>
+          <div className="alarm-safety-card">
+            <span className="alarm-safety-label font-mono">
+              {t('dietaryAdvice')}:
+            </span>
+            <span className="alarm-safety-text">
+              {medication.safety.instruction}
+            </span>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+        {/* High-Impact Actions */}
+        <div className="alarm-actions-stack">
           <button
             type="button"
-            className="btn-cyber"
-            style={{ width: '100%', padding: '14px', fontSize: '1.05rem' }}
-            onClick={() => {
-              if (intervalRef.current) clearInterval(intervalRef.current);
-              onConfirm(dose, 'taken');
-            }}
+            className="alarm-btn-confirm"
+            onClick={handleTake}
           >
-            ✓ {t('taken')}
+            <CheckIcon size={20} />
+            <span>{t('taken')} — I Have Taken This Dose</span>
           </button>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="alarm-actions-secondary">
             <button
               type="button"
-              className="btn-glass"
-              style={{ flex: 1, padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-              onClick={() => {
-                if (intervalRef.current) clearInterval(intervalRef.current);
-                onSnooze(dose);
-              }}
+              className="alarm-btn-snooze"
+              onClick={handleSnooze}
             >
-              <ClockIcon size={16} /> Snooze 5m
+              <ClockIcon size={15} />
+              <span>Snooze for 5 mins</span>
             </button>
 
             <button
               type="button"
-              className="btn-glass"
-              style={{ flex: 1, padding: '12px', color: '#94a3b8' }}
-              onClick={() => {
-                if (intervalRef.current) clearInterval(intervalRef.current);
-                onConfirm(dose, 'skipped');
-              }}
+              className="alarm-btn-skip"
+              onClick={handleSkip}
             >
-              {t('skipped')}
+              <span>{t('skipped')}</span>
             </button>
           </div>
         </div>
       </div>
+
+      <style>{`
+        .alarm-overlay-backdrop {
+          position: fixed !important;
+          inset: 0 !important;
+          background: rgba(18, 12, 10, 0.78) !important;
+          backdrop-filter: blur(12px) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          z-index: 10000 !important;
+          padding: 20px !important;
+          animation: alarmStrobe 1.5s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes alarmStrobe {
+          0% { background: rgba(18, 12, 10, 0.82); }
+          100% { background: rgba(45, 16, 12, 0.88); }
+        }
+
+        .alarm-modal-container {
+          background: var(--paper) !important;
+          border: 2px solid var(--apricot) !important;
+          border-radius: 28px !important;
+          max-width: 480px !important;
+          width: 100% !important;
+          padding: 36px 32px 30px !important;
+          text-align: center !important;
+          position: relative !important;
+          box-shadow: 0 0 60px rgba(217, 119, 70, 0.45), 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+          animation: modalRattle 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite !important;
+        }
+
+        @keyframes modalRattle {
+          0%, 100% { transform: translate(0, 0); }
+          20% { transform: translate(-2px, 1px); }
+          40% { transform: translate(2px, -1px); }
+          60% { transform: translate(-1px, -1px); }
+          80% { transform: translate(1px, 2px); }
+        }
+
+        .alarm-bell-stage {
+          position: relative !important;
+          width: 90px !important;
+          height: 90px !important;
+          margin: 0 auto 16px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+
+        .alarm-sonar-ring {
+          position: absolute !important;
+          border-radius: 50% !important;
+          border: 2px solid var(--apricot) !important;
+          pointer-events: none !important;
+          animation: sonarRingPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite !important;
+        }
+
+        .alarm-sonar-ring.ring-1 { width: 76px; height: 76px; animation-delay: 0s !important; }
+        .alarm-sonar-ring.ring-2 { width: 76px; height: 76px; animation-delay: 0.6s !important; }
+        .alarm-sonar-ring.ring-3 { width: 76px; height: 76px; animation-delay: 1.2s !important; }
+
+        @keyframes sonarRingPulse {
+          0% { transform: scale(0.9); opacity: 0.9; }
+          100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .alarm-bell-core {
+          position: relative !important;
+          z-index: 2 !important;
+          width: 76px !important;
+          height: 76px !important;
+          border-radius: 50% !important;
+          background: rgba(217, 119, 70, 0.14) !important;
+          border: 2px solid var(--apricot) !important;
+          color: var(--apricot) !important;
+          display: grid !important;
+          place-items: center !important;
+          box-shadow: 0 0 24px rgba(217, 119, 70, 0.4) !important;
+          animation: bellRattle 0.35s ease-in-out infinite !important;
+        }
+
+        @keyframes bellRattle {
+          0%, 100% { transform: rotate(0deg) scale(1); }
+          25% { transform: rotate(-14deg) scale(1.08); }
+          75% { transform: rotate(14deg) scale(1.08); }
+        }
+
+        .alarm-badge-row {
+          margin-bottom: 10px !important;
+        }
+
+        .alarm-urgent-chip {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          padding: 4px 14px !important;
+          border-radius: 9999px !important;
+          background: rgba(217, 119, 70, 0.14) !important;
+          color: var(--apricot) !important;
+          border: 1px solid rgba(217, 119, 70, 0.3) !important;
+          font-size: 11px !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.08em !important;
+        }
+
+        .alarm-med-title {
+          font-size: 1.85rem !important;
+          font-weight: 700 !important;
+          color: var(--ink) !important;
+          margin: 0 0 10px 0 !important;
+          line-height: 1.15 !important;
+        }
+
+        .alarm-meta-row {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 10px !important;
+          margin-bottom: 18px !important;
+          flex-wrap: wrap !important;
+        }
+
+        .alarm-dosage-chip {
+          display: inline-flex !important;
+          align-items: center !important;
+          padding: 4px 12px !important;
+          background: var(--mist) !important;
+          color: var(--leaf) !important;
+          font-size: 13px !important;
+          font-weight: 700 !important;
+          border-radius: 8px !important;
+          border: 1px solid rgba(45, 122, 88, 0.2) !important;
+        }
+
+        .alarm-time-chip {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          padding: 4px 12px !important;
+          background: var(--cream) !important;
+          color: var(--text-secondary) !important;
+          font-size: 12.5px !important;
+          font-weight: 500 !important;
+          border-radius: 8px !important;
+          border: 1px solid var(--border-medium) !important;
+        }
+
+        .alarm-safety-card {
+          background: rgba(217, 119, 70, 0.08) !important;
+          border-left: 3px solid var(--apricot) !important;
+          padding: 10px 14px !important;
+          border-radius: 0 10px 10px 0 !important;
+          font-size: 13px !important;
+          line-height: 1.45 !important;
+          margin-bottom: 22px !important;
+          text-align: left !important;
+        }
+
+        .alarm-safety-label {
+          font-weight: 700 !important;
+          color: var(--apricot) !important;
+          font-size: 11px !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.05em !important;
+          margin-right: 6px !important;
+        }
+
+        .alarm-safety-text {
+          color: var(--ink) !important;
+          font-weight: 500 !important;
+        }
+
+        .alarm-actions-stack {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 12px !important;
+          margin-top: 8px !important;
+        }
+
+        .alarm-btn-confirm {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 10px !important;
+          width: 100% !important;
+          padding: 15px 24px !important;
+          border-radius: 14px !important;
+          background: var(--leaf) !important;
+          color: #ffffff !important;
+          font-family: var(--font-sans) !important;
+          font-size: 15px !important;
+          font-weight: 700 !important;
+          border: none !important;
+          cursor: pointer !important;
+          box-shadow: 0 4px 16px rgba(45, 122, 88, 0.35) !important;
+          transition: all 140ms ease !important;
+        }
+
+        .alarm-btn-confirm:hover {
+          background: #246347 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 6px 20px rgba(45, 122, 88, 0.45) !important;
+        }
+
+        .alarm-actions-secondary {
+          display: grid !important;
+          grid-template-columns: 1.2fr 1fr !important;
+          gap: 10px !important;
+        }
+
+        .alarm-btn-snooze {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 8px !important;
+          padding: 12px 16px !important;
+          border-radius: 12px !important;
+          background: var(--cream) !important;
+          border: 1px solid var(--border-medium) !important;
+          color: var(--ink) !important;
+          font-family: var(--font-sans) !important;
+          font-size: 13.5px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 140ms ease !important;
+        }
+
+        .alarm-btn-snooze:hover {
+          background: #ffffff !important;
+          border-color: var(--ink) !important;
+        }
+
+        .alarm-btn-skip {
+          padding: 12px 16px !important;
+          border-radius: 12px !important;
+          background: transparent !important;
+          border: 1px solid var(--border-subtle) !important;
+          color: var(--text-muted) !important;
+          font-family: var(--font-sans) !important;
+          font-size: 13px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: all 140ms ease !important;
+        }
+
+        .alarm-btn-skip:hover {
+          color: var(--ink) !important;
+          border-color: var(--border-medium) !important;
+        }
+      `}</style>
     </div>
   );
 }
