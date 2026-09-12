@@ -87,8 +87,9 @@ export function Workspace({ onLogout }) {
     notify,
     listen,
     openModal: setModal,
-    triggerAlarm: triggerAlarmManually
-  }), [data.dashboard, data.alerts, data.patients, data.selectedPatientId, data.setSelectedPatientId, data.refresh, notify, listen]);
+    triggerAlarm: triggerAlarmManually,
+    setTab
+  }), [data.dashboard, data.alerts, data.patients, data.selectedPatientId, data.setSelectedPatientId, data.refresh, notify, listen, setTab]);
 
   const navItems = navigationFor(session.role, t);
   const unreadAlerts = data.alerts.filter((item) => !item.readBy?.includes(session.id)).length;

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { createApp } from './app.js';
 import { config } from './config.js';
 import { seedDemoPasswords } from './data/seeder.js';

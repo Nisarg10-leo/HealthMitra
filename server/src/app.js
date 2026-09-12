@@ -11,6 +11,7 @@ import { authRouter } from './routes/auth.js';
 import { doseLogsRouter } from './routes/doseLogs.js';
 import { medicationsRouter } from './routes/medications.js';
 import { patientsRouter } from './routes/patients.js';
+import { profileRouter } from './routes/profile.js';
 import { safetyRouter } from './routes/safety.js';
 import { sosRouter } from './routes/sos.js';
 import { supportRouter } from './routes/support.js';
@@ -22,12 +23,12 @@ const __dirname = path.dirname(__filename);
 export function createApp() {
   const app = express();
   app.use(cors({ origin: config.allowedOrigins.length ? config.allowedOrigins : true }));
-  app.use(express.json({ limit: '1mb' }));
+  app.use(express.json({ limit: '15mb' }));
 
   // Public: health, sign-in, and stateless helpers (symptom lookup, voice intent).
   app.use('/api', systemRouter, authRouter, supportRouter);
   // Protected: everything that reads or changes patient data.
-  app.use('/api', requireUser, patientsRouter, medicationsRouter, doseLogsRouter, alertsRouter, sosRouter, safetyRouter);
+  app.use('/api', requireUser, profileRouter, patientsRouter, medicationsRouter, doseLogsRouter, alertsRouter, sosRouter, safetyRouter);
 
   // Serve production client build if present
   const clientDist = path.resolve(__dirname, '../../client/dist');

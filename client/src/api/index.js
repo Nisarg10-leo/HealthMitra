@@ -53,5 +53,11 @@ export const safetyApi = {
 export const guidanceApi = {
   symptom: (symptom, severe, language) => get(`/symptom-suggestions?symptom=${encodeURIComponent(symptom)}&severe=${severe}&language=${language}`),
   voiceIntent: (transcript) => post('/voice/intent', { transcript }),
-  askMitra: (question, language = 'en') => post('/support/ask-mitra', { question, language })
+  askMitra: (question, language = 'en') => post('/support/ask-mitra', { question, language }),
+  scanPrescription: (payload) => post('/support/scan-prescription', payload)
+};
+
+export const profileApi = {
+  get: () => get('/profile'),
+  update: (data) => put('/profile', data)
 };

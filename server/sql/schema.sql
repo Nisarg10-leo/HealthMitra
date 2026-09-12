@@ -10,6 +10,18 @@ CREATE TABLE users (
   email           TEXT UNIQUE NOT NULL,
   password_hash   TEXT NOT NULL,
   preferred_language VARCHAR(8) DEFAULT 'en',
+  dob             DATE,
+  gender          TEXT,
+  blood_group     TEXT,
+  height          NUMERIC,
+  weight          NUMERIC,
+  conditions      TEXT[] DEFAULT '{}',
+  allergies       TEXT[] DEFAULT '{}',
+  emergency_contact_name TEXT,
+  emergency_contact_phone TEXT,
+  emergency_contact_relation TEXT,
+  medical_files   JSONB DEFAULT '[]'::jsonb,
+  profile_complete BOOLEAN DEFAULT false,
   created_at      TIMESTAMPTZ DEFAULT now()
 );
 

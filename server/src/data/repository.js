@@ -50,7 +50,8 @@ if (config.databaseUrl) {
       },
       listPatients: () => where('users')((item) => item.role === 'patient'),
       insert: insert('users'),
-      updatePassword: (id, passwordHash) => update('users')(id, { passwordHash })
+      updatePassword: (id, passwordHash) => update('users')(id, { passwordHash }),
+      update: (id, changes) => update('users')(id, changes)
     },
     links: {
       forCaregiver: (caregiverId) => where('links')((link) => link.caregiverId === caregiverId),

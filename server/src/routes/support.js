@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { asyncRoute } from '../middleware/errorHandler.js';
 import { requireUser } from '../middleware/requireUser.js';
 import { assertCanView, resolvePatientId } from '../services/accessService.js';
@@ -6,6 +6,7 @@ import { CONTACT_TYPES, addContact, listContacts } from '../services/contactServ
 import { askMitra } from '../services/groqService.js';
 import { symptomGuidance } from '../services/symptomService.js';
 import { detectIntent } from '../services/voiceIntentService.js';
+import { scanPrescriptionImage } from '../services/visionService.js';
 
 export const supportRouter = Router();
 
@@ -20,6 +21,18 @@ supportRouter.post('/support/ask-mitra', requireUser, asyncRoute(async (req, res
     patientId,
     language: req.body?.language || 'en'
   });
+  res.json(result);
+}));
+
+supportRouter.post('/support/scan-prescription', requireUser, express.json({ limit: '10mb' }), asyncRoute(async (req, res) => {
+  const patientId = await resolvePatientId(req, req.actor);
+  await assertCanView(req.actor, patientId);
+  
+  if (!req.body?.image && !req.body?.text) {
+    return res.status(400).json({ error: 'Image or text is required' });
+  }
+
+  const result = await scanPrescriptionImage(req.body?.image, req.body?.text);
   res.json(result);
 }));
 

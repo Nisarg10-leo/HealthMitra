@@ -135,6 +135,11 @@ export const pgRepository = {
       const uid = cleanUuid(id);
       if (!uid) return null;
       return one(await query('UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING *', [passwordHash, uid]));
+    },
+    update: async (id, changes) => {
+      const uid = cleanUuid(id);
+      if (!uid) return null;
+      return one(await query(...Object.values(buildUpdate('users', uid, changes))));
     }
   },
 

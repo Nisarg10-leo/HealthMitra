@@ -13,7 +13,13 @@ const STORE_PATH = path.join(DATA_DIR, 'local_store.json');
 // In-memory tables that mirror server/sql/schema.sql one-to-one. Only
 // repository.js is allowed to touch this object; services never import it.
 const demoPassword = hashPassword('demo123');
-const seededUser = (id, name, role, email, phone, preferredLanguage = 'en') => ({ id, name, role, email, phone, passwordHash: demoPassword, preferredLanguage });
+const seededUser = (id, name, role, email, phone, preferredLanguage = 'en') => ({
+  id, name, role, email, phone, passwordHash: demoPassword, preferredLanguage,
+  dob: null, gender: null, bloodGroup: null, height: null, weight: null,
+  conditions: [], allergies: [], emergencyContactName: null,
+  emergencyContactPhone: null, emergencyContactRelation: null,
+  profileComplete: false
+});
 
 export const tables = {
   users: [
