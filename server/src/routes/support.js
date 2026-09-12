@@ -10,7 +10,27 @@ import { scanPrescriptionImage } from '../services/visionService.js';
 
 export const supportRouter = Router();
 
-supportRouter.get('/symptom-suggestions', (req, res) => res.json(symptomGuidance({ symptom: req.query.symptom, language: req.query.language, severe: req.query.severe === 'true' })));
+supportRouter.get('/symptom-suggestions', asyncRoute(async (req, res) => {
+  const patientId = req.query.patientId || req.actor?.id;
+  const result = await symptomGuidance({
+    symptom: req.query.symptom,
+    language: req.query.language,
+    severe: req.query.severe === 'true',
+    patientId
+  });
+  res.json(result);
+}));
+
+supportRouter.post('/support/symptom-ai', asyncRoute(async (req, res) => {
+  const patientId = req.body?.patientId || req.actor?.id;
+  const result = await symptomGuidance({
+    symptom: req.body?.symptom,
+    language: req.body?.language,
+    severe: req.body?.severe === true,
+    patientId
+  });
+  res.json(result);
+}));
 supportRouter.post('/voice/intent', (req, res) => res.json(detectIntent(req.body?.transcript)));
 
 supportRouter.post('/support/ask-mitra', requireUser, asyncRoute(async (req, res) => {

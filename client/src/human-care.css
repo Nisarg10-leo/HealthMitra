@@ -2571,13 +2571,68 @@ button.danger:hover, .btn-danger:hover, .btn-emergency:hover {
   user-select: none !important;
 }
 
+.symptom-custom-box {
+  margin-bottom: 20px !important;
+}
+
+.symptom-input-label {
+  display: block !important;
+  font-size: 11px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+.symptom-input-row {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.symptom-custom-input {
+  width: 100% !important;
+  padding: 12px 38px 12px 14px !important;
+  background: var(--cream) !important;
+  border: 1.5px solid var(--border-medium) !important;
+  border-radius: 12px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  color: var(--ink) !important;
+  outline: none !important;
+  transition: all 140ms ease !important;
+}
+
+.symptom-custom-input:focus {
+  background: #ffffff !important;
+  border-color: var(--leaf) !important;
+  box-shadow: 0 0 0 3px rgba(45, 122, 88, 0.12) !important;
+}
+
+.symptom-clear-btn {
+  position: absolute !important;
+  right: 12px !important;
+  background: none !important;
+  border: none !important;
+  font-size: 18px !important;
+  color: var(--text-muted) !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  padding: 4px !important;
+}
+
+.symptom-clear-btn:hover {
+  color: var(--ink) !important;
+}
+
 .symptom-guidance-box {
   margin-top: 24px !important;
   padding: 22px 24px !important;
   border-radius: 16px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 12px !important;
+  gap: 14px !important;
   animation: fadeIn 200ms ease !important;
 }
 
@@ -2587,10 +2642,66 @@ button.danger:hover, .btn-danger:hover, .btn-emergency:hover {
   color: var(--leaf) !important;
 }
 
-.symptom-guidance-box.guidance-alert {
-  background: rgba(217, 119, 70, 0.1) !important;
-  border: 1px solid rgba(217, 119, 70, 0.3) !important;
+.symptom-guidance-box.guidance-moderate {
+  background: rgba(217, 119, 70, 0.08) !important;
+  border: 1px solid rgba(217, 119, 70, 0.28) !important;
   color: var(--apricot) !important;
+}
+
+.symptom-guidance-box.guidance-alert {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border: 1px solid rgba(220, 38, 38, 0.28) !important;
+  color: #dc2626 !important;
+}
+
+.guidance-meta-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid rgba(28, 40, 38, 0.08) !important;
+}
+
+.guidance-source-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+}
+
+.guidance-triage-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+}
+
+.guidance-triage-pill.triage-safe {
+  background: rgba(45, 122, 88, 0.15) !important;
+  color: var(--leaf) !important;
+  border: 1px solid rgba(45, 122, 88, 0.3) !important;
+}
+
+.guidance-triage-pill.triage-moderate {
+  background: rgba(217, 119, 70, 0.12) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(217, 119, 70, 0.3) !important;
+}
+
+.guidance-triage-pill.triage-urgent {
+  background: rgba(220, 38, 38, 0.12) !important;
+  color: #dc2626 !important;
+  border: 1px solid rgba(220, 38, 38, 0.3) !important;
 }
 
 .guidance-header-row {
@@ -2610,6 +2721,89 @@ button.danger:hover, .btn-danger:hover, .btn-emergency:hover {
   font-size: 14px !important;
   line-height: 1.65 !important;
   margin: 0 !important;
+  white-space: pre-line !important;
+}
+
+.guidance-redflags-card {
+  background: rgba(220, 38, 38, 0.06) !important;
+  border: 1px solid rgba(220, 38, 38, 0.2) !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+  margin-top: 4px !important;
+}
+
+.redflags-title {
+  display: block !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+.redflags-text {
+  font-size: 13px !important;
+  color: var(--ink) !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+.guidance-actions-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  margin-top: 6px !important;
+}
+
+.guidance-listen-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid var(--border-medium) !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.guidance-listen-btn:hover {
+  background: var(--cream) !important;
+  border-color: var(--leaf) !important;
+  color: var(--leaf) !important;
+}
+
+.guidance-listen-btn.listen-active {
+  background: var(--leaf) !important;
+  color: #ffffff !important;
+  border-color: var(--leaf) !important;
+}
+
+.guidance-whatsapp-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid rgba(37, 211, 102, 0.4) !important;
+  background: rgba(37, 211, 102, 0.08) !important;
+  color: #128C7E !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.guidance-whatsapp-btn:hover {
+  background: #25D366 !important;
+  color: #ffffff !important;
 }
 
 .guidance-disclaimer {

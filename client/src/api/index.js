@@ -51,7 +51,9 @@ export const safetyApi = {
 };
 
 export const guidanceApi = {
-  symptom: (symptom, severe, language) => get(`/symptom-suggestions?symptom=${encodeURIComponent(symptom)}&severe=${severe}&language=${language}`),
+  symptom: (symptom, severe, language, patientId) =>
+    get(`/symptom-suggestions?symptom=${encodeURIComponent(symptom)}&severe=${Boolean(severe)}&language=${language || 'en'}${patientId ? `&patientId=${encodeURIComponent(patientId)}` : ''}`),
+  symptomAi: (payload) => post('/support/symptom-ai', payload),
   voiceIntent: (transcript) => post('/voice/intent', { transcript }),
   askMitra: (question, language = 'en') => post('/support/ask-mitra', { question, language }),
   scanPrescription: (payload) => post('/support/scan-prescription', payload)
