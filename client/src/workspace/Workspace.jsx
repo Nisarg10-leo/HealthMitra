@@ -105,7 +105,16 @@ export function Workspace({ onLogout }) {
 
   const navItems = navigationFor(session.role, t);
   const unreadAlerts = data.alerts.filter((item) => !item.readBy?.includes(session.id)).length;
-  const dueReminder = data.notifications.find((item) => item.type === 'reminder' && !item.readAt);
+  const dueReminder = data.notifications.find((item) => {
+    if (item.type !== 'reminder' || item.readAt) return false;
+    if (item.doseLogId && data.dashboard?.logs) {
+      const log = data.dashboard.logs.find((l) => l.id === item.doseLogId);
+      if (log && log.status !== 'pending') return false;
+    }
+    const ageMs = Date.now() - new Date(item.createdAt).getTime();
+    if (ageMs > 4 * 3600_000) return false;
+    return true;
+  });
   const Screen = SCREENS[tab] || SCREENS.today;
 
   const alarmMedication = alarmDose

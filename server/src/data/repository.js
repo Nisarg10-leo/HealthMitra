@@ -86,7 +86,10 @@ if (config.databaseUrl) {
       insert: insert('notifications', { atFront: true }),
       update: async (id, changes) => {
         const record = tables.notifications.find((item) => item.id === id);
-        if (record) Object.assign(record, changes);
+        if (record) {
+          Object.assign(record, changes);
+          persistStore();
+        }
         return record || null;
       }
     },

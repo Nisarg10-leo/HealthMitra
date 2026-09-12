@@ -1,21 +1,61 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { alertsApi } from '../../api/index.js';
+import { alertsApi, dosesApi } from '../../api/index.js';
 import { useSpokenText } from '../../hooks/useSpeech.js';
 import { formatTime } from '../../utils/format.js';
-import { CheckIcon, ClockIcon } from '../ui/Icons.jsx';
+import { CheckIcon, ClockIcon, CrossIcon } from '../ui/Icons.jsx';
 
 export function ReminderBanner({ notification, onDismissed }) {
   const { t, i18n } = useTranslation();
+  const [acting, setActing] = useState(false);
   useSpokenText(notification.body, notification.id);
 
+  const handleTake = async () => {
+    setActing(true);
+    try {
+      if (notification.doseLogId) {
+        await dosesApi.confirm(notification.doseLogId, 'taken', 'manual');
+      }
+      await alertsApi.markNotificationRead(notification.id);
+      if (onDismissed) onDismissed();
+    } catch (err) {
+      console.error(err);
+      await alertsApi.markNotificationRead(notification.id);
+      if (onDismissed) onDismissed();
+    } finally {
+      setActing(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    setActing(true);
+    try {
+      if (notification.doseLogId) {
+        await dosesApi.confirm(notification.doseLogId, 'skipped', 'manual');
+      }
+      await alertsApi.markNotificationRead(notification.id);
+      if (onDismissed) onDismissed();
+    } catch (err) {
+      console.error(err);
+      await alertsApi.markNotificationRead(notification.id);
+      if (onDismissed) onDismissed();
+    } finally {
+      setActing(false);
+    }
+  };
+
   const dismiss = async () => {
-    await alertsApi.markNotificationRead(notification.id);
-    onDismissed();
+    setActing(true);
+    try {
+      await alertsApi.markNotificationRead(notification.id);
+      if (onDismissed) onDismissed();
+    } finally {
+      setActing(false);
+    }
   };
 
   return (
-    <aside className="reminder-banner-card" role="alert">
+    <aside className="reminder-banner-card reminder-banner" role="alert">
       <div className="reminder-banner-left">
         <div className="reminder-icon-badge" aria-hidden="true">
           <ClockIcon size={18} />
@@ -34,14 +74,40 @@ export function ReminderBanner({ notification, onDismissed }) {
         </div>
       </div>
 
-      <div className="reminder-actions-row">
+      <div className="reminder-actions-row" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        {notification.doseLogId && (
+          <button
+            type="button"
+            onClick={handleTake}
+            disabled={acting}
+            className="btn-cyber btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+          >
+            <CheckIcon size={13} />
+            <span>{i18n.language === 'hi' ? 'दवा ली' : 'Mark Taken'}</span>
+          </button>
+        )}
+
+        {notification.doseLogId && (
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={acting}
+            className="btn-glass btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+          >
+            <span>{i18n.language === 'hi' ? 'छोड़ी' : 'Skip'}</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={dismiss}
+          disabled={acting}
           className="reminder-dismiss-btn font-mono"
           title="Dismiss this reminder"
         >
-          <CheckIcon size={13} />
+          <CrossIcon size={12} />
           <span>{t('dismiss') || 'Dismiss'}</span>
         </button>
       </div>

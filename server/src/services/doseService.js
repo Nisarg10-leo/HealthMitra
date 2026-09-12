@@ -40,6 +40,19 @@ export async function confirmDose(actor, doseId, { status, method }) {
   const access = await accessFor(actor, medication.patientId);
   if (!access.allowed || (actor.role !== 'patient' && !access.canEdit)) throw forbidden('You cannot confirm this dose.');
   if (!['taken', 'skipped'].includes(status)) throw badRequest('Choose taken or skipped.');
-  if (log.status !== 'pending') throw conflict(`This dose is already ${log.status}.`);
-  return repository.doseLogs.update(log.id, { status, respondedAt: nowIso(), responseMethod: method === 'voice' ? 'voice' : 'tap' });
+  const updated = await repository.doseLogs.update(log.id, { status, respondedAt: nowIso(), responseMethod: method === 'voice' ? 'voice' : 'tap' });
+
+  // Clear any active reminder notifications for this dose log
+  try {
+    const notifs = await repository.notifications.forUser(medication.patientId);
+    for (const n of notifs) {
+      if (n.doseLogId === log.id && !n.readAt) {
+        await repository.notifications.update(n.id, { readAt: nowIso() });
+      }
+    }
+  } catch (err) {
+    console.warn('[doseService] Could not auto-clear reminder notification:', err.message);
+  }
+
+  return updated;
 }

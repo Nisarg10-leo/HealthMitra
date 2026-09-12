@@ -904,7 +904,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ── Reminder Banner (Active Schedule Alert) ── */
-.reminder-banner-card {
+.reminder-banner-card, .reminder-banner {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
