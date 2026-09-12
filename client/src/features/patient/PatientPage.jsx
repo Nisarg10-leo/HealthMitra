@@ -19,10 +19,10 @@ import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 
 const MOODS = [
-  { id: 'great', label: 'Feeling Great', labelHi: 'बहुत अच्छा', color: 'var(--mint-bright)', icon: '😄' },
-  { id: 'good', label: 'Good & Active', labelHi: 'अच्छा और सक्रिय', color: 'var(--cyan)', icon: '🙂' },
-  { id: 'okay', label: 'Just Okay', labelHi: 'ठीक-ठाक', color: 'var(--amber)', icon: '😐' },
-  { id: 'unwell', label: 'Feeling Unwell', labelHi: 'अस्वस्थ', color: 'var(--coral)', icon: '🙁' }
+  { id: 'great', label: 'Feeling Great', labelHi: 'बहुत अच्छा', color: 'var(--mint-bright)' },
+  { id: 'good', label: 'Good & Active', labelHi: 'अच्छा और सक्रिय', color: 'var(--cyan)' },
+  { id: 'okay', label: 'Just Okay', labelHi: 'ठीक-ठाक', color: 'var(--amber)' },
+  { id: 'unwell', label: 'Feeling Unwell', labelHi: 'अस्वस्थ', color: 'var(--coral)' }
 ];
 
 export function PatientPage() {
@@ -179,17 +179,33 @@ export function PatientPage() {
                   <ActivityIcon size={12} />
                   <span>Telemetry Live</span>
                 </span>
-                <span className="chip-telemetry chip-cyan font-mono" style={{ fontSize: '0.74rem' }}>
-                  O+ Blood Group
-                </span>
+                {activePatient.bloodGroup && (
+                  <span className="chip-telemetry chip-cyan font-mono" style={{ fontSize: '0.74rem' }}>
+                    {activePatient.bloodGroup} Blood Group
+                  </span>
+                )}
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
-                <span>Age: <strong style={{ color: '#ffffff' }}>{activePatient.age || 68} yrs</strong></span>
-                <span>•</span>
-                <span>Hospital: <strong style={{ color: '#ffffff' }}>Lilavati, Mumbai</strong></span>
-                <span>•</span>
-                <span>Physician: <strong style={{ color: 'var(--cyan)' }}>Dr. R. Nair</strong></span>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '0.84rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                {activePatient.age ? (
+                  <>
+                    <span>Age: <strong style={{ color: '#ffffff' }}>{activePatient.age} yrs</strong></span>
+                    <span>•</span>
+                  </>
+                ) : null}
+                {activePatient.gender ? (
+                  <>
+                    <span>Gender: <strong style={{ color: '#ffffff' }}>{activePatient.gender}</strong></span>
+                    <span>•</span>
+                  </>
+                ) : null}
+                {activePatient.emergencyContactName ? (
+                  <>
+                    <span>Emergency: <strong style={{ color: '#ffffff' }}>{activePatient.emergencyContactName}</strong></span>
+                    <span>•</span>
+                  </>
+                ) : null}
+                <span>Prescriptions: <strong style={{ color: 'var(--mint-bright)' }}>{dashboard?.medications?.length || 0} active</strong></span>
               </div>
             </div>
           </div>
@@ -224,20 +240,28 @@ export function PatientPage() {
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
             Conditions:
           </span>
-          {(activePatient.conditions || ['Type 2 Diabetes', 'Hypertension']).map((c) => (
-            <span key={c} className="chip-telemetry chip-amber" style={{ fontSize: '0.74rem' }}>
-              {c}
-            </span>
-          ))}
+          {activePatient.conditions?.length > 0 ? (
+            activePatient.conditions.map((c) => (
+              <span key={c} className="chip-telemetry chip-amber" style={{ fontSize: '0.74rem' }}>
+                {c}
+              </span>
+            ))
+          ) : (
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>None recorded</span>
+          )}
 
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
             Allergies:
           </span>
-          {(activePatient.allergies || ['Sulfa Drugs']).map((a) => (
-            <span key={a} className="chip-telemetry chip-error" style={{ fontSize: '0.74rem' }}>
-              {a}
-            </span>
-          ))}
+          {activePatient.allergies?.length > 0 ? (
+            activePatient.allergies.map((a) => (
+              <span key={a} className="chip-telemetry chip-error" style={{ fontSize: '0.74rem' }}>
+                {a}
+              </span>
+            ))
+          ) : (
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>No known allergies</span>
+          )}
         </div>
       </section>
 
@@ -284,12 +308,18 @@ export function PatientPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '14px' }}>
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Daily Mood</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                  <span style={{ fontSize: '1.3rem' }}>
-                    {MOODS.find((m) => m.id === todayCheckup.mood)?.icon || '😄'}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: MOODS.find((m) => m.id === todayCheckup.mood)?.color || 'var(--mint-bright)',
+                      boxShadow: `0 0 8px ${MOODS.find((m) => m.id === todayCheckup.mood)?.color || 'var(--mint-bright)'}`
+                    }}
+                  />
                   <strong style={{ fontSize: '0.92rem', color: '#ffffff' }}>
-                    {MOODS.find((m) => m.id === todayCheckup.mood)?.label || 'Great'}
+                    {MOODS.find((m) => m.id === todayCheckup.mood)?.label || 'Good'}
                   </strong>
                 </div>
               </div>
@@ -298,9 +328,8 @@ export function PatientPage() {
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Blood Pressure</span>
                 <div style={{ marginTop: '4px' }}>
                   <strong className="font-mono" style={{ fontSize: '1.05rem', color: 'var(--cyan)' }}>
-                    {todayCheckup.bloodPressure || '120/80'}
+                    {todayCheckup.bloodPressure ? `${todayCheckup.bloodPressure} mmHg` : 'Not recorded'}
                   </strong>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginLeft: '4px' }}>mmHg</span>
                 </div>
               </div>
 
@@ -308,9 +337,8 @@ export function PatientPage() {
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Fasting Sugar</span>
                 <div style={{ marginTop: '4px' }}>
                   <strong className="font-mono" style={{ fontSize: '1.05rem', color: 'var(--mint-bright)' }}>
-                    {todayCheckup.bloodSugar || '105'}
+                    {todayCheckup.bloodSugar ? `${todayCheckup.bloodSugar} mg/dL` : 'Not recorded'}
                   </strong>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginLeft: '4px' }}>mg/dL</span>
                 </div>
               </div>
 
@@ -318,7 +346,7 @@ export function PatientPage() {
                 <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Sleep Quality</span>
                 <div style={{ marginTop: '4px' }}>
                   <strong style={{ fontSize: '0.92rem', color: '#ffffff', textTransform: 'capitalize' }}>
-                    {todayCheckup.sleepQuality || 'Good'}
+                    {todayCheckup.sleepQuality || 'Normal'}
                   </strong>
                 </div>
               </div>
@@ -335,7 +363,7 @@ export function PatientPage() {
           </div>
         ) : (
           <div style={{ background: 'var(--paper)', border: '1px dashed var(--border-subtle)', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
-            <span style={{ fontSize: '1.8rem', display: 'block', marginBottom: '8px' }}>⏰</span>
+            <ClockIcon size={24} style={{ color: 'var(--amber)', margin: '0 auto 8px', display: 'block' }} />
             <strong style={{ display: 'block', fontSize: '1rem', color: '#ffffff', marginBottom: '4px' }}>
               No Everyday Checkup Logged Yet Today
             </strong>
@@ -437,9 +465,15 @@ export function PatientPage() {
                 style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.3rem' }}>
-                    {MOODS.find((m) => m.id === chk.mood)?.icon || '😄'}
-                  </span>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: MOODS.find((m) => m.id === chk.mood)?.color || 'var(--mint-bright)',
+                      boxShadow: `0 0 6px ${MOODS.find((m) => m.id === chk.mood)?.color || 'var(--mint-bright)'}`
+                    }}
+                  />
                   <div>
                     <strong style={{ fontSize: '0.9rem', color: '#ffffff' }}>
                       {chk.date} at {chk.time}

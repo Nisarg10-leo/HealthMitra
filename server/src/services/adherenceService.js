@@ -136,7 +136,21 @@ export async function patientSummary(patientId, actor = null) {
   const safetyAdvisory = await getSafetyAdvisory(patientId, lang);
 
   return {
-    patient: patient ? { id: patient.id, name: patient.name, phone: patient.phone, preferredLanguage: patient.preferredLanguage } : null,
+    patient: patient ? {
+      id: patient.id,
+      name: patient.name,
+      phone: patient.phone,
+      preferredLanguage: patient.preferredLanguage,
+      dob: patient.dob,
+      age: patient.age || (patient.dob ? (new Date().getFullYear() - new Date(patient.dob).getFullYear()) : null),
+      gender: patient.gender,
+      bloodGroup: patient.bloodGroup,
+      conditions: patient.conditions || [],
+      allergies: patient.allergies || [],
+      emergencyContactName: patient.emergencyContactName,
+      emergencyContactPhone: patient.emergencyContactPhone,
+      emergencyContactRelation: patient.emergencyContactRelation
+    } : null,
     permissions: { canEdit: access.canEdit, permissionLevel: access.permissionLevel },
     today: {
       total: dayLogs.length,
