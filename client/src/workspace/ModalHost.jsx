@@ -1,3 +1,4 @@
+import React from 'react';
 import { AskMitraModal } from '../components/ui/AskMitraModal.jsx';
 import { EmergencyQrModal } from '../components/ui/EmergencyQrModal.jsx';
 import { PillVerificationModal } from '../components/ui/PillVerificationModal.jsx';
