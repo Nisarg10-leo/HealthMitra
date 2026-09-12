@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatLongDate } from '../../utils/format.js';
-import { AlertTriangleIcon, GlobeIcon } from '../ui/Icons.jsx';
+import { AlertTriangleIcon } from '../ui/Icons.jsx';
 
-export function Topbar({ session, patients, selectedPatient, selectedPatientId, onSelectPatient, onToggleLanguage, onSos }) {
+export function Topbar({ session, patients, selectedPatient, selectedPatientId, onSelectPatient, onSos }) {
   const { t, i18n } = useTranslation();
   const firstName = session?.name ? session.name.split(' ')[0] : 'User';
   const initial = session?.name ? session.name.charAt(0).toUpperCase() : 'H';
@@ -52,15 +52,6 @@ export function Topbar({ session, patients, selectedPatient, selectedPatientId, 
           </label>
         )}
 
-        <button
-          type="button"
-          className="btn-glass topbar-btn"
-          onClick={onToggleLanguage}
-          title={t('language')}
-        >
-          <GlobeIcon size={15} />
-          <span>{i18n.language === 'en' ? 'हिन्दी' : 'English'}</span>
-        </button>
 
         {session.role === 'patient' && (
           <button

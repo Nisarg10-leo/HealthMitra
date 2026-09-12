@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CrossMedicalIcon, GlobeIcon, LogoutIcon } from '../ui/Icons.jsx';
+import { CrossMedicalIcon, LogoutIcon } from '../ui/Icons.jsx';
 import { NavButtons } from './NavButtons.jsx';
 
-export function Sidebar({ session, items, activeTab, onSelect, unreadAlerts, onToggleLanguage, onLogout }) {
-  const { t, i18n } = useTranslation();
+export function Sidebar({ session, items, activeTab, onSelect, unreadAlerts, onLogout }) {
+  const { t } = useTranslation();
   const initial = session.name?.[0]?.toUpperCase() || 'H';
 
   return (
@@ -33,16 +33,6 @@ export function Sidebar({ session, items, activeTab, onSelect, unreadAlerts, onT
 
       {/* Bottom Controls */}
       <div className="sidebar-footer">
-        <button
-          type="button"
-          className="sidebar-action-btn"
-          onClick={onToggleLanguage}
-          title={t('language')}
-        >
-          <GlobeIcon size={16} />
-          <span>{i18n.language === 'en' ? 'हिन्दी' : 'English'}</span>
-        </button>
-
         <button
           type="button"
           className="sidebar-action-btn logout-btn"

@@ -28,6 +28,7 @@ export function ProfilePage() {
   // Form State
   const [formData, setFormData] = useState({
     dob: '',
+    age: '',
     gender: '',
     bloodGroup: '',
     height: '',
@@ -37,6 +38,8 @@ export function ProfilePage() {
     emergencyContactName: '',
     emergencyContactPhone: '',
     emergencyContactRelation: '',
+    dietaryPreference: 'Vegetarian',
+    mobilityStatus: 'Independent',
     medicalFiles: []
   });
 
@@ -61,6 +64,7 @@ export function ProfilePage() {
         if (data) {
           setFormData({
             dob: data.dob || '',
+            age: data.age || '',
             gender: data.gender || '',
             bloodGroup: data.bloodGroup || '',
             height: data.height || '',
@@ -70,6 +74,8 @@ export function ProfilePage() {
             emergencyContactName: data.emergencyContactName || '',
             emergencyContactPhone: data.emergencyContactPhone || '',
             emergencyContactRelation: data.emergencyContactRelation || '',
+            dietaryPreference: data.dietaryPreference || 'Vegetarian',
+            mobilityStatus: data.mobilityStatus || 'Independent',
             medicalFiles: Array.isArray(data.medicalFiles) ? data.medicalFiles : []
           });
         }

@@ -2,11 +2,21 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { authApi } from '../../api/index.js';
 import { ErrorText } from '../../components/ui/ErrorText.jsx';
+import {
+  CheckIcon,
+  CrossMedicalIcon,
+  EyeIcon,
+  EyeOffIcon,
+  GlobeIcon,
+  HeartIcon,
+  ShieldIcon,
+  SparklesIcon,
+  UserIcon
+} from '../../components/ui/Icons.jsx';
 import { useAsyncAction } from '../../hooks/useAsyncAction.js';
-import { EyeIcon, EyeOffIcon } from '../../components/ui/Icons.jsx';
 
 export function AuthPage({ onLogin }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot' | 'reset'
   const [role, setRole] = useState('patient');
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
@@ -83,7 +93,13 @@ export function AuthPage({ onLogin }) {
     run(async () => {
       const res = mode === 'login'
         ? await authApi.login(cleanEmail, form.password)
-        : await authApi.register({ name: String(form.name || '').trim(), email: cleanEmail, phone: String(form.phone || '').trim(), password: form.password }, role);
+        : await authApi.register({
+            name: String(form.name || '').trim(),
+            email: cleanEmail,
+            phone: String(form.phone || '').trim(),
+            password: form.password,
+            preferredLanguage: i18n.language
+          }, role);
       onLogin(res.user);
     });
   };
@@ -142,655 +158,503 @@ export function AuthPage({ onLogin }) {
     setDemoOtpHint('');
   };
 
+  // Quick Demo Logins for effortless testing
+  const fillDemoPatient = () => {
+    setMode('login');
+    setForm({ ...form, email: 'meera@demo.health', password: 'demo123' });
+    setValidationError('');
+  };
+
+  const fillDemoCaregiver = () => {
+    setMode('login');
+    setForm({ ...form, email: 'arjun@demo.health', password: 'demo123' });
+    setValidationError('');
+  };
+
+  const fillTestNewUser = () => {
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    setMode('register');
+    setRole('patient');
+    setForm({
+      name: 'Ramesh Patel',
+      email: `ramesh${randomSuffix}@demo.health`,
+      phone: '+9198200' + randomSuffix,
+      password: 'Password@123',
+      confirmPassword: 'Password@123'
+    });
+    setValidationError('');
+  };
+
   return (
-    <main className="auth">
-      <section className="brand-panel">
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(0, 210, 211, 0.12)', border: '1px solid var(--cyan-border)', borderRadius: '999px', marginBottom: '18px' }}>
-            <span style={{ fontSize: '1.2rem', color: 'var(--cyan)' }}>✚</span>
-            <span style={{ color: 'var(--cyan)', letterSpacing: '0.06em', fontWeight: '700', fontSize: '0.85rem' }}>
-              HEALTHMITRA : FAMILY CARE
-            </span>
+    <div className="auth-wrapper">
+      {/* Top Header with Brand & Language Selector (on Login Page only) */}
+      <header className="auth-top-nav">
+        <div className="auth-top-brand">
+          <div className="auth-brand-badge">
+            <CrossMedicalIcon size={16} strokeWidth={2.4} />
           </div>
-          <h1 style={{ fontSize: '2.5rem', lineHeight: '1.18', margin: '8px 0 16px', color: '#ffffff', fontWeight: '700' }}>
-            {t('brandTitle')}<br />
-            <span style={{ color: 'var(--cyan)', fontWeight: '700' }}>{t('brandTitleAccent')}</span>
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6', maxWidth: '480px' }}>
-            {t('brandDescription')}
-          </p>
-          <div style={{ color: '#34d399', marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
-            <span aria-hidden="true" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }} />
-            Private & Secure Family Health Network
-          </div>
-          <div className="brand-pills" style={{ marginTop: '22px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>Voice-assisted for Seniors</span>
-            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>Family Caregiver Alerts</span>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>English & Hindi Bilingual</span>
+          <div>
+            <span className="auth-brand-name">HealthMitra</span>
+            <span className="auth-brand-sub">Personal Health Companion</span>
           </div>
         </div>
-      </section>
 
-      <section className="auth-card">
-        <div className="glass-matrix" style={{ padding: '36px 32px' }}>
-          <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', marginBottom: '10px' }}>
-            {mode === 'login' && 'Secure Authentication'}
-            {mode === 'register' && 'Create Encrypted Account'}
-            {mode === 'forgot' && 'Account Recovery'}
-            {mode === 'reset' && 'Verification & Reset'}
-          </span>
-          <h2 style={{ fontSize: '1.85rem', margin: '4px 0 6px', color: '#ffffff' }}>
-            {mode === 'login' && t('welcomeBack')}
-            {mode === 'register' && t('createAccount')}
-            {mode === 'forgot' && (t('forgotPassword') || 'Forgot Password')}
-            {mode === 'reset' && (t('resetPassword') || 'Reset Password')}
-          </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: '0 0 20px', lineHeight: '1.5' }}>
-            {mode === 'login' && 'Sign in to access real-time telemetry and medication scheduling.'}
-            {mode === 'register' && 'Set up your secure HealthMitra profile.'}
-            {mode === 'forgot' && 'Enter your registered email address to receive a 6-digit verification code.'}
-            {mode === 'reset' && `Enter the 6-digit OTP sent to ${form.email || 'your email'} and set a new password.`}
-          </p>
+        {/* ── Language Selector exclusively on Login Page ── */}
+        <div className="auth-lang-selector" aria-label="Select Language">
+          <GlobeIcon size={15} />
+          <button
+            type="button"
+            className={`auth-lang-pill ${i18n.language === 'en' ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage('en')}
+          >
+            English
+          </button>
+          <span className="auth-lang-sep">/</span>
+          <button
+            type="button"
+            className={`auth-lang-pill ${i18n.language === 'hi' ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage('hi')}
+          >
+            हिन्दी
+          </button>
+        </div>
+      </header>
 
-          {/* Success Status Message */}
-          {statusMessage && (
-            <div
-              style={{
-                background: 'rgba(111, 251, 190, 0.1)',
-                border: '1px solid rgba(111, 251, 190, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 14px',
-                marginBottom: '16px',
-                color: '#6ffbbe',
-                fontSize: '0.86rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>✓</span>
-              <span>{statusMessage}</span>
-            </div>
-          )}
+      <main className="auth-main-layout">
+        {/* Left Side: Warm Brand Narrative */}
+        <section className="auth-editorial-panel">
+          <div className="auth-editorial-content">
+            <span className="chip-telemetry chip-mint">
+              <SparklesIcon size={13} />
+              <span>{t('pillCare') || 'Caregiver Loop'}</span>
+            </span>
 
-          {/* Demo OTP Helper (helpful for instant verification in dev & review) */}
-          {demoOtpHint && mode === 'reset' && (
-            <div
-              style={{
-                background: 'rgba(0, 242, 254, 0.08)',
-                border: '1px solid rgba(0, 242, 254, 0.25)',
-                borderRadius: '10px',
-                padding: '10px 14px',
-                marginBottom: '16px',
-                color: '#00f2fe',
-                fontSize: '0.82rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <span>
-                Generated OTP: <strong style={{ letterSpacing: '0.12em', color: '#ffffff', fontSize: '0.95rem' }}>{demoOtpHint}</strong>
+            <h1 className="auth-headline">
+              {t('brandTitle') || 'Health support,'}{' '}
+              <span className="auth-headline-italic">
+                {t('brandTitleAccent') || 'close to home.'}
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setOtp(demoOtpHint);
-                  setValidationError('');
-                }}
-                style={{
-                  background: 'rgba(0, 242, 254, 0.15)',
-                  border: '1px solid rgba(0, 242, 254, 0.35)',
-                  color: '#00f2fe',
-                  borderRadius: '6px',
-                  padding: '3px 8px',
-                  fontSize: '0.74rem',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                Auto-fill
-              </button>
-            </div>
-          )}
+            </h1>
 
-          {/* REGISTER ROLE PICKER */}
-          {mode === 'register' && (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                background: 'rgba(10, 14, 23, 0.8)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
-                padding: '4px',
-                marginBottom: '20px'
-              }}
-              aria-label={t('chooseRole')}
-            >
-              <button
-                type="button"
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: role === 'patient' ? 'linear-gradient(135deg, #00f2fe, #4facfe)' : 'transparent',
-                  color: role === 'patient' ? '#090d16' : '#94a3b8',
-                  fontWeight: '700',
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => setRole('patient')}
-              >
-                {t('patient')}
-              </button>
-              <button
-                type="button"
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: role === 'caregiver' ? 'linear-gradient(135deg, #00f2fe, #4facfe)' : 'transparent',
-                  color: role === 'caregiver' ? '#090d16' : '#94a3b8',
-                  fontWeight: '700',
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => setRole('caregiver')}
-              >
-                {t('caregiver')}
-              </button>
-            </div>
-          )}
+            <p className="auth-narrative">
+              {t('brandDescription') ||
+                'Simple medicine care for you. Quiet confidence for the people who love you. Designed for older adults and their families.'}
+            </p>
 
-          {/* LOGIN & REGISTER FORMS */}
-          {(mode === 'login' || mode === 'register') && (
-            <form onSubmit={submitAuth}>
-              {mode === 'register' && (
-                <>
-                  <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                    {t('name')}
-                    <input
-                      required
-                      value={form.name}
-                      onChange={field('name')}
-                      placeholder={t('namePlaceholder')}
-                      autoComplete="name"
-                      style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                    />
-                  </label>
-                  <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                    {t('phone')}
-                    <input
-                      value={form.phone}
-                      onChange={field('phone')}
-                      placeholder="+91 98765 43210"
-                      autoComplete="tel"
-                      style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                    />
-                  </label>
-                </>
-              )}
-
-              <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                {t('email')}
-                <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={field('email')}
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                  style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                />
-              </label>
-
-              <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span>{t('password')}</span>
-                  {mode === 'login' && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode('forgot');
-                        setValidationError('');
-                        setStatusMessage('');
-                        setDemoOtpHint('');
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#00f2fe',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
-                    >
-                      {t('forgotPassword')}
-                    </button>
-                  )}
+            <div className="auth-feature-list">
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <HeartIcon size={16} />
                 </div>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    required
-                    type={showPassword ? 'text' : 'password'}
-                    value={form.password}
-                    onChange={field('password')}
-                    placeholder={mode === 'register' ? 'Minimum 8 characters' : 'Enter your password'}
-                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      color: '#94a3b8',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-                  </button>
+                <div>
+                  <strong>Gentle Medication Routine</strong>
+                  <p>Clear, large-text schedule with audible alerts and one-tap confirmations.</p>
                 </div>
-              </label>
+              </div>
 
-              {mode === 'register' && (
-                <>
-                  <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                    Confirm Password
-                    <div style={{ position: 'relative', marginTop: '6px' }}>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <ShieldIcon size={16} />
+                </div>
+                <div>
+                  <strong>Family Caregiver Sync</strong>
+                  <p>Instant peace of mind with real-time missed-dose alerts and SOS escalation.</p>
+                </div>
+              </div>
+
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <ActivityIcon size={16} />
+                </div>
+                <div>
+                  <strong>Mitra Clinical Intelligence</strong>
+                  <p>Safe AI guidance on food interactions, timings, and symptom checks in English & Hindi.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Right Side: Human Care Auth Card */}
+        <section className="auth-form-panel">
+          <div className="auth-card-box">
+            {/* Card Header */}
+            <div className="auth-card-head">
+              <h2 className="auth-card-title">
+                {mode === 'login' && (t('welcomeBack') || 'Welcome back')}
+                {mode === 'register' && (t('createAccount') || 'Create your account')}
+                {mode === 'forgot' && (t('forgotPassword') || 'Forgot Password')}
+                {mode === 'reset' && (t('resetPassword') || 'Reset Password')}
+              </h2>
+              <p className="auth-card-sub">
+                {mode === 'login' && 'Sign in to access your medicines and care circle.'}
+                {mode === 'register' && 'Set up your account to start personalizing care.'}
+                {mode === 'forgot' && 'Enter your email to receive a 6-digit recovery code.'}
+                {mode === 'reset' && `Enter the 6-digit code sent to ${form.email || 'your email'}.`}
+              </p>
+            </div>
+
+            {/* Status & Demo Hints */}
+            {statusMessage && (
+              <div className="auth-status-banner success">
+                <CheckIcon size={16} />
+                <span>{statusMessage}</span>
+              </div>
+            )}
+
+            {demoOtpHint && mode === 'reset' && (
+              <div className="auth-status-banner info">
+                <span>Verification code: <strong className="font-mono">{demoOtpHint}</strong></span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtp(demoOtpHint);
+                    setValidationError('');
+                  }}
+                  className="btn-subtle"
+                >
+                  Auto-fill
+                </button>
+              </div>
+            )}
+
+            {/* Role Switcher for Registration */}
+            {mode === 'register' && (
+              <div className="auth-role-segmented">
+                <button
+                  type="button"
+                  className={`auth-role-btn ${role === 'patient' ? 'active' : ''}`}
+                  onClick={() => setRole('patient')}
+                >
+                  <UserIcon size={14} />
+                  <span>{t('patient') || 'Patient'}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`auth-role-btn ${role === 'caregiver' ? 'active' : ''}`}
+                  onClick={() => setRole('caregiver')}
+                >
+                  <ShieldIcon size={14} />
+                  <span>{t('caregiver') || 'Caregiver'}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Login & Registration Form */}
+            {(mode === 'login' || mode === 'register') && (
+              <form onSubmit={submitAuth} className="auth-form-fields">
+                {mode === 'register' && (
+                  <>
+                    <div className="auth-field">
+                      <label htmlFor="auth-name">{t('name') || 'Your name'}</label>
                       <input
+                        id="auth-name"
                         required
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        value={form.confirmPassword}
-                        onChange={field('confirmPassword')}
-                        placeholder="Re-enter your password"
-                        autoComplete="new-password"
-                        style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                        type="text"
+                        value={form.name}
+                        onChange={field('name')}
+                        placeholder={t('namePlaceholder') || 'Full name'}
+                        autoComplete="name"
+                        className="setup-input"
                       />
+                    </div>
+
+                    <div className="auth-field">
+                      <label htmlFor="auth-phone">{t('phone') || 'Phone number'}</label>
+                      <input
+                        id="auth-phone"
+                        type="tel"
+                        value={form.phone}
+                        onChange={field('phone')}
+                        placeholder="+91 98765 43210"
+                        autoComplete="tel"
+                        className="setup-input font-mono"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="auth-field">
+                  <label htmlFor="auth-email">{t('email') || 'Email address'}</label>
+                  <input
+                    id="auth-email"
+                    required
+                    type="email"
+                    value={form.email}
+                    onChange={field('email')}
+                    placeholder="name@example.com"
+                    autoComplete="email"
+                    className="setup-input font-mono"
+                  />
+                </div>
+
+                <div className="auth-field">
+                  <div className="auth-field-header">
+                    <label htmlFor="auth-pwd">{t('password') || 'Password'}</label>
+                    {mode === 'login' && (
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                        style={{
-                          position: 'absolute',
-                          right: '12px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '1rem',
-                          color: '#94a3b8',
-                          padding: 0,
-                          display: 'flex',
-                          alignItems: 'center'
+                        onClick={() => {
+                          setMode('forgot');
+                          setValidationError('');
+                          setStatusMessage('');
                         }}
+                        className="auth-link-subtle"
                       >
-                        {showConfirmPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                        {t('forgotPassword') || 'Forgot password?'}
                       </button>
-                    </div>
-                  </label>
-
-                  {/* Vitalis Dark Glass Password Security Checklist */}
-                  <div
-                    style={{
-                      background: 'rgba(10, 14, 23, 0.85)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
-                      padding: '14px',
-                      margin: '12px 0 16px',
-                      fontSize: '0.8rem'
-                    }}
-                  >
-                    <strong style={{ color: '#00f2fe', display: 'block', marginBottom: '8px', fontSize: '0.78rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                      Security Requirements:
-                    </strong>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                      <span style={{ color: registerRules.length ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.length ? '✓' : '○'}</span> 8+ characters
-                      </span>
-                      <span style={{ color: registerRules.upper ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.upper ? '✓' : '○'}</span> Uppercase letter
-                      </span>
-                      <span style={{ color: registerRules.lower ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.lower ? '✓' : '○'}</span> Lowercase letter
-                      </span>
-                      <span style={{ color: registerRules.number ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.number ? '✓' : '○'}</span> At least 1 number
-                      </span>
-                      <span style={{ color: registerRules.special ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.special ? '✓' : '○'}</span> Special symbol
-                      </span>
-                      <span style={{ color: registerRules.match ? '#6ffbbe' : '#ffb4ab', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{registerRules.match ? '✓' : '○'}</span> Passwords match
-                      </span>
-                    </div>
+                    )}
                   </div>
-                </>
-              )}
-
-              <ErrorText error={validationError || error} />
-
-              <button
-                className="btn-cyber"
-                disabled={busy || (mode === 'register' && !allRegisterRulesPass)}
-                style={{ width: '100%', marginTop: '16px', padding: '14px', fontSize: '1.02rem' }}
-              >
-                {busy ? t('pleaseWait') : mode === 'login' ? t('signIn') : t('createAccount')}
-              </button>
-            </form>
-          )}
-
-          {/* FORGOT PASSWORD FORM (STEP 1: REQUEST OTP) */}
-          {mode === 'forgot' && (
-            <form onSubmit={handleSendOtp}>
-              <label style={{ display: 'block', marginBottom: '16px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                {t('email')}
-                <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={field('email')}
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                  autoFocus
-                  style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                />
-              </label>
-
-              <ErrorText error={validationError || error} />
-
-              <button
-                type="submit"
-                className="btn-cyber"
-                disabled={busy || !form.email}
-                style={{ width: '100%', marginTop: '16px', padding: '14px', fontSize: '1.02rem' }}
-              >
-                {busy ? t('pleaseWait') : t('sendOtp')}
-              </button>
-
-              <p style={{ textAlign: 'center', marginTop: '22px', fontSize: '0.86rem', color: '#94a3b8' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('login');
-                    setValidationError('');
-                    setStatusMessage('');
-                    setDemoOtpHint('');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#00f2fe',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  ← {t('backToSignIn')}
-                </button>
-              </p>
-            </form>
-          )}
-
-          {/* RESET PASSWORD FORM (STEP 2: OTP + NEW PASSWORD) */}
-          {mode === 'reset' && (
-            <form onSubmit={handleResetPassword}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-                  Target account: <strong style={{ color: '#dfe2ef' }}>{form.email}</strong>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('forgot');
-                    setValidationError('');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#00f2fe',
-                    fontSize: '0.78rem',
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  Change email
-                </button>
-              </div>
-
-              <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <span>{t('enterOtp')}</span>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={handleSendOtp}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#00f2fe',
-                      fontSize: '0.78rem',
-                      cursor: 'pointer',
-                      padding: 0
-                    }}
-                  >
-                    {t('resendOtp')}
-                  </button>
+                  <div className="auth-input-eye-wrap">
+                    <input
+                      id="auth-pwd"
+                      required
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={field('password')}
+                      placeholder={mode === 'register' ? 'Minimum 8 characters' : 'Enter password'}
+                      autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                      className="setup-input font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="auth-eye-btn"
+                    >
+                      {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                    </button>
+                  </div>
                 </div>
-                <input
-                  required
-                  type="text"
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => {
-                    setOtp(e.target.value.replace(/\D/g, ''));
-                    setValidationError('');
-                  }}
-                  placeholder="••••••"
-                  autoComplete="one-time-code"
-                  autoFocus
-                  style={{
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    marginTop: '4px',
-                    padding: '12px 14px',
-                    fontSize: '1.3rem',
-                    letterSpacing: '0.3em',
-                    textAlign: 'center',
-                    fontFamily: 'monospace',
-                    fontWeight: '700'
-                  }}
-                />
-              </label>
 
-              <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                {t('newPassword')}
-                <div style={{ position: 'relative', marginTop: '6px' }}>
+                {mode === 'register' && (
+                  <>
+                    <div className="auth-field">
+                      <label htmlFor="auth-cpwd">Confirm Password</label>
+                      <div className="auth-input-eye-wrap">
+                        <input
+                          id="auth-cpwd"
+                          required
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={form.confirmPassword}
+                          onChange={field('confirmPassword')}
+                          placeholder="Re-enter password"
+                          autoComplete="new-password"
+                          className="setup-input font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                          className="auth-eye-btn"
+                        >
+                          {showConfirmPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="auth-pw-checklist">
+                      <span className="auth-pw-req-title">Password Security Checklist:</span>
+                      <div className="auth-pw-grid">
+                        <span className={`pw-check-item ${registerRules.length ? 'pass' : ''}`}>
+                          {registerRules.length ? '✓' : '○'} 8+ characters
+                        </span>
+                        <span className={`pw-check-item ${registerRules.upper ? 'pass' : ''}`}>
+                          {registerRules.upper ? '✓' : '○'} Uppercase letter
+                        </span>
+                        <span className={`pw-check-item ${registerRules.lower ? 'pass' : ''}`}>
+                          {registerRules.lower ? '✓' : '○'} Lowercase letter
+                        </span>
+                        <span className={`pw-check-item ${registerRules.number ? 'pass' : ''}`}>
+                          {registerRules.number ? '✓' : '○'} 1+ number
+                        </span>
+                        <span className={`pw-check-item ${registerRules.special ? 'pass' : ''}`}>
+                          {registerRules.special ? '✓' : '○'} Special character
+                        </span>
+                        <span className={`pw-check-item ${registerRules.match ? 'pass' : ''}`}>
+                          {registerRules.match ? '✓' : '○'} Passwords match
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <ErrorText error={validationError || error} />
+
+                <button
+                  type="submit"
+                  disabled={busy || (mode === 'register' && !allRegisterRulesPass)}
+                  className="setup-submit-btn"
+                >
+                  {busy ? t('pleaseWait') : mode === 'login' ? t('signIn') || 'Sign in' : t('createAccount') || 'Create account'}
+                </button>
+              </form>
+            )}
+
+            {/* Forgot Password Request */}
+            {mode === 'forgot' && (
+              <form onSubmit={handleSendOtp} className="auth-form-fields">
+                <div className="auth-field">
+                  <label htmlFor="auth-forgot-email">{t('email') || 'Email address'}</label>
                   <input
+                    id="auth-forgot-email"
                     required
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={newPassword}
+                    type="email"
+                    value={form.email}
+                    onChange={field('email')}
+                    placeholder="name@example.com"
+                    autoComplete="email"
+                    autoFocus
+                    className="setup-input font-mono"
+                  />
+                </div>
+
+                <ErrorText error={validationError || error} />
+
+                <button type="submit" disabled={busy || !form.email} className="setup-submit-btn">
+                  {busy ? t('pleaseWait') : t('sendOtp') || 'Send verification code'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMode('login')}
+                  className="auth-back-link"
+                >
+                  ← {t('backToSignIn') || 'Back to sign in'}
+                </button>
+              </form>
+            )}
+
+            {/* Reset Password Form */}
+            {mode === 'reset' && (
+              <form onSubmit={handleResetPassword} className="auth-form-fields">
+                <div className="auth-field">
+                  <div className="auth-field-header">
+                    <label htmlFor="auth-otp">{t('enterOtp') || 'Verification code (OTP)'}</label>
+                    <button type="button" disabled={busy} onClick={handleSendOtp} className="auth-link-subtle">
+                      {t('resendOtp') || 'Resend'}
+                    </button>
+                  </div>
+                  <input
+                    id="auth-otp"
+                    required
+                    type="text"
+                    maxLength={6}
+                    value={otp}
                     onChange={(e) => {
-                      setNewPassword(e.target.value);
+                      setOtp(e.target.value.replace(/\D/g, ''));
                       setValidationError('');
                     }}
-                    placeholder="Minimum 8 characters"
-                    autoComplete="new-password"
-                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                    placeholder="••••••"
+                    autoComplete="one-time-code"
+                    autoFocus
+                    className="setup-input font-mono auth-otp-input"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      color: '#94a3b8',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    {showNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-                  </button>
                 </div>
-              </label>
 
-              <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
-                {t('confirmNewPassword')}
-                <div style={{ position: 'relative', marginTop: '6px' }}>
-                  <input
-                    required
-                    type={showConfirmNewPassword ? 'text' : 'password'}
-                    value={confirmNewPassword}
-                    onChange={(e) => {
-                      setConfirmNewPassword(e.target.value);
-                      setValidationError('');
-                    }}
-                    placeholder="Re-enter your new password"
-                    autoComplete="new-password"
-                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
-                    aria-label={showConfirmNewPassword ? 'Hide password' : 'Show password'}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      color: '#94a3b8',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    {showConfirmNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-                  </button>
+                <div className="auth-field">
+                  <label htmlFor="auth-new-pwd">{t('newPassword') || 'New password'}</label>
+                  <div className="auth-input-eye-wrap">
+                    <input
+                      id="auth-new-pwd"
+                      required
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => {
+                        setNewPassword(e.target.value);
+                        setValidationError('');
+                      }}
+                      placeholder="Minimum 8 characters"
+                      autoComplete="new-password"
+                      className="setup-input font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="auth-eye-btn"
+                    >
+                      {showNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                    </button>
+                  </div>
                 </div>
-              </label>
 
-              {/* Vitalis Dark Glass Password Security Checklist for Reset */}
-              <div
-                style={{
-                  background: 'rgba(10, 14, 23, 0.85)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  padding: '14px',
-                  margin: '12px 0 16px',
-                  fontSize: '0.8rem'
-                }}
-              >
-                <strong style={{ color: '#00f2fe', display: 'block', marginBottom: '8px', fontSize: '0.78rem', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                  Security Requirements:
-                </strong>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                  <span style={{ color: resetRules.length ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.length ? '✓' : '○'}</span> 8+ characters
-                  </span>
-                  <span style={{ color: resetRules.upper ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.upper ? '✓' : '○'}</span> Uppercase letter
-                  </span>
-                  <span style={{ color: resetRules.lower ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.lower ? '✓' : '○'}</span> Lowercase letter
-                  </span>
-                  <span style={{ color: resetRules.number ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.number ? '✓' : '○'}</span> At least 1 number
-                  </span>
-                  <span style={{ color: resetRules.special ? '#6ffbbe' : '#849495', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.special ? '✓' : '○'}</span> Special symbol
-                  </span>
-                  <span style={{ color: resetRules.match ? '#6ffbbe' : '#ffb4ab', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{resetRules.match ? '✓' : '○'}</span> Passwords match
-                  </span>
+                <div className="auth-field">
+                  <label htmlFor="auth-cnew-pwd">{t('confirmNewPassword') || 'Confirm new password'}</label>
+                  <div className="auth-input-eye-wrap">
+                    <input
+                      id="auth-cnew-pwd"
+                      required
+                      type={showConfirmNewPassword ? 'text' : 'password'}
+                      value={confirmNewPassword}
+                      onChange={(e) => {
+                        setConfirmNewPassword(e.target.value);
+                        setValidationError('');
+                      }}
+                      placeholder="Re-enter new password"
+                      autoComplete="new-password"
+                      className="setup-input font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                      className="auth-eye-btn"
+                    >
+                      {showConfirmNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <ErrorText error={validationError || error} />
+                <ErrorText error={validationError || error} />
 
-              <button
-                type="submit"
-                className="btn-cyber"
-                disabled={busy || !allResetRulesPass || otp.trim().length !== 6}
-                style={{ width: '100%', marginTop: '16px', padding: '14px', fontSize: '1.02rem' }}
-              >
-                {busy ? t('pleaseWait') : t('resetPassword')}
-              </button>
+                <button
+                  type="submit"
+                  disabled={busy || !allResetRulesPass || otp.trim().length !== 6}
+                  className="setup-submit-btn"
+                >
+                  {busy ? t('pleaseWait') : t('resetPassword') || 'Reset password'}
+                </button>
 
-              <p style={{ textAlign: 'center', marginTop: '22px', fontSize: '0.86rem', color: '#94a3b8' }}>
                 <button
                   type="button"
-                  onClick={() => {
-                    setMode('login');
-                    setValidationError('');
-                    setStatusMessage('');
-                    setDemoOtpHint('');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#00f2fe',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
+                  onClick={() => setMode('login')}
+                  className="auth-back-link"
                 >
-                  ← {t('backToSignIn')}
+                  ← {t('backToSignIn') || 'Back to sign in'}
                 </button>
-              </p>
-            </form>
-          )}
+              </form>
+            )}
 
-          {/* FOOTER SWITCH FOR LOGIN / REGISTER */}
-          {(mode === 'login' || mode === 'register') && (
-            <p style={{ textAlign: 'center', marginTop: '22px', fontSize: '0.86rem', color: '#94a3b8' }}>
-              {mode === 'login' ? 'Need a new HealthMitra account?' : t('alreadyAccount')}
-              <button
-                type="button"
-                onClick={switchMode}
-                style={{
-                  marginLeft: '8px',
-                  fontWeight: '700',
-                  color: '#00f2fe',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                {mode === 'login' ? t('createAccount') : t('signIn')}
-              </button>
-            </p>
-          )}
-        </div>
-      </section>
-    </main>
+            {/* Footer Switch */}
+            {(mode === 'login' || mode === 'register') && (
+              <div className="auth-switch-footer">
+                <span>{mode === 'login' ? (t('newToHealthMitra') || 'New to HealthMitra?') : (t('alreadyAccount') || 'Already have an account?')}</span>
+                <button type="button" onClick={switchMode} className="auth-switch-btn">
+                  {mode === 'login' ? (t('createAccount') || 'Create account') : (t('signIn') || 'Sign in')}
+                </button>
+              </div>
+            )}
+
+            {/* Quick Demo Access Bar for Developer & Review Testing */}
+            <div className="auth-demo-bar">
+              <span className="auth-demo-label">One-Tap Review Accounts:</span>
+              <div className="auth-demo-buttons">
+                <button type="button" onClick={fillDemoPatient} className="demo-chip">
+                  <UserIcon size={12} />
+                  <span>Meera (Patient)</span>
+                </button>
+                <button type="button" onClick={fillDemoCaregiver} className="demo-chip">
+                  <ShieldIcon size={12} />
+                  <span>Arjun (Caregiver)</span>
+                </button>
+                <button type="button" onClick={fillTestNewUser} className="demo-chip demo-chip-highlight" title="Creates fresh patient to test first-time profile setup wizard">
+                  <SparklesIcon size={12} />
+                  <span>New Patient (Test Setup Wizard)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }
-

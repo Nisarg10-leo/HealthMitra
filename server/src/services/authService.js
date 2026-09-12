@@ -36,7 +36,21 @@ export async function register({ name, email, phone = '', password, role, prefer
     phone: String(phone || '').trim(),
     passwordHash: hashPassword(String(password)),
     role,
-    preferredLanguage: preferredLanguage === 'hi' ? 'hi' : 'en'
+    preferredLanguage: preferredLanguage === 'hi' ? 'hi' : 'en',
+    dob: null,
+    age: null,
+    gender: null,
+    bloodGroup: null,
+    height: null,
+    weight: null,
+    conditions: [],
+    allergies: [],
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    emergencyContactRelation: null,
+    dietaryPreference: null,
+    mobilityStatus: null,
+    profileComplete: false
   });
   return { user: publicUser(user), token: user.id };
 }

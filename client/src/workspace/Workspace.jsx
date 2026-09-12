@@ -28,7 +28,6 @@ export function Workspace({ onLogout }) {
   const { toast, notify } = useToast();
   const listen = useSpeechInput(notify);
   const data = useWorkspaceData(session, notify);
-  const toggleLanguage = () => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en');
 
   // Real-time Medicine Alarm trigger loop
   useEffect(() => {
@@ -120,7 +119,6 @@ export function Workspace({ onLogout }) {
           activeTab={tab}
           onSelect={setTab}
           unreadAlerts={unreadAlerts}
-          onToggleLanguage={toggleLanguage}
           onLogout={onLogout}
         />
         <main className="content">
@@ -130,7 +128,6 @@ export function Workspace({ onLogout }) {
             selectedPatient={data.dashboard?.patient}
             selectedPatientId={data.selectedPatientId}
             onSelectPatient={data.setSelectedPatientId}
-            onToggleLanguage={toggleLanguage}
             onSos={handleSos}
           />
           {!data.dashboard ? (

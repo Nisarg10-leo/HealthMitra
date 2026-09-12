@@ -19,7 +19,7 @@ const readStoredSession = () => {
     const validRole = saved?.role === 'patient' || saved?.role === 'caregiver';
     if (saved?.id && typeof saved?.name === 'string' && validRole) return saved;
   } catch { /* ignore */ }
-  return defaultSession;
+  return null;
 };
 
 export function useSessionState() {
@@ -29,7 +29,23 @@ export function useSessionState() {
     return stored;
   });
   useEffect(() => { setSessionToken(session?.id || null); }, [session]);
-  const signIn = useCallback((user) => { localStorage.setItem(STORAGE_KEY, JSON.stringify(user)); setSessionToken(user.id); setSession(user); }, []);
-  const signOut = useCallback(() => { localStorage.removeItem(STORAGE_KEY); setSessionToken(null); setSession(null); }, []);
-  return { session, signIn, signOut };
+  const signIn = useCallback((user) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    setSessionToken(user.id);
+    setSession(user);
+  }, []);
+  const signOut = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setSessionToken(null);
+    setSession(null);
+  }, []);
+  const updateSession = useCallback((fields) => {
+    setSession((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...fields };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+  return { session, signIn, signOut, updateSession };
 }

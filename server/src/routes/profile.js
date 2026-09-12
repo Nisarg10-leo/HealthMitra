@@ -20,17 +20,27 @@ profileRouter.put('/profile', asyncRoute(async (req, res) => {
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
   const {
-    dob, gender, bloodGroup, height, weight,
+    dob, age, gender, bloodGroup, height, weight,
     conditions, allergies, emergencyContactName,
     emergencyContactPhone, emergencyContactRelation,
-    medicalFiles
+    dietaryPreference, mobilityStatus,
+    medicalFiles, profileComplete: explicitComplete
   } = req.body;
 
-  // Mark profile complete if conditions or basic info are filled
-  const profileComplete = Boolean((dob && gender) || (Array.isArray(conditions) && conditions.length > 0));
+  // Mark profile complete if basic info, allergies, or conditions are provided or explicitly confirmed
+  const profileComplete = explicitComplete !== undefined
+    ? Boolean(explicitComplete)
+    : Boolean(
+        (dob || age) ||
+        (height && weight) ||
+        (Array.isArray(conditions) && conditions.length > 0) ||
+        (Array.isArray(allergies) && allergies.length > 0) ||
+        emergencyContactName
+      );
 
   const changes = {
     dob: dob || null,
+    age: age ? Number(age) : null,
     gender: gender || null,
     bloodGroup: bloodGroup || null,
     height: height ? Number(height) : null,
@@ -40,6 +50,8 @@ profileRouter.put('/profile', asyncRoute(async (req, res) => {
     emergencyContactName: emergencyContactName || null,
     emergencyContactPhone: emergencyContactPhone || null,
     emergencyContactRelation: emergencyContactRelation || null,
+    dietaryPreference: dietaryPreference || null,
+    mobilityStatus: mobilityStatus || null,
     medicalFiles: Array.isArray(medicalFiles) ? medicalFiles : [],
     profileComplete
   };

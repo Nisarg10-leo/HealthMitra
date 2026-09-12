@@ -5,7 +5,9 @@ import { unauthorized } from '../lib/httpError.js';
 // JWT/session cookies only changes this file; routes keep reading `req.actor`.
 export async function requireUser(req, _res, next) {
   try {
-    const userId = req.header('x-user-id');
+    const authHeader = req.header('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+    const userId = req.header('x-user-id') || bearerToken;
     if (!userId) return next(unauthorized());
     const actor = await repository.users.findById(userId);
     if (!actor) return next(unauthorized());
