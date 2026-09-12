@@ -9,7 +9,13 @@ import { Workspace } from './workspace/Workspace.jsx';
 export default function App() {
   const { session, signIn, signOut } = useSessionState();
 
-  if (!session) return <AuthPage onLogin={signIn} />;
+  if (!session) {
+    return (
+      <ErrorBoundary>
+        <AuthPage onLogin={signIn} />
+      </ErrorBoundary>
+    );
+  }
 
   // First-time login: if profile is not yet completed, show onboarding setup
   if (!session.profileComplete) {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { authApi } from '../../api/index.js';
 import { ErrorText } from '../../components/ui/ErrorText.jsx';
 import {
+  ActivityIcon,
   CheckIcon,
   CrossMedicalIcon,
   EyeIcon,
