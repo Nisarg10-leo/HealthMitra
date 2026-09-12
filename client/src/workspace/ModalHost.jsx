@@ -1,5 +1,6 @@
 import React from 'react';
 import { AskMitraModal } from '../components/ui/AskMitraModal.jsx';
+import { AlarmToneModal } from '../components/ui/AlarmToneModal.jsx';
 import { EmergencyQrModal } from '../components/ui/EmergencyQrModal.jsx';
 import { PillVerificationModal } from '../components/ui/PillVerificationModal.jsx';
 import { ContactFormModal } from '../features/contacts/ContactFormModal.jsx';
@@ -17,7 +18,8 @@ const MODALS = {
   contact: ContactFormModal,
   askMitra: AskMitraModal,
   emergencyQr: EmergencyQrModal,
-  pillVerify: PillVerificationModal
+  pillVerify: PillVerificationModal,
+  alarmTone: AlarmToneModal
 };
 
 export function ModalHost({ modal, onClose }) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dosesApi, guidanceApi, patientsApi, sosApi } from '../../api/index.js';
 import { DoseCelebration } from '../../components/ui/DoseCelebration.jsx';
@@ -17,6 +17,7 @@ import {
 } from '../../components/ui/Icons.jsx';
 import { useFallDetector } from '../../hooks/useFallDetector.js';
 import { useVoiceCompanion } from '../../hooks/useSpeech.js';
+import { ALARM_TONES, getSelectedAlarmTone } from '../../utils/audio.js';
 import { isToday } from '../../utils/format.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 import { DoseCard } from './DoseCard.jsx';
@@ -26,6 +27,15 @@ export function TodayPage() {
   const { dashboard, refresh, notify, listen, openModal, triggerAlarm } = useWorkspace();
   const [reassuranceSent, setReassuranceSent] = useState(false);
   const [celebratingMed, setCelebratingMed] = useState(null);
+  const [currentToneId, setCurrentToneId] = useState(() => getSelectedAlarmTone());
+
+  useEffect(() => {
+    const handler = (e) => setCurrentToneId(e.detail || getSelectedAlarmTone());
+    window.addEventListener('alarm-tone-changed', handler);
+    return () => window.removeEventListener('alarm-tone-changed', handler);
+  }, []);
+
+  const currentToneObj = ALARM_TONES.find((t) => t.id === currentToneId) || ALARM_TONES[0];
 
   const logs = (dashboard?.logs || [])
     .filter((log) => isToday(log.scheduledTime))
@@ -325,6 +335,16 @@ export function TodayPage() {
                   onClick={fallDetector.active ? fallDetector.stopListening : fallDetector.startListening}
                 >
                   {fallDetector.active ? 'Turn off' : 'Turn on'}
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-glass btn-sm"
+                  onClick={() => openModal({ kind: 'alarmTone' })}
+                  title={i18n.language === 'hi' ? 'अलार्म धुन बदलें' : 'Change medication alarm sound'}
+                >
+                  <span style={{ fontSize: '13px' }}>{currentToneObj?.icon}</span>
+                  <span>{i18n.language === 'hi' ? 'धुन: ' + (currentToneObj?.nameHi?.split(' ')[0] || 'सायरन') : 'Tone: ' + (currentToneObj?.name?.split(' ')[0] || 'Siren')}</span>
                 </button>
 
                 <button

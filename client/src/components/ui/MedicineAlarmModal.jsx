@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { startCrazyAlarm, stopCrazyAlarm } from '../../utils/audio.js';
+import {
+  ALARM_TONES,
+  getSelectedAlarmTone,
+  setSelectedAlarmTone,
+  startAlarm,
+  stopAlarm
+} from '../../utils/audio.js';
 import { formatTime } from '../../utils/format.js';
 import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon } from './Icons.jsx';
 
 export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
   const [muted, setMuted] = useState(false);
+  const [currentTone, setCurrentTone] = useState(() => getSelectedAlarmTone());
+  const [showTonePicker, setShowTonePicker] = useState(false);
   const voiceTimeoutRef = useRef(null);
 
   // Spoken voice announcement with authoritative emergency cadence
@@ -29,43 +36,52 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
   };
 
   useEffect(() => {
-    // Start continuous piercing alarm loop
-    const stopAudio = startCrazyAlarm();
+    // Start continuous synthesized alarm loop with the selected tone
+    if (!muted) {
+      startAlarm(currentTone);
+    }
     voiceTimeoutRef.current = setTimeout(announceAlarm, 800);
 
     return () => {
-      stopAudio();
-      stopCrazyAlarm();
+      stopAlarm();
       if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     };
-  }, [dose?.id, medication?.name, i18n.language]);
+  }, [dose?.id, medication?.name, i18n.language, currentTone, muted]);
 
   const toggleMute = () => {
     if (muted) {
       setMuted(false);
-      startCrazyAlarm();
+      startAlarm(currentTone);
     } else {
       setMuted(true);
-      stopCrazyAlarm();
+      stopAlarm();
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     }
   };
 
+  const currentToneObj = ALARM_TONES.find((t) => t.id === currentTone) || ALARM_TONES[0];
+
+  const handleToneChange = (toneId) => {
+    setCurrentTone(toneId);
+    setSelectedAlarmTone(toneId);
+    setShowTonePicker(false);
+  };
+
   const handleTake = () => {
-    stopCrazyAlarm();
+    stopAlarm();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     onConfirm(dose, 'taken');
   };
 
   const handleSnooze = () => {
-    stopCrazyAlarm();
+    stopAlarm();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     onSnooze(dose);
   };
 
   const handleSkip = () => {
-    stopCrazyAlarm();
+    stopAlarm();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     onConfirm(dose, 'skipped');
   };
@@ -100,8 +116,53 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             onClick={toggleMute}
             title={muted ? 'Unmute alarm' : 'Silence siren'}
           >
-            {muted ? 'Unmute 🔔' : 'Silence Siren 🔇'}
+            {muted ? 'Unmute 🔔' : 'Silence 🔇'}
           </button>
+        </div>
+
+        {/* Quick Alarm Tone Switcher */}
+        <div className="alarm-tone-picker-box">
+          <button
+            type="button"
+            className="alarm-tone-trigger-btn font-mono"
+            onClick={() => setShowTonePicker((prev) => !prev)}
+            title="Click to switch alarm sound"
+          >
+            <span>Tone: {currentToneObj.icon} {i18n.language === 'hi' ? currentToneObj.nameHi : currentToneObj.name}</span>
+            <span className="tone-picker-caret">{showTonePicker ? '▲' : '▼'}</span>
+          </button>
+
+          {showTonePicker && (
+            <div className="alarm-tone-popover">
+              <div className="alarm-popover-title font-mono">
+                {i18n.language === 'hi' ? 'अलार्म ध्वनि बदलें' : 'SWITCH ALARM SOUND'}
+              </div>
+              <div className="alarm-popover-items">
+                {ALARM_TONES.map((t) => {
+                  const isActive = currentTone === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className={`alarm-popover-item ${isActive ? 'popover-item-active' : ''}`}
+                      onClick={() => handleToneChange(t.id)}
+                    >
+                      <span className="popover-item-icon">{t.icon}</span>
+                      <div className="popover-item-text">
+                        <span className="popover-item-name font-sans">
+                          {i18n.language === 'hi' ? t.nameHi : t.name}
+                        </span>
+                        <span className="popover-item-badge font-mono">
+                          {i18n.language === 'hi' ? t.badgeHi : t.badge}
+                        </span>
+                      </div>
+                      {isActive && <CheckIcon size={13} className="popover-check" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Medicine Name & Dosage */}
@@ -293,6 +354,123 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
           font-size: 11px !important;
           font-weight: 700 !important;
           letter-spacing: 0.08em !important;
+        }
+
+        .alarm-tone-picker-box {
+          position: relative !important;
+          display: inline-block !important;
+          margin-bottom: 14px !important;
+        }
+
+        .alarm-tone-trigger-btn {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          padding: 5px 14px !important;
+          border-radius: 9999px !important;
+          background: rgba(45, 122, 88, 0.08) !important;
+          border: 1px solid rgba(45, 122, 88, 0.28) !important;
+          color: var(--leaf) !important;
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 140ms ease !important;
+        }
+
+        .alarm-tone-trigger-btn:hover {
+          background: rgba(45, 122, 88, 0.16) !important;
+          transform: translateY(-1px) !important;
+        }
+
+        .tone-picker-caret {
+          font-size: 9px !important;
+          opacity: 0.7 !important;
+        }
+
+        .alarm-tone-popover {
+          position: absolute !important;
+          top: calc(100% + 6px) !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          width: 320px !important;
+          background: var(--paper) !important;
+          border: 1.5px solid var(--border-medium) !important;
+          border-radius: 16px !important;
+          box-shadow: 0 12px 36px rgba(28, 40, 38, 0.18) !important;
+          padding: 10px !important;
+          z-index: 100 !important;
+          text-align: left !important;
+          animation: fadeIn 150ms ease !important;
+        }
+
+        .alarm-popover-title {
+          font-size: 10px !important;
+          letter-spacing: 0.08em !important;
+          text-transform: uppercase !important;
+          color: var(--text-muted) !important;
+          font-weight: 700 !important;
+          padding: 6px 10px 8px !important;
+          border-bottom: 1px solid var(--border-subtle) !important;
+          margin-bottom: 6px !important;
+        }
+
+        .alarm-popover-items {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 4px !important;
+          max-height: 240px !important;
+          overflow-y: auto !important;
+        }
+
+        .alarm-popover-item {
+          display: flex !important;
+          align-items: center !important;
+          gap: 10px !important;
+          padding: 8px 10px !important;
+          border-radius: 10px !important;
+          border: 1px solid transparent !important;
+          background: transparent !important;
+          cursor: pointer !important;
+          transition: all 120ms ease !important;
+          width: 100% !important;
+          text-align: left !important;
+        }
+
+        .alarm-popover-item:hover {
+          background: var(--cream) !important;
+          border-color: var(--border-subtle) !important;
+        }
+
+        .alarm-popover-item.popover-item-active {
+          background: rgba(45, 122, 88, 0.1) !important;
+          border-color: rgba(45, 122, 88, 0.3) !important;
+        }
+
+        .popover-item-icon {
+          font-size: 18px !important;
+          line-height: 1 !important;
+        }
+
+        .popover-item-text {
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          min-width: 0 !important;
+        }
+
+        .popover-item-name {
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          color: var(--ink) !important;
+        }
+
+        .popover-item-badge {
+          font-size: 10px !important;
+          color: var(--text-muted) !important;
+        }
+
+        .popover-check {
+          color: var(--leaf) !important;
         }
 
         .alarm-med-title {

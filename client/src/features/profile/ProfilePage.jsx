@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi, medicationsApi, profileApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
-import { CheckIcon, FileTextIcon, PlusIcon, SparklesIcon } from '../../components/ui/Icons.jsx';
+import { BellIcon, CheckIcon, FileTextIcon, PlusIcon, SparklesIcon, Volume2Icon } from '../../components/ui/Icons.jsx';
+import {
+  ALARM_TONES,
+  getSelectedAlarmTone,
+  previewAlarmTone,
+  setSelectedAlarmTone,
+  stopAlarm
+} from '../../utils/audio.js';
 
 const COMMON_CONDITIONS = [
   'Type 2 Diabetes', 'Hypertension (High BP)', 'Cardiovascular Disease',
@@ -17,13 +24,14 @@ const COMMON_ALLERGIES = [
 ];
 
 export function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const session = useSession();
   const { dashboard, refresh, notify, setTab } = useWorkspace();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [previewingTone, setPreviewingTone] = useState(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -40,7 +48,8 @@ export function ProfilePage() {
     emergencyContactRelation: '',
     dietaryPreference: 'Vegetarian',
     mobilityStatus: 'Independent',
-    medicalFiles: []
+    medicalFiles: [],
+    alarmTone: getSelectedAlarmTone()
   });
 
   const [newCondition, setNewCondition] = useState('');
@@ -58,10 +67,20 @@ export function ProfilePage() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    return () => {
+      stopAlarm();
+    };
+  }, []);
+
+  useEffect(() => {
     async function loadProfile() {
       try {
         const data = await profileApi.get();
         if (data) {
+          const tone = data.alarmTone || getSelectedAlarmTone();
+          if (data.alarmTone) {
+            setSelectedAlarmTone(data.alarmTone);
+          }
           setFormData({
             dob: data.dob || '',
             age: data.age || '',
@@ -76,7 +95,8 @@ export function ProfilePage() {
             emergencyContactRelation: data.emergencyContactRelation || '',
             dietaryPreference: data.dietaryPreference || 'Vegetarian',
             mobilityStatus: data.mobilityStatus || 'Independent',
-            medicalFiles: Array.isArray(data.medicalFiles) ? data.medicalFiles : []
+            medicalFiles: Array.isArray(data.medicalFiles) ? data.medicalFiles : [],
+            alarmTone: tone
           });
         }
       } catch (err) {
@@ -248,10 +268,34 @@ export function ProfilePage() {
     }
   };
 
+  const handleTonePreview = (toneId) => {
+    if (previewingTone === toneId) {
+      stopAlarm();
+      setPreviewingTone(null);
+      return;
+    }
+    setPreviewingTone(toneId);
+    previewAlarmTone(toneId);
+    setTimeout(() => {
+      setPreviewingTone((curr) => (curr === toneId ? null : curr));
+    }, 2200);
+  };
+
+  const handleToneSelect = (toneId) => {
+    setFormData((prev) => ({ ...prev, alarmTone: toneId }));
+    setSelectedAlarmTone(toneId);
+    const toneObj = ALARM_TONES.find((t) => t.id === toneId);
+    const name = i18n.language === 'hi' ? toneObj?.nameHi : toneObj?.name;
+    notify(i18n.language === 'hi' ? `अलार्म धुन "${name}" चुनी गई` : `Alarm tone "${name}" selected`);
+  };
+
   // Save Full Profile
   const handleSave = async () => {
     setSaving(true);
     try {
+      if (formData.alarmTone) {
+        setSelectedAlarmTone(formData.alarmTone);
+      }
       await profileApi.update(formData);
       setToastMessage('Health profile saved successfully!');
       notify('Health profile saved successfully!');
@@ -845,6 +889,96 @@ export function ProfilePage() {
               ))}
             </select>
           </label>
+        </div>
+      </section>
+
+      {/* Section 6: Medication Alarm Tone & Audio Preferences */}
+      <section className="glass-matrix" style={{ padding: '24px', borderRadius: '18px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <BellIcon size={18} style={{ color: 'var(--leaf)' }} />
+              <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600', color: 'var(--ink)' }}>
+                {i18n.language === 'hi' ? 'दवा अलार्म और ध्वनि प्राथमिकताएँ' : 'Medication Alarm & Audio Settings'}
+              </h2>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              {i18n.language === 'hi'
+                ? 'अपनी सुविधानुसार अलार्म ध्वनि चुनें। प्रत्येक धुन का पूर्वावलोकन सुनें।'
+                : 'Choose how HealthMitra alerts you when medication is due. Preview each sound before saving.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="alarm-settings-grid">
+          {ALARM_TONES.map((tone) => {
+            const isSelected = (formData.alarmTone || 'crazy-siren') === tone.id;
+            const isPlaying = previewingTone === tone.id;
+
+            return (
+              <div
+                key={tone.id}
+                className={`alarm-pref-card ${isSelected ? 'alarm-pref-card-active' : ''}`}
+                onClick={() => handleToneSelect(tone.id)}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '1.4rem' }}>{tone.icon}</span>
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--ink)' }}>
+                        {i18n.language === 'hi' ? tone.nameHi : tone.name}
+                      </strong>
+                      <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {i18n.language === 'hi' ? tone.badgeHi : tone.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 8px',
+                      borderRadius: '9999px',
+                      background: 'rgba(45, 122, 88, 0.15)',
+                      color: 'var(--leaf)',
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
+                    }}>
+                      <CheckIcon size={12} />
+                      <span>{i18n.language === 'hi' ? 'सक्रिय' : 'Active'}</span>
+                    </span>
+                  )}
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 14px 0', lineHeight: '1.45' }}>
+                  {i18n.language === 'hi' ? tone.descHi : tone.desc}
+                </p>
+
+                <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    className={`btn-glass btn-sm ${isPlaying ? 'preview-playing' : ''}`}
+                    onClick={() => handleTonePreview(tone.id)}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    <Volume2Icon size={13} />
+                    <span>{isPlaying ? (i18n.language === 'hi' ? 'सुन रहे हैं...' : 'Playing...') : (i18n.language === 'hi' ? 'सुनें' : 'Preview')}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-sm ${isSelected ? 'btn-cyber' : 'btn-glass'}`}
+                    onClick={() => handleToneSelect(tone.id)}
+                    style={{ flex: 1 }}
+                  >
+                    {isSelected ? (i18n.language === 'hi' ? 'चयनित ✓' : 'Selected ✓') : (i18n.language === 'hi' ? 'चुनें' : 'Set as Alarm')}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

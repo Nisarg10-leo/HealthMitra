@@ -18,7 +18,8 @@ const seededUser = (id, name, role, email, phone, preferredLanguage = 'en') => (
   dob: null, gender: null, bloodGroup: null, height: null, weight: null,
   conditions: [], allergies: [], emergencyContactName: null,
   emergencyContactPhone: null, emergencyContactRelation: null,
-  profileComplete: false
+  profileComplete: false,
+  alarmTone: 'crazy-siren'
 });
 
 export const tables = {

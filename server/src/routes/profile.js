@@ -24,7 +24,7 @@ profileRouter.put('/profile', asyncRoute(async (req, res) => {
     conditions, allergies, emergencyContactName,
     emergencyContactPhone, emergencyContactRelation,
     dietaryPreference, mobilityStatus,
-    medicalFiles, profileComplete: explicitComplete
+    medicalFiles, profileComplete: explicitComplete, alarmTone
   } = req.body;
 
   // Mark profile complete if basic info, allergies, or conditions are provided or explicitly confirmed
@@ -53,7 +53,8 @@ profileRouter.put('/profile', asyncRoute(async (req, res) => {
     dietaryPreference: dietaryPreference || null,
     mobilityStatus: mobilityStatus || null,
     medicalFiles: Array.isArray(medicalFiles) ? medicalFiles : [],
-    profileComplete
+    profileComplete,
+    alarmTone: alarmTone || 'crazy-siren'
   };
 
   const updatedUser = await repository.users.update(userId, changes);
