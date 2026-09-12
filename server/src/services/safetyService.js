@@ -7,7 +7,7 @@ const DRUG_DATABASE = {
       en: 'Take with or immediately after meals to reduce stomach upset. Avoid heavy alcohol.',
       hi: 'पेट की परेशानी से बचने के लिए भोजन के साथ या तुरंत बाद लें। शराब से बचें।'
     },
-    icon: '🍚',
+    icon: 'food',
     category: 'Antidiabetic',
     cautions: ['Do not double dose if missed', 'Stay well hydrated'],
     interactionsWith: ['contrast dye', 'cimetidine']
@@ -17,7 +17,7 @@ const DRUG_DATABASE = {
       en: 'Avoid grapefruit and grapefruit juice, as it can dangerously elevate medication levels.',
       hi: 'चकोतरा (Grapefruit) और उसके रस से बचें, यह दवा के असर को खतरनाक रूप से बढ़ा सकता है।'
     },
-    icon: '🍊⚠️',
+    icon: 'caution',
     category: 'Antihypertensive (Calcium Channel Blocker)',
     cautions: ['Rise slowly from sitting or lying down to prevent dizziness'],
     interactionsWith: ['simvastatin', 'diltiazem']
@@ -27,7 +27,7 @@ const DRUG_DATABASE = {
       en: 'Take with your largest meal containing healthy fats for maximum absorption.',
       hi: 'बेहतर अवशोषण के लिए भोजन (जिसमें थोड़ा वसा/घी हो) के साथ लें।'
     },
-    icon: '🥗',
+    icon: 'meal',
     category: 'Supplement',
     cautions: ['Do not exceed prescribed dosage'],
     interactionsWith: ['orlistat', 'steroids']
@@ -37,7 +37,7 @@ const DRUG_DATABASE = {
       en: 'Can be taken with or without food. Do not exceed 3000 mg in 24 hours.',
       hi: 'भोजन के साथ या बिना भोजन के ले सकते हैं। 24 घंटे में 3000 mg से अधिक न लें।'
     },
-    icon: '💧',
+    icon: 'water',
     category: 'Analgesic / Antipyretic',
     cautions: ['Check other cold medicines to avoid accidental acetaminophen overdose'],
     interactionsWith: ['warfarin', 'alcohol']
@@ -47,7 +47,7 @@ const DRUG_DATABASE = {
       en: 'Always take with food or a glass of milk to protect stomach lining.',
       hi: 'पेट की सुरक्षा के लिए हमेशा भोजन या दूध के साथ लें।'
     },
-    icon: '🥛',
+    icon: 'milk',
     category: 'Antiplatelet / NSAID',
     cautions: ['Watch for unexplained bruising or dark stools'],
     interactionsWith: ['ibuprofen', 'warfarin', 'heparin']
@@ -57,7 +57,7 @@ const DRUG_DATABASE = {
       en: 'Avoid large quantities of grapefruit juice. Preferably take at bedtime.',
       hi: 'चकोतरे (Grapefruit) के रस से बचें। रात को सोते समय लेना बेहतर होता है।'
     },
-    icon: '🌙',
+    icon: 'night',
     category: 'Lipid-lowering',
     cautions: ['Report persistent muscle pain to your doctor'],
     interactionsWith: ['clarithromycin', 'gemfibrozil']
@@ -67,7 +67,7 @@ const DRUG_DATABASE = {
       en: 'Avoid high-potassium salt substitutes unless advised by your doctor.',
       hi: 'डॉक्टर की सलाह के बिना अधिक पोटेशियम वाले नमक के विकल्पों से बचें।'
     },
-    icon: '🧂⚠️',
+    icon: 'salt',
     category: 'Antihypertensive (ARB)',
     cautions: ['Stay adequately hydrated in hot weather'],
     interactionsWith: ['potassium supplements', 'spironolactone', 'nsaids']
@@ -77,7 +77,7 @@ const DRUG_DATABASE = {
       en: 'Take 30–60 minutes before your first meal of the day on an empty stomach.',
       hi: 'सुबह के पहले भोजन से 30–60 मिनट पहले खाली पेट लें।'
     },
-    icon: '⏰',
+    icon: 'timing',
     category: 'Proton Pump Inhibitor (Antacid)',
     cautions: ['Swallow whole; do not crush or chew'],
     interactionsWith: ['iron supplements', 'methotrexate']
@@ -111,7 +111,7 @@ export async function getSafetyAdvisory(patientId, language = 'en') {
   const dietaryGuidelines = drugMatches.map((item) => ({
     medicationId: item.medicationId,
     medicationName: item.name,
-    icon: item.info?.icon || '💊',
+    icon: item.info?.icon || 'pill',
     category: item.info?.category || 'General Medication',
     instruction: item.info?.dietary?.[language] || item.info?.dietary?.en || 'Take as prescribed with water.',
     cautions: item.info?.cautions || []

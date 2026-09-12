@@ -7,7 +7,7 @@ import {
   stopAlarm
 } from '../../utils/audio.js';
 import { formatTime } from '../../utils/format.js';
-import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon } from './Icons.jsx';
+import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon, ToneIcon, Volume2Icon, VolumeXIcon } from './Icons.jsx';
 
 export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
@@ -116,7 +116,17 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             onClick={toggleMute}
             title={muted ? 'Unmute alarm' : 'Silence siren'}
           >
-            {muted ? 'Unmute 🔔' : 'Silence 🔇'}
+            {muted ? (
+              <>
+                <Volume2Icon size={13} />
+                <span>{i18n.language === 'hi' ? 'ध्वनि चालू करें' : 'Unmute Alarm'}</span>
+              </>
+            ) : (
+              <>
+                <VolumeXIcon size={13} />
+                <span>{i18n.language === 'hi' ? 'शांत करें' : 'Silence Siren'}</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -128,7 +138,8 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             onClick={() => setShowTonePicker((prev) => !prev)}
             title="Click to switch alarm sound"
           >
-            <span>Tone: {currentToneObj.icon} {i18n.language === 'hi' ? currentToneObj.nameHi : currentToneObj.name}</span>
+            <ToneIcon toneId={currentToneObj.id} size={14} />
+            <span>{i18n.language === 'hi' ? 'धुन: ' + currentToneObj.nameHi : 'Tone: ' + currentToneObj.name}</span>
             <span className="tone-picker-caret">{showTonePicker ? '▲' : '▼'}</span>
           </button>
 
@@ -147,7 +158,9 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
                       className={`alarm-popover-item ${isActive ? 'popover-item-active' : ''}`}
                       onClick={() => handleToneChange(t.id)}
                     >
-                      <span className="popover-item-icon">{t.icon}</span>
+                      <span className="popover-item-icon">
+                        <ToneIcon toneId={t.id} size={16} />
+                      </span>
                       <div className="popover-item-text">
                         <span className="popover-item-name font-sans">
                           {i18n.language === 'hi' ? t.nameHi : t.name}

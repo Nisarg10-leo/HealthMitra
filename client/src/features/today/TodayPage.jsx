@@ -13,7 +13,8 @@ import {
   PlusIcon,
   QrCodeIcon,
   ShieldIcon,
-  SparklesIcon
+  SparklesIcon,
+  ToneIcon
 } from '../../components/ui/Icons.jsx';
 import { useFallDetector } from '../../hooks/useFallDetector.js';
 import { useVoiceCompanion } from '../../hooks/useSpeech.js';
@@ -343,7 +344,7 @@ export function TodayPage() {
                   onClick={() => openModal({ kind: 'alarmTone' })}
                   title={i18n.language === 'hi' ? 'अलार्म धुन बदलें' : 'Change medication alarm sound'}
                 >
-                  <span style={{ fontSize: '13px' }}>{currentToneObj?.icon}</span>
+                  <ToneIcon toneId={currentToneObj?.id} size={14} />
                   <span>{i18n.language === 'hi' ? 'धुन: ' + (currentToneObj?.nameHi?.split(' ')[0] || 'सायरन') : 'Tone: ' + (currentToneObj?.name?.split(' ')[0] || 'Siren')}</span>
                 </button>
 

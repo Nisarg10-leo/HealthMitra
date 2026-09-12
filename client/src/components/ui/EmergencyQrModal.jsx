@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { generateQrSvg } from '../../utils/qrcode.js';
-import { ShieldAlertIcon, PhoneIcon, PrinterIcon } from './Icons.jsx';
+import { CrossIcon, ShieldAlertIcon, PhoneIcon, PrinterIcon } from './Icons.jsx';
 
 export function EmergencyQrModal({ patient, medications, onClose }) {
   const { t } = useTranslation();
@@ -81,7 +81,7 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
               fontSize: '14px'
             }}
           >
-            ✕
+            <CrossIcon size={14} />
           </button>
         </div>
 

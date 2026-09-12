@@ -360,4 +360,34 @@ export function MicIcon({ size = 18, strokeWidth = 1.75, className = '', style =
   );
 }
 
+export function VolumeXIcon({ size = 18, strokeWidth = 1.75, className = '', style = {} }) {
+  return (
+    <svg {...defaultProps(size, strokeWidth)} className={className} style={style}>
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <line x1="23" y1="9" x2="17" y2="15" />
+      <line x1="17" y1="9" x2="23" y2="15" />
+    </svg>
+  );
+}
+
+export function ToneIcon({ toneId, size = 16, strokeWidth = 1.75, className = '', style = {} }) {
+  switch (toneId) {
+    case 'crazy-siren':
+      return <AlertTriangleIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    case 'gentle-chime':
+      return <SparklesIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    case 'digital-beep':
+      return <ClockIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    case 'clinical-pulse':
+      return <ActivityIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    case 'vintage-bell':
+      return <BellIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    case 'radar-sonar':
+      return <ShieldIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+    default:
+      return <BellIcon size={size} strokeWidth={strokeWidth} className={className} style={style} />;
+  }
+}
+
+
 

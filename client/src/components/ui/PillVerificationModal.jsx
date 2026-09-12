@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PillIcon } from './Icons.jsx';
+import { CrossIcon, PillIcon } from './Icons.jsx';
 
 // Converts hex (#4f67d8) to [r, g, b]
 function hexToRgb(hex) {
@@ -141,7 +141,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
               fontSize: '14px'
             }}
           >
-            ✕
+            <CrossIcon size={14} />
           </button>
         </div>
 

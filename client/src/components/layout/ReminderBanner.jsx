@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { alertsApi } from '../../api/index.js';
 import { useSpokenText } from '../../hooks/useSpeech.js';
 import { formatTime } from '../../utils/format.js';
-import { ClockIcon } from '../ui/Icons.jsx';
+import { CheckIcon, ClockIcon } from '../ui/Icons.jsx';
 
 export function ReminderBanner({ notification, onDismissed }) {
   const { t, i18n } = useTranslation();
@@ -15,20 +15,36 @@ export function ReminderBanner({ notification, onDismissed }) {
   };
 
   return (
-    <aside className="reminder-banner" role="alert">
-      <span className="reminder-icon" aria-hidden="true">
-        <ClockIcon size={16} />
-      </span>
-      <div className="reminder-body">
-        <strong>{notification.title}</strong>
-        <p>{notification.body}</p>
+    <aside className="reminder-banner-card" role="alert">
+      <div className="reminder-banner-left">
+        <div className="reminder-icon-badge" aria-hidden="true">
+          <ClockIcon size={18} />
+        </div>
+        <div className="reminder-content-stack">
+          <div className="reminder-header-row">
+            <span className="reminder-badge-chip font-mono">
+              {i18n.language === 'hi' ? 'दवा समय' : 'SCHEDULED DOSE'}
+            </span>
+            <span className="reminder-time-text font-mono">
+              {formatTime(notification.createdAt, i18n.language)}
+            </span>
+          </div>
+          <strong className="reminder-title font-sans">{notification.title}</strong>
+          <p className="reminder-body-text">{notification.body}</p>
+        </div>
       </div>
-      <button type="button" onClick={dismiss} className="reminder-dismiss-btn">
-        <span>{t('dismiss')}</span>
-        <span className="reminder-time font-mono">
-          · {formatTime(notification.createdAt, i18n.language)}
-        </span>
-      </button>
+
+      <div className="reminder-actions-row">
+        <button
+          type="button"
+          onClick={dismiss}
+          className="reminder-dismiss-btn font-mono"
+          title="Dismiss this reminder"
+        >
+          <CheckIcon size={13} />
+          <span>{t('dismiss') || 'Dismiss'}</span>
+        </button>
+      </div>
     </aside>
   );
 }

@@ -10,7 +10,7 @@ export const ALARM_TONES = [
     badgeHi: 'तीव्र और ज़ोरदार',
     desc: 'High-frequency piercing chirps and sweeping dual siren. Impossible to sleep through.',
     descHi: 'तेज आवाज और सायरन — गहरी नींद में भी सुनाई देने वाला अलार्म।',
-    icon: '🚨',
+    iconKey: 'siren',
     category: 'urgent',
     loopInterval: 1150
   },
@@ -22,7 +22,7 @@ export const ALARM_TONES = [
     badgeHi: 'शांत और मधुर',
     desc: 'Peaceful harmonic marimba and harp arpeggios for anxiety-free reminders.',
     descHi: 'शांत और मधुर धुन जो बिना किसी घबराहट के दवा की याद दिलाती है।',
-    icon: '🎵',
+    iconKey: 'chimes',
     category: 'gentle',
     loopInterval: 1800
   },
@@ -34,7 +34,7 @@ export const ALARM_TONES = [
     badgeHi: 'आधुनिक और स्पष्ट',
     desc: 'Crisp double-beep cadence like a modern digital smartwatch alert.',
     descHi: 'स्मार्टवॉच जैसी स्पष्ट दोहरी बीप जो आसानी से समझ आती है।',
-    icon: '⌚',
+    iconKey: 'pulse',
     category: 'standard',
     loopInterval: 1000
   },
@@ -46,7 +46,7 @@ export const ALARM_TONES = [
     badgeHi: 'मेडिकल ग्रेड',
     desc: 'Rhythmic hospital cardiac monitor pings with warm harmonic depth.',
     descHi: 'अस्पताल के कार्डियक मॉनिटर जैसी लयबद्ध और गंभीर बीप।',
-    icon: '🩺',
+    iconKey: 'telemetry',
     category: 'medical',
     loopInterval: 1200
   },
@@ -58,7 +58,7 @@ export const ALARM_TONES = [
     badgeHi: 'पारंपरिक घंटी',
     desc: 'Rapid alternating brass bells with nostalgic mechanical clockwork rattle.',
     descHi: 'पुरानी पीतल की अलार्म घड़ी जैसी तेज और स्पष्ट खड़खड़ाहट।',
-    icon: '⏰',
+    iconKey: 'bell',
     category: 'loud',
     loopInterval: 1150
   },
@@ -70,7 +70,7 @@ export const ALARM_TONES = [
     badgeHi: 'गहरा प्रतिध्वनि पिंग',
     desc: 'Deep resonant underwater sonar pulse with spatial reverberation decay.',
     descHi: 'गहरी प्रतिध्वनि वाला सोनार पिंग जो अलग और विशिष्ट सुनाई देता है।',
-    icon: '🌊',
+    iconKey: 'sonar',
     category: 'standard',
     loopInterval: 1450
   }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { CheckIcon } from './Icons.jsx';
 
 /**
  * DoseCelebration
@@ -94,7 +95,7 @@ export function DoseCelebration({ medicationName = 'Medicine', patientName = 'Me
             boxShadow: '0 8px 16px rgba(16, 185, 129, 0.35)'
           }}
         >
-          ✓
+          <CheckIcon size={32} strokeWidth={2.5} />
         </div>
         <span style={{ color: '#059669', fontSize: '0.82em', fontWeight: '800', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
           DOSE RECORDED

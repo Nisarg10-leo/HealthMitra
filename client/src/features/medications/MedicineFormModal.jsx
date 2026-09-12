@@ -65,7 +65,7 @@ export function MedicineFormModal({ medication, onClose }) {
             dosage: firstMed.dosage || '500 mg',
             times: Array.isArray(firstMed.times) && firstMed.times.length > 0 ? firstMed.times.join(', ') : '08:00'
           }));
-          notify(`✓ Extracted: ${firstMed.name} (${firstMed.dosage || 'standard dose'})`);
+          notify(`Extracted: ${firstMed.name} (${firstMed.dosage || 'standard dose'})`);
         } else {
           // Fallback pattern matching
           const matched = KNOWN_PACKAGES.find((pkg) => pkg.match.test(file.name.toLowerCase()));

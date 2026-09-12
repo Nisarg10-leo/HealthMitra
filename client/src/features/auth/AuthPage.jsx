@@ -457,22 +457,22 @@ export function AuthPage({ onLogin }) {
                       <span className="auth-pw-req-title">Password Security Checklist:</span>
                       <div className="auth-pw-grid">
                         <span className={`pw-check-item ${registerRules.length ? 'pass' : ''}`}>
-                          {registerRules.length ? '✓' : '○'} 8+ characters
+                          {registerRules.length ? <CheckIcon size={12} /> : <span className="pw-bullet" />} 8+ characters
                         </span>
                         <span className={`pw-check-item ${registerRules.upper ? 'pass' : ''}`}>
-                          {registerRules.upper ? '✓' : '○'} Uppercase letter
+                          {registerRules.upper ? <CheckIcon size={12} /> : <span className="pw-bullet" />} Uppercase letter
                         </span>
                         <span className={`pw-check-item ${registerRules.lower ? 'pass' : ''}`}>
-                          {registerRules.lower ? '✓' : '○'} Lowercase letter
+                          {registerRules.lower ? <CheckIcon size={12} /> : <span className="pw-bullet" />} Lowercase letter
                         </span>
                         <span className={`pw-check-item ${registerRules.number ? 'pass' : ''}`}>
-                          {registerRules.number ? '✓' : '○'} 1+ number
+                          {registerRules.number ? <CheckIcon size={12} /> : <span className="pw-bullet" />} 1+ number
                         </span>
                         <span className={`pw-check-item ${registerRules.special ? 'pass' : ''}`}>
-                          {registerRules.special ? '✓' : '○'} Special character
+                          {registerRules.special ? <CheckIcon size={12} /> : <span className="pw-bullet" />} Special character
                         </span>
                         <span className={`pw-check-item ${registerRules.match ? 'pass' : ''}`}>
-                          {registerRules.match ? '✓' : '○'} Passwords match
+                          {registerRules.match ? <CheckIcon size={12} /> : <span className="pw-bullet" />} Passwords match
                         </span>
                       </div>
                     </div>

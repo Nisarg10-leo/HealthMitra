@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi, medicationsApi, profileApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
-import { BellIcon, CheckIcon, FileTextIcon, PlusIcon, SparklesIcon, Volume2Icon } from '../../components/ui/Icons.jsx';
+import { BellIcon, CheckIcon, FileTextIcon, PlusIcon, SparklesIcon, ToneIcon, Volume2Icon } from '../../components/ui/Icons.jsx';
 import {
   ALARM_TONES,
   getSelectedAlarmTone,
@@ -545,8 +545,9 @@ export function ProfilePage() {
             {!scanning && scannedMedicines.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem' }}>
-                    ✓ Detected {scannedMedicines.length} Medicine(s)
+                  <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <CheckIcon size={12} />
+                    <span>Detected {scannedMedicines.length} Medicine(s)</span>
                   </span>
                   {scannedDoctor && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Doctor: {scannedDoctor}</span>
@@ -923,7 +924,18 @@ export function ProfilePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '1.4rem' }}>{tone.icon}</span>
+                    <span className="tone-icon-badge" style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: 'rgba(45, 122, 88, 0.1)',
+                      color: 'var(--leaf)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0
+                    }}>
+                      <ToneIcon toneId={tone.id} size={18} />
+                    </span>
                     <div>
                       <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--ink)' }}>
                         {i18n.language === 'hi' ? tone.nameHi : tone.name}
@@ -973,7 +985,7 @@ export function ProfilePage() {
                     onClick={() => handleToneSelect(tone.id)}
                     style={{ flex: 1 }}
                   >
-                    {isSelected ? (i18n.language === 'hi' ? 'चयनित ✓' : 'Selected ✓') : (i18n.language === 'hi' ? 'चुनें' : 'Set as Alarm')}
+                    {isSelected ? (i18n.language === 'hi' ? 'चयनित' : 'Selected') : (i18n.language === 'hi' ? 'चुनें' : 'Set as Alarm')}
                   </button>
                 </div>
               </div>
@@ -990,12 +1002,13 @@ export function ProfilePage() {
         className="btn-cyber"
         style={{ padding: '14px', fontSize: '1rem', width: '100%' }}
       >
-        {saving ? 'Saving Health Profile…' : '✓ Save Health Profile'}
+        {saving ? 'Saving Health Profile…' : 'Save Health Profile'}
       </button>
 
       {toastMessage && (
-        <div className="toast" role="status">
-          ✓ {toastMessage}
+        <div className="toast" role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <CheckIcon size={16} />
+          <span>{toastMessage}</span>
         </div>
       )}
     </div>

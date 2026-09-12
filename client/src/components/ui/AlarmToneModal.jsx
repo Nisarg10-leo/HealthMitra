@@ -8,7 +8,7 @@ import {
   stopAlarm
 } from '../../utils/audio.js';
 import { profileApi } from '../../api/index.js';
-import { BellIcon, CheckIcon, Volume2Icon } from './Icons.jsx';
+import { BellIcon, CheckIcon, ToneIcon, Volume2Icon } from './Icons.jsx';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 
 export function AlarmToneModal({ onClose }) {
@@ -128,7 +128,9 @@ export function AlarmToneModal({ onClose }) {
                 onClick={() => handleSelect(tone.id)}
               >
                 <div className="tone-item-left">
-                  <span className="tone-emoji-avatar">{tone.icon}</span>
+                  <span className="tone-icon-avatar">
+                    <ToneIcon toneId={tone.id} size={18} />
+                  </span>
 
                   <div className="tone-item-info">
                     <div className="tone-title-row">
