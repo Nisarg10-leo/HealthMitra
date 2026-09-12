@@ -13,7 +13,7 @@ if (config.databaseUrl) {
 } else {
   // Original in-memory implementation (kept for zero-setup dev).
   const crypto = await import('node:crypto');
-  const { tables } = await import('./memoryStore.js');
+  const { tables, persistStore } = await import('./memoryStore.js');
 
   const byId = (table) => (id) => Promise.resolve(tables[table].find((item) => item.id === id) || null);
   const where = (table) => (predicate) => Promise.resolve(tables[table].filter(predicate));
@@ -21,23 +21,33 @@ if (config.databaseUrl) {
     const record = { id: crypto.randomUUID(), ...item };
     if (atFront) tables[table].unshift(record);
     else tables[table].push(record);
+    persistStore();
     return Promise.resolve(record);
   };
   const update = (table) => async (id, changes) => {
     const record = tables[table].find((item) => item.id === id);
-    if (record) Object.assign(record, changes);
+    if (record) {
+      Object.assign(record, changes);
+      persistStore();
+    }
     return record || null;
   };
   const remove = (table) => async (id) => {
     const index = tables[table].findIndex((item) => item.id === id);
-    if (index >= 0) tables[table].splice(index, 1);
+    if (index >= 0) {
+      tables[table].splice(index, 1);
+      persistStore();
+    }
     return index >= 0;
   };
 
   _repository = {
     users: {
       findById: byId('users'),
-      findByEmail: (email) => Promise.resolve(tables.users.find((item) => item.email === email) || null),
+      findByEmail: (email) => {
+        const normalized = String(email || '').trim().toLowerCase();
+        return Promise.resolve(tables.users.find((item) => String(item.email || '').trim().toLowerCase() === normalized) || null);
+      },
       listPatients: () => where('users')((item) => item.role === 'patient'),
       insert: insert('users'),
       updatePassword: (id, passwordHash) => update('users')(id, { passwordHash })

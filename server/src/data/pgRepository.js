@@ -128,7 +128,7 @@ export const pgRepository = {
       if (!uid) return null;
       return one(await query('SELECT * FROM users WHERE id = $1', [uid]));
     },
-    findByEmail: async (email) => one(await query('SELECT * FROM users WHERE email = $1', [email])),
+    findByEmail: async (email) => one(await query('SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))', [email])),
     listPatients: async () => rows(await query("SELECT * FROM users WHERE role = 'patient'")),
     insert: async (item) => one(await query(...Object.values(buildInsert('users', item)))),
     updatePassword: async (id, passwordHash) => {

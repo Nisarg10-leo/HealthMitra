@@ -13,6 +13,10 @@ export function AuthPage({ onLogin }) {
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const [validationError, setValidationError] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [demoOtpHint, setDemoOtpHint] = useState('');
@@ -75,10 +79,11 @@ export function AuthPage({ onLogin }) {
         return;
       }
     }
+    const cleanEmail = String(form.email || '').trim();
     run(async () => {
       const res = mode === 'login'
-        ? await authApi.login(form.email, form.password)
-        : await authApi.register({ name: form.name, email: form.email, phone: form.phone, password: form.password }, role);
+        ? await authApi.login(cleanEmail, form.password)
+        : await authApi.register({ name: String(form.name || '').trim(), email: cleanEmail, phone: String(form.phone || '').trim(), password: form.password }, role);
       onLogin(res.user);
     });
   };
@@ -370,30 +375,76 @@ export function AuthPage({ onLogin }) {
                     </button>
                   )}
                 </div>
-                <input
-                  required
-                  type="password"
-                  value={form.password}
-                  onChange={field('password')}
-                  placeholder={mode === 'register' ? 'Minimum 8 characters' : 'Enter your password'}
-                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px' }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    required
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={field('password')}
+                    placeholder={mode === 'register' ? 'Minimum 8 characters' : 'Enter your password'}
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      color: '#94a3b8',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {showPassword ? '👁️' : '🙈'}
+                  </button>
+                </div>
               </label>
 
               {mode === 'register' && (
                 <>
                   <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
                     Confirm Password
-                    <input
-                      required
-                      type="password"
-                      value={form.confirmPassword}
-                      onChange={field('confirmPassword')}
-                      placeholder="Re-enter your password"
-                      autoComplete="new-password"
-                      style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                    />
+                    <div style={{ position: 'relative', marginTop: '6px' }}>
+                      <input
+                        required
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={form.confirmPassword}
+                        onChange={field('confirmPassword')}
+                        placeholder="Re-enter your password"
+                        autoComplete="new-password"
+                        style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '1rem',
+                          color: '#94a3b8',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {showConfirmPassword ? '👁️' : '🙈'}
+                      </button>
+                    </div>
                   </label>
 
                   {/* Vitalis Dark Glass Password Security Checklist */}
@@ -571,34 +622,80 @@ export function AuthPage({ onLogin }) {
 
               <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
                 {t('newPassword')}
-                <input
-                  required
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => {
-                    setNewPassword(e.target.value);
-                    setValidationError('');
-                  }}
-                  placeholder="Minimum 8 characters"
-                  autoComplete="new-password"
-                  style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                />
+                <div style={{ position: 'relative', marginTop: '6px' }}>
+                  <input
+                    required
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setValidationError('');
+                    }}
+                    placeholder="Minimum 8 characters"
+                    autoComplete="new-password"
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      color: '#94a3b8',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {showNewPassword ? '👁️' : '🙈'}
+                  </button>
+                </div>
               </label>
 
               <label style={{ display: 'block', marginBottom: '14px', fontSize: '0.86rem', color: '#dfe2ef', fontWeight: '600' }}>
                 {t('confirmNewPassword')}
-                <input
-                  required
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => {
-                    setConfirmNewPassword(e.target.value);
-                    setValidationError('');
-                  }}
-                  placeholder="Re-enter your new password"
-                  autoComplete="new-password"
-                  style={{ width: '100%', boxSizing: 'border-box', marginTop: '6px', padding: '12px 14px' }}
-                />
+                <div style={{ position: 'relative', marginTop: '6px' }}>
+                  <input
+                    required
+                    type={showConfirmNewPassword ? 'text' : 'password'}
+                    value={confirmNewPassword}
+                    onChange={(e) => {
+                      setConfirmNewPassword(e.target.value);
+                      setValidationError('');
+                    }}
+                    placeholder="Re-enter your new password"
+                    autoComplete="new-password"
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '12px 42px 12px 14px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                    aria-label={showConfirmNewPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      color: '#94a3b8',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {showConfirmNewPassword ? '👁️' : '🙈'}
+                  </button>
+                </div>
               </label>
 
               {/* Vitalis Dark Glass Password Security Checklist for Reset */}

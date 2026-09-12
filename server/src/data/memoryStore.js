@@ -1,6 +1,14 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { hashPassword } from '../lib/password.js';
 import { isoAt, localDateKey, nowIso, today } from '../lib/time.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.resolve(__dirname, '../../.data');
+const STORE_PATH = path.join(DATA_DIR, 'local_store.json');
 
 // In-memory tables that mirror server/sql/schema.sql one-to-one. Only
 // repository.js is allowed to touch this object; services never import it.
@@ -52,4 +60,55 @@ function seedHistory() {
   tables.alerts.push({ id: 'alert-welcome', patientId: 'patient-1', type: 'info', message: 'Welcome back. Your medication plan is ready.', createdAt: nowIso(), readBy: [] });
 }
 
+// Restore saved data from local_store.json if it exists
+function restoreSavedData() {
+  try {
+    if (!fs.existsSync(STORE_PATH)) return;
+    const raw = fs.readFileSync(STORE_PATH, 'utf-8');
+    const saved = JSON.parse(raw);
+    if (!saved || typeof saved !== 'object') return;
+
+    // Merge saved users (preserving seed users if untouched, updating or adding new users)
+    if (Array.isArray(saved.users)) {
+      saved.users.forEach((savedUser) => {
+        const existingIdx = tables.users.findIndex((u) => u.id === savedUser.id || (savedUser.email && u.email?.toLowerCase() === savedUser.email?.toLowerCase()));
+        if (existingIdx >= 0) {
+          tables.users[existingIdx] = { ...tables.users[existingIdx], ...savedUser };
+        } else {
+          tables.users.push(savedUser);
+        }
+      });
+    }
+
+    // Merge other entities
+    ['links', 'medications', 'doseLogs', 'alerts', 'notifications', 'doctors', 'chemists', 'sosEvents'].forEach((key) => {
+      if (Array.isArray(saved[key])) {
+        saved[key].forEach((item) => {
+          if (!tables[key].some((existing) => existing.id === item.id)) {
+            tables[key].push(item);
+          }
+        });
+      }
+    });
+  } catch (err) {
+    console.warn('[data] Could not restore local_store.json:', err.message);
+  }
+}
+
+let persistTimer = null;
+export function persistStore() {
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      fs.writeFileSync(STORE_PATH, JSON.stringify(tables, null, 2), 'utf-8');
+    } catch (err) {
+      console.warn('[data] Could not persist to local_store.json:', err.message);
+    }
+  }, 100);
+}
+
 seedHistory();
+restoreSavedData();
