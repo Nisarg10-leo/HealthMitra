@@ -39,7 +39,8 @@ if (config.databaseUrl) {
       findById: byId('users'),
       findByEmail: (email) => Promise.resolve(tables.users.find((item) => item.email === email) || null),
       listPatients: () => where('users')((item) => item.role === 'patient'),
-      insert: insert('users')
+      insert: insert('users'),
+      updatePassword: (id, passwordHash) => update('users')(id, { passwordHash })
     },
     links: {
       forCaregiver: (caregiverId) => where('links')((link) => link.caregiverId === caregiverId),

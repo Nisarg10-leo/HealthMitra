@@ -5,7 +5,9 @@ const patientQuery = (patientId) => `?patient_id=${encodeURIComponent(patientId)
 
 export const authApi = {
   login: (email, password) => post('/auth/login', { email, password }),
-  register: (form, role) => post('/auth/register', { ...form, role })
+  register: (form, role) => post('/auth/register', { ...form, role }),
+  forgotPassword: (email) => post('/auth/forgot-password', { email }),
+  resetPassword: (email, otp, newPassword) => post('/auth/reset-password', { email, otp, newPassword })
 };
 
 export const patientsApi = {

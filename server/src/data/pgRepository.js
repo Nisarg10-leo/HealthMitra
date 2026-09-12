@@ -130,7 +130,12 @@ export const pgRepository = {
     },
     findByEmail: async (email) => one(await query('SELECT * FROM users WHERE email = $1', [email])),
     listPatients: async () => rows(await query("SELECT * FROM users WHERE role = 'patient'")),
-    insert: async (item) => one(await query(...Object.values(buildInsert('users', item))))
+    insert: async (item) => one(await query(...Object.values(buildInsert('users', item)))),
+    updatePassword: async (id, passwordHash) => {
+      const uid = cleanUuid(id);
+      if (!uid) return null;
+      return one(await query('UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING *', [passwordHash, uid]));
+    }
   },
 
   links: {
