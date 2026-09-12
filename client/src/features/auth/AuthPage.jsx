@@ -159,16 +159,38 @@ export function AuthPage({ onLogin }) {
     setDemoOtpHint('');
   };
 
+  // Handle switching roles between Patient and Caregiver
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    setValidationError('');
+    if (mode === 'login') {
+      if (newRole === 'caregiver' && (!form.email || form.email === 'meera@demo.health')) {
+        setForm((prev) => ({ ...prev, email: 'arjun@demo.health', password: 'demo123' }));
+      } else if (newRole === 'patient' && (!form.email || form.email === 'arjun@demo.health' || form.email === 'kavya@demo.health')) {
+        setForm((prev) => ({ ...prev, email: 'meera@demo.health', password: 'demo123' }));
+      }
+    }
+  };
+
   // Quick Demo Logins for effortless testing
   const fillDemoPatient = () => {
     setMode('login');
+    setRole('patient');
     setForm({ ...form, email: 'meera@demo.health', password: 'demo123' });
     setValidationError('');
   };
 
   const fillDemoCaregiver = () => {
     setMode('login');
+    setRole('caregiver');
     setForm({ ...form, email: 'arjun@demo.health', password: 'demo123' });
+    setValidationError('');
+  };
+
+  const fillDemoCaregiverKavya = () => {
+    setMode('login');
+    setRole('caregiver');
+    setForm({ ...form, email: 'kavya@demo.health', password: 'demo123' });
     setValidationError('');
   };
 
@@ -319,25 +341,42 @@ export function AuthPage({ onLogin }) {
               </div>
             )}
 
-            {/* Role Switcher for Registration */}
-            {mode === 'register' && (
-              <div className="auth-role-segmented">
-                <button
-                  type="button"
-                  className={`auth-role-btn ${role === 'patient' ? 'active' : ''}`}
-                  onClick={() => setRole('patient')}
-                >
-                  <UserIcon size={14} />
-                  <span>{t('patient') || 'Patient'}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`auth-role-btn ${role === 'caregiver' ? 'active' : ''}`}
-                  onClick={() => setRole('caregiver')}
-                >
-                  <ShieldIcon size={14} />
-                  <span>{t('caregiver') || 'Caregiver'}</span>
-                </button>
+            {/* Role Switcher for both Login and Registration */}
+            {(mode === 'login' || mode === 'register') && (
+              <div className="auth-role-wrapper">
+                <div className="auth-role-segmented" role="tablist" aria-label="Portal Selection">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={role === 'patient'}
+                    className={`auth-role-btn ${role === 'patient' ? 'active' : ''}`}
+                    onClick={() => handleRoleChange('patient')}
+                  >
+                    <UserIcon size={14} />
+                    <span>{t('patient') || 'Patient'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={role === 'caregiver'}
+                    className={`auth-role-btn ${role === 'caregiver' ? 'active' : ''}`}
+                    onClick={() => handleRoleChange('caregiver')}
+                  >
+                    <ShieldIcon size={14} />
+                    <span>{t('caregiver') || 'Caregiver'}</span>
+                  </button>
+                </div>
+                <div className="portal-hint">
+                  {role === 'caregiver' ? (
+                    <span>
+                      <ShieldIcon size={12} /> <strong>Caregiver Portal:</strong> Monitor patient adherence, view health vitals & receive missed-dose alerts
+                    </span>
+                  ) : (
+                    <span>
+                      <UserIcon size={12} /> <strong>Patient Portal:</strong> View daily medication schedule, listen to alarms & record doses
+                    </span>
+                  )}
+                </div>
               </div>
             )}
 
@@ -637,17 +676,21 @@ export function AuthPage({ onLogin }) {
 
             {/* Quick Demo Access Bar for Developer & Review Testing */}
             <div className="auth-demo-bar">
-              <span className="auth-demo-label">One-Tap Review Accounts:</span>
+              <span className="auth-demo-label">One-Tap Review Portals:</span>
               <div className="auth-demo-buttons">
-                <button type="button" onClick={fillDemoPatient} className="demo-chip">
+                <button type="button" onClick={fillDemoPatient} className={`demo-chip ${role === 'patient' ? 'demo-chip-highlight' : ''}`} title="Sign in to Patient Portal as Meera Shah">
                   <UserIcon size={12} />
-                  <span>Meera (Patient)</span>
+                  <span>Meera (Patient Portal)</span>
                 </button>
-                <button type="button" onClick={fillDemoCaregiver} className="demo-chip">
+                <button type="button" onClick={fillDemoCaregiver} className={`demo-chip ${role === 'caregiver' ? 'demo-chip-highlight' : ''}`} title="Sign in to Caregiver Portal as Arjun Shah">
                   <ShieldIcon size={12} />
-                  <span>Arjun (Caregiver)</span>
+                  <span>Arjun (Caregiver Portal)</span>
                 </button>
-                <button type="button" onClick={fillTestNewUser} className="demo-chip demo-chip-highlight" title="Creates fresh patient to test first-time profile setup wizard">
+                <button type="button" onClick={fillDemoCaregiverKavya} className="demo-chip" title="Sign in to Caregiver Portal as Kavya Shah (Hindi)">
+                  <ShieldIcon size={12} />
+                  <span>Kavya (Caregiver Hindi)</span>
+                </button>
+                <button type="button" onClick={fillTestNewUser} className="demo-chip" title="Creates fresh patient to test first-time profile setup wizard">
                   <SparklesIcon size={12} />
                   <span>New Patient (Test Setup Wizard)</span>
                 </button>

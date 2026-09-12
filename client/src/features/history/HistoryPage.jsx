@@ -28,13 +28,13 @@ export function HistoryPage() {
             {t('medicationHistory')}
           </h1>
           <p className="page-intro-desc">
-            {t('historySubtitle', { name: dashboard.patient?.name || 'Patient' })}
+            {t('historySubtitle', { name: dashboard?.patient?.name || 'Patient' })}
           </p>
         </div>
 
         <span className="chip-telemetry chip-mint">
           <ActivityIcon size={12} />
-          <span className="font-mono">{dashboard.streak || 1} {t('dayStreak')}</span>
+          <span className="font-mono">{dashboard?.streak || 1} {t('dayStreak')}</span>
         </span>
       </section>
 

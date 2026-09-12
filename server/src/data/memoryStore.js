@@ -13,12 +13,22 @@ const STORE_PATH = path.join(DATA_DIR, 'local_store.json');
 // In-memory tables that mirror server/sql/schema.sql one-to-one. Only
 // repository.js is allowed to touch this object; services never import it.
 const demoPassword = hashPassword('demo123');
-const seededUser = (id, name, role, email, phone, preferredLanguage = 'en') => ({
+const seededUser = (id, name, role, email, phone, preferredLanguage = 'en', profileComplete = true) => ({
   id, name, role, email, phone, passwordHash: demoPassword, preferredLanguage,
-  dob: null, gender: null, bloodGroup: null, height: null, weight: null,
-  conditions: [], allergies: [], emergencyContactName: null,
-  emergencyContactPhone: null, emergencyContactRelation: null,
-  profileComplete: false,
+  dob: role === 'patient' ? '1958-04-12' : null,
+  age: role === 'patient' ? 68 : 42,
+  gender: role === 'patient' ? 'Female' : 'Male',
+  bloodGroup: role === 'patient' ? 'O+' : 'B+',
+  height: role === 'patient' ? 158 : 175,
+  weight: role === 'patient' ? 62 : 78,
+  conditions: role === 'patient' ? ['Type 2 Diabetes', 'Hypertension (High BP)'] : [],
+  allergies: role === 'patient' ? ['Sulfa Drugs'] : [],
+  emergencyContactName: role === 'patient' ? 'Arjun Shah' : null,
+  emergencyContactPhone: role === 'patient' ? '+919810000002' : null,
+  emergencyContactRelation: role === 'patient' ? 'Son' : null,
+  dietaryPreference: 'Vegetarian',
+  mobilityStatus: 'Independent',
+  profileComplete,
   alarmTone: 'crazy-siren'
 });
 

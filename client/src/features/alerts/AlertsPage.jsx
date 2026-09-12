@@ -21,9 +21,10 @@ export function AlertsPage() {
   const session = useSession();
   const { dashboard, alerts, refresh, notify } = useWorkspace();
   const [sosEvents, setSosEvents] = useState([]);
-  const patientId = dashboard.patient.id;
+  const patientId = dashboard?.patient?.id;
 
   useEffect(() => {
+    if (!patientId) return;
     sosApi.list(patientId).then(setSosEvents).catch((error) => notify(error.message));
   }, [patientId, notify]);
 

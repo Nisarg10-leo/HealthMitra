@@ -17,8 +17,8 @@ export default function App() {
     );
   }
 
-  // First-time login: if profile is not yet completed, show onboarding setup
-  if (!session.profileComplete) {
+  // First-time patient login: if medical profile is not yet completed, show onboarding setup
+  if (session.role === 'patient' && !session.profileComplete) {
     return (
       <ErrorBoundary>
         <SessionContext.Provider value={session}>
