@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { generateQrSvg } from '../../utils/qrcode.js';
+import { ShieldAlertIcon, PhoneIcon, PrinterIcon } from './Icons.jsx';
 
 export function EmergencyQrModal({ patient, medications, onClose }) {
   const { t } = useTranslation();
@@ -46,7 +47,9 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '1.5rem', color: '#ffb4ab' }}>🚨</span>
+            <span style={{ display: 'grid', placeItems: 'center', color: '#ffb4ab' }}>
+              <ShieldAlertIcon size={24} />
+            </span>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff', fontWeight: '800' }}>
                 Universal Medical ID
@@ -186,7 +189,7 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
                   }}
                   title="Call Arjun Shah"
                 >
-                  📞
+                  <PhoneIcon size={16} />
                 </a>
               </div>
             </div>
@@ -198,10 +201,10 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
           <button
             type="button"
             className="btn-cyber"
-            style={{ width: '100%' }}
+            style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             onClick={handlePrint}
           >
-            🖨️ Print Fridge Card
+            <PrinterIcon size={16} /> Print Fridge Card
           </button>
 
           <button

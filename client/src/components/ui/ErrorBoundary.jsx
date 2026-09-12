@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangleIcon } from './Icons.jsx';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -19,7 +20,9 @@ export class ErrorBoundary extends React.Component {
       return (
         <div style={{ padding: '40px 20px', maxWidth: '560px', margin: '60px auto' }}>
           <div className="glass-matrix" style={{ padding: '32px 28px', textAlign: 'center' }}>
-            <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>⚠️</span>
+            <div style={{ display: 'grid', placeItems: 'center', marginBottom: '16px', color: 'var(--amber)' }}>
+              <AlertTriangleIcon size={36} />
+            </div>
             <h2 style={{ color: '#ffffff', fontSize: '1.5rem', margin: '0 0 8px' }}>
               Something went wrong
             </h2>

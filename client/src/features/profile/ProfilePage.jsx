@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi, medicationsApi, profileApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
+import { CheckIcon, FileTextIcon, PlusIcon, SparklesIcon } from '../../components/ui/Icons.jsx';
 
 const COMMON_CONDITIONS = [
   'Type 2 Diabetes', 'Hypertension (High BP)', 'Cardiovascular Disease',
@@ -305,7 +306,12 @@ export function ProfilePage() {
           className="btn-cyber"
           style={{ padding: '10px 20px', fontSize: '0.9rem' }}
         >
-          {saving ? 'Saving…' : '💾 Save Profile'}
+          {saving ? 'Saving…' : (
+            <>
+              <CheckIcon size={15} />
+              <span>Save Profile</span>
+            </>
+          )}
         </button>
       </div>
 
@@ -344,7 +350,7 @@ export function ProfilePage() {
                   transition: 'all 0.15s ease'
                 }}
               >
-                {isSelected ? '✓ ' : '+ '} {c}
+                {isSelected ? 'Selected • ' : '+ '} {c}
               </button>
             );
           })}
@@ -453,7 +459,7 @@ export function ProfilePage() {
               </div>
             ) : (
               <>
-                <span style={{ fontSize: '2rem' }}>🧾</span>
+                <FileTextIcon size={36} className="color-cyan" />
                 <div>
                   <strong style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff' }}>Upload Prescription or Receipt</strong>
                   <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>PNG, JPG, or camera photo</span>
@@ -537,7 +543,7 @@ export function ProfilePage() {
                   className="btn-cyber"
                   style={{ padding: '10px', fontSize: '0.88rem' }}
                 >
-                  {addingMeds ? 'Adding…' : '⚡ Add Extracted Medicines to Daily Schedule'}
+                  {addingMeds ? 'Adding…' : 'Add Extracted Medicines to Daily Schedule'}
                 </button>
               </div>
             )}
@@ -598,7 +604,7 @@ export function ProfilePage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                  <span style={{ fontSize: '1.2rem' }}>📄</span>
+                  <FileTextIcon size={18} style={{ color: 'var(--cyan)' }} />
                   <div style={{ minWidth: 0 }}>
                     <strong style={{ display: 'block', fontSize: '0.84rem', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {file.name}

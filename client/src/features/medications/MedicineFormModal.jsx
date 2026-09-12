@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi, medicationsApi } from '../../api/index.js';
 import { ErrorText } from '../../components/ui/ErrorText.jsx';
 import { ModalShell } from '../../components/ui/ModalShell.jsx';
+import { CameraIcon, CheckIcon } from '../../components/ui/Icons.jsx';
 import { useAsyncAction } from '../../hooks/useAsyncAction.js';
 import { useSession } from '../../hooks/useSession.js';
 import { dateKey } from '../../utils/format.js';
@@ -166,7 +167,7 @@ export function MedicineFormModal({ medication, onClose }) {
             }}
             onClick={() => fileInputRef.current?.click()}
           >
-            <span>📷</span>
+            <CameraIcon size={16} />
             <span>{scanning ? t('scanningPackaging') : t('scanMedicineBtn')}</span>
           </button>
           <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -180,7 +181,9 @@ export function MedicineFormModal({ medication, onClose }) {
                 alt="Packaging scan"
                 style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--surface-border)' }}
               />
-              <small style={{ color: 'var(--mint-bright)', fontWeight: '600' }}>✓ {t('scanSuccess')}</small>
+              <small style={{ color: 'var(--mint-bright)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <CheckIcon size={13} /> {t('scanSuccess')}
+              </small>
             </div>
           )}
         </div>

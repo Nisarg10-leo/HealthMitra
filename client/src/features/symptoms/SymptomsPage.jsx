@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { guidanceApi } from '../../api/index.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
+import {
+  AlertCircleIcon,
+  AlertTriangleIcon,
+  CheckIcon,
+  HeartIcon,
+  MicrophoneIcon,
+  ShieldIcon,
+  SparklesIcon
+} from '../../components/ui/Icons.jsx';
 
 export const SYMPTOMS = ['headache', 'mild fever', 'common cold', 'mild body ache', 'mild cough'];
 const HINDI_HINTS = { 'mild fever': /बुखार/ };
@@ -46,17 +55,17 @@ export function SymptomsPage() {
     });
 
   return (
-    <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="page-shell-container max-w-prose">
       {/* ── Page Header ── */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <section className="page-intro-header">
         <div>
-          <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '2px 8px', marginBottom: '6px' }}>
+          <span className="chip-telemetry chip-cyan">
             {t('patientTool')}
           </span>
-          <h1 style={{ fontSize: '1.75rem', margin: '4px 0 2px', color: '#ffffff', fontWeight: '700' }}>
+          <h1 className="page-intro-title">
             {t('feelingQuestion')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
+          <p className="page-intro-desc">
             {t('symptomSubtitle')}
           </p>
         </div>
@@ -64,21 +73,20 @@ export function SymptomsPage() {
         <button
           type="button"
           className="btn-glass"
-          style={{ padding: '8px 14px', fontSize: '0.85rem' }}
           onClick={chooseByVoice}
         >
-          <span>🎙️</span>
+          <MicrophoneIcon size={16} />
           <span>{t('speak')}</span>
         </button>
       </section>
 
       {/* ── Interactive Symptom Selector ── */}
-      <section className="hm-card" style={{ padding: '22px 24px' }}>
-        <h3 style={{ margin: '0 0 14px', fontSize: '1.1rem', color: '#ffffff', fontWeight: '600' }}>
+      <section className="symptom-selector-card">
+        <h3 className="symptom-selector-title">
           {t('selectSymptom')}
         </h3>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '18px' }}>
+        <div className="symptom-chips-row">
           {SYMPTOMS.map((item) => {
             const isSelected = symptom === item;
             return (
@@ -86,18 +94,7 @@ export function SymptomsPage() {
                 key={item}
                 type="button"
                 onClick={() => choose(item)}
-                style={{
-                  background: isSelected ? 'var(--cyan-subtle)' : 'var(--surface-dim)',
-                  border: isSelected ? '1px solid var(--cyan)' : '1px solid var(--surface-border)',
-                  color: isSelected ? '#ffffff' : 'var(--text-secondary)',
-                  padding: '9px 16px',
-                  borderRadius: '10px',
-                  fontSize: '0.88rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: isSelected ? '0 0 12px rgba(0, 210, 211, 0.25)' : 'none'
-                }}
+                className={`symptom-pill-btn ${isSelected ? 'symptom-pill-active' : ''}`}
               >
                 {t(item)}
               </button>
@@ -105,7 +102,7 @@ export function SymptomsPage() {
           })}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', background: 'var(--surface-dim)', borderRadius: '10px', border: '1px solid var(--surface-border)', marginBottom: '18px' }}>
+        <div className="symptom-severe-row">
           <input
             type="checkbox"
             id="severe-check"
@@ -114,66 +111,60 @@ export function SymptomsPage() {
               setSevere(e.target.checked);
               setResult(null);
             }}
-            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--coral)' }}
+            className="symptom-checkbox"
           />
-          <label htmlFor="severe-check" style={{ color: severe ? '#fca5a5' : 'var(--text-secondary)', fontSize: '0.88rem', cursor: 'pointer', fontWeight: severe ? '600' : '400' }}>
+          <label htmlFor="severe-check" className="symptom-severe-label">
             {t('severeCheck')}
           </label>
         </div>
 
         <button
           type="button"
-          className="btn-cyber"
+          className="btn-cyber btn-full"
           disabled={!symptom || loading}
           onClick={check}
-          style={{ width: '100%', padding: '12px 20px', fontSize: '0.95rem' }}
         >
-          {loading ? 'Analyzing Clinical Patterns...' : t('safeGuidance')}
+          {loading ? (
+            <span>Analyzing Clinical Patterns...</span>
+          ) : (
+            <>
+              <SparklesIcon size={16} />
+              <span>{t('safeGuidance')}</span>
+            </>
+          )}
         </button>
 
         {/* Clinical Guidance Result */}
         {result && (
           <div
-            style={{
-              marginTop: '18px',
-              padding: '18px 20px',
-              borderRadius: '12px',
-              background: result.safe ? 'var(--emerald-subtle)' : 'var(--coral-subtle)',
-              borderLeft: `4px solid ${result.safe ? 'var(--emerald)' : 'var(--coral)'}`,
-              border: `1px solid ${result.safe ? 'var(--emerald-border)' : 'var(--coral-border)'}`
-            }}
+            className={`symptom-guidance-box ${
+              result.safe ? 'guidance-safe' : 'guidance-alert'
+            }`}
           >
-            <strong style={{ display: 'block', fontSize: '1rem', color: result.safe ? '#34d399' : '#fca5a5', marginBottom: '6px' }}>
-              {result.safe ? t('gentleSuggestion') : t('seekMedicalGuidance')}
-            </strong>
-            <p style={{ color: '#ffffff', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 10px' }}>
+            <div className="guidance-header-row">
+              {result.safe ? <CheckIcon size={18} /> : <AlertTriangleIcon size={18} />}
+              <strong className="guidance-title">
+                {result.safe ? t('gentleSuggestion') : t('seekMedicalGuidance')}
+              </strong>
+            </div>
+            <p className="guidance-body-text">
               {result.suggestion}
             </p>
-            <small style={{ color: 'var(--text-muted)', fontSize: '0.78rem', display: 'block' }}>
-              ⚕ {result.disclaimer}
-            </small>
+            <span className="guidance-disclaimer font-mono">
+              {result.disclaimer}
+            </span>
           </div>
         )}
       </section>
 
       {/* ── Persistent Medical Disclaimer ── */}
-      <div
-        className="hm-card"
-        style={{
-          padding: '14px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          background: 'var(--surface-dim)',
-          border: '1px solid var(--surface-border)'
-        }}
-      >
-        <span style={{ fontSize: '1.2rem', color: 'var(--cyan)' }}>⚕</span>
+      <div className="symptom-footer-disclaimer">
+        <ShieldIcon size={18} className="disclaimer-shield-icon" />
         <div>
-          <strong style={{ fontSize: '0.82rem', color: '#ffffff', display: 'block' }}>
+          <strong className="disclaimer-title font-mono">
             {t('safetyFirst')}
           </strong>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+          <p className="disclaimer-text">
             {t('persistentDisclaimer')}
           </p>
         </div>

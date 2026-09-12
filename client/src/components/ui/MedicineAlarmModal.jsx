@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { playAlarmChime } from '../../utils/audio.js';
 import { formatTime } from '../../utils/format.js';
+import { BellIcon, ClockIcon } from './Icons.jsx';
 
 export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
@@ -86,12 +87,11 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
               background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1))',
               border: '2px solid #ef4444',
               color: '#ffb4ab',
-              fontSize: '34px',
               boxShadow: '0 0 24px rgba(239, 68, 68, 0.5)',
               animation: 'bellTink 1.2s ease-in-out infinite'
             }}
           >
-            🔔
+            <BellIcon size={32} />
           </div>
         </div>
 
@@ -188,13 +188,13 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             <button
               type="button"
               className="btn-glass"
-              style={{ flex: 1, padding: '12px' }}
+              style={{ flex: 1, padding: '12px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               onClick={() => {
                 if (intervalRef.current) clearInterval(intervalRef.current);
                 onSnooze(dose);
               }}
             >
-              ⏰ Snooze 5m
+              <ClockIcon size={16} /> Snooze 5m
             </button>
 
             <button

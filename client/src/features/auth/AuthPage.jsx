@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { authApi } from '../../api/index.js';
 import { ErrorText } from '../../components/ui/ErrorText.jsx';
 import { useAsyncAction } from '../../hooks/useAsyncAction.js';
+import { EyeIcon, EyeOffIcon } from '../../components/ui/Icons.jsx';
 
 export function AuthPage({ onLogin }) {
   const { t } = useTranslation();
@@ -163,9 +164,9 @@ export function AuthPage({ onLogin }) {
             Private & Secure Family Health Network
           </div>
           <div className="brand-pills" style={{ marginTop: '22px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>🎙️ Voice-assisted for Seniors</span>
-            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>👨‍👩‍👧 Family Caregiver Alerts</span>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>🇮🇳 English + हिन्दी</span>
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>Voice-assisted for Seniors</span>
+            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>Family Caregiver Alerts</span>
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.82rem', padding: '6px 12px' }}>English & Hindi Bilingual</span>
           </div>
         </div>
       </section>
@@ -401,7 +402,7 @@ export function AuthPage({ onLogin }) {
                       alignItems: 'center'
                     }}
                   >
-                    {showPassword ? '👁️' : '🙈'}
+                    {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                   </button>
                 </div>
               </label>
@@ -439,7 +440,7 @@ export function AuthPage({ onLogin }) {
                           alignItems: 'center'
                         }}
                       >
-                        {showConfirmPassword ? '👁️' : '🙈'}
+                        {showConfirmPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                       </button>
                     </div>
                   </label>
@@ -651,7 +652,7 @@ export function AuthPage({ onLogin }) {
                       alignItems: 'center'
                     }}
                   >
-                    {showNewPassword ? '👁️' : '🙈'}
+                    {showNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                   </button>
                 </div>
               </label>
@@ -690,7 +691,7 @@ export function AuthPage({ onLogin }) {
                       alignItems: 'center'
                     }}
                   >
-                    {showConfirmNewPassword ? '👁️' : '🙈'}
+                    {showConfirmNewPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                   </button>
                 </div>
               </label>

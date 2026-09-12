@@ -2,6 +2,19 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dosesApi, guidanceApi, patientsApi, sosApi } from '../../api/index.js';
 import { DoseCelebration } from '../../components/ui/DoseCelebration.jsx';
+import {
+  ActivityIcon,
+  AlertCircleIcon,
+  BellIcon,
+  CheckIcon,
+  CrossMedicalIcon,
+  MicrophoneIcon,
+  PillIcon,
+  PlusIcon,
+  QrCodeIcon,
+  ShieldIcon,
+  SparklesIcon
+} from '../../components/ui/Icons.jsx';
 import { useFallDetector } from '../../hooks/useFallDetector.js';
 import { useVoiceCompanion } from '../../hooks/useSpeech.js';
 import { isToday } from '../../utils/format.js';
@@ -17,7 +30,7 @@ export function TodayPage() {
   const logs = (dashboard?.logs || [])
     .filter((log) => isToday(log.scheduledTime))
     .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
-  
+
   const medicationById = (id) => dashboard?.medications?.find((medication) => medication.id === id);
 
   const handleFallEmergency = async () => {
@@ -38,479 +51,356 @@ export function TodayPage() {
 
   const testAlarm = () => {
     const firstPending = logs.find((l) => l.status === 'pending') || logs[0] || {
-      id: 'test-alarm-dose',
-      medicationId: dashboard?.medications?.[0]?.id,
+      id: 'test-alarm-id',
       scheduledTime: new Date().toISOString(),
-      status: 'pending'
+      status: 'pending',
+      medicationId: dashboard?.medications?.[0]?.id || 'demo-med'
     };
     triggerAlarm(firstPending);
   };
 
-  const confirm = async (log, status, method = 'tap') => {
+  const confirm = async (log, status, source = 'manual') => {
     try {
-      await dosesApi.confirm(log.id, status, method);
-      if (status === 'taken') {
-        const med = medicationById(log.medicationId);
-        setCelebratingMed(med?.name || 'Medicine');
-      }
+      await dosesApi.confirm(log.id, status, source);
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
       refresh();
-    } catch (requestError) {
-      notify(requestError.message);
+
+      if (status === 'taken') {
+        const med = medicationById(log.medicationId);
+        setCelebratingMed(med?.name || t('medication'));
+      }
+    } catch (error) {
+      notify(error.message);
     }
   };
 
   const confirmByVoice = (log) =>
     listen(async (transcript) => {
-      try {
-        const { intent } = await guidanceApi.voiceIntent(transcript);
-        if (intent === 'taken' || intent === 'skipped') await confirm(log, intent, 'voice');
-        else notify(t('voiceUnclear'));
-      } catch (requestError) {
-        notify(requestError.message);
+      const positive = /yes|taken|haan|ha|le li|done/i.test(transcript);
+      const negative = /no|skip|chhod|nahi/i.test(transcript);
+      if (!positive && !negative) {
+        notify(t('voiceUnclear'));
+        return;
       }
+      await confirm(log, positive ? 'taken' : 'skipped', 'voice');
     });
-
-  const companion = useVoiceCompanion(
-    dashboard,
-    async (doseId, status, method) => {
-      await dosesApi.confirm(doseId, status, method);
-      refresh();
-    },
-    notify
-  );
 
   const handleReassurance = async () => {
     try {
       await patientsApi.reassure(dashboard.patient.id);
       setReassuranceSent(true);
       notify(t('reassuranceSent'));
-      refresh();
     } catch (err) {
       notify(err.message);
     }
   };
 
-  const { today } = dashboard || { today: { total: 0, taken: 0 } };
-  const adherenceScore = today?.total > 0 ? Math.round((today.taken / today.total) * 100) : 100;
-  const pendingDoses = Math.max(0, (today?.total || 0) - (today?.taken || 0));
+  const companion = useVoiceCompanion(dashboard, (doseId, status) => {
+    const log = logs.find((l) => l.id === doseId);
+    if (log) confirm(log, status, 'voice-dialog');
+  });
+
+  const today = dashboard?.summary?.today || { taken: 0, total: 0 };
   const complete = today.total > 0 && today.taken === today.total;
-  const showInactivityBanner = dashboard?.inactivityCheck?.needsReassurance && !reassuranceSent;
+  const pendingDoses = Math.max(0, today.total - today.taken);
+  const adherenceScore = today.total > 0 ? Math.round((today.taken / today.total) * 100) : 100;
+  const showReassurancePrompt = (dashboard?.alerts || []).some(
+    (a) => a.type === 'missed-dose' && !reassuranceSent
+  );
 
   return (
-    <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* ── 1. Inactivity Safety Banner ── */}
-      {showInactivityBanner && (
-        <div
-          className="hm-card"
-          style={{
-            borderLeft: '4px solid var(--amber)',
-            padding: '16px 20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '16px',
-            flexWrap: 'wrap'
-          }}
-        >
-          <div>
-            <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--amber)', fontWeight: '600' }}>
-              {t('areYouOkayTitle')}
-            </strong>
-            <p style={{ margin: '3px 0 0', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              {t('areYouOkayBody')}
-            </p>
+    <div className="page-shell-container">
+      {/* ── Reassurance Banner if a dose was missed ── */}
+      {showReassurancePrompt && (
+        <aside className="reassurance-card" role="region" aria-label="Caregiver check-in">
+          <div className="reassurance-info">
+            <span className="reassurance-icon" aria-hidden="true">
+              <ShieldIcon size={18} />
+            </span>
+            <div>
+              <strong className="reassurance-title">{t('areYouOkayTitle')}</strong>
+              <p className="reassurance-desc">{t('areYouOkayBody')}</p>
+            </div>
           </div>
-          <button type="button" className="btn-cyber" onClick={handleReassurance}>
-            {t('iAmOkayBtn')}
+          <button type="button" className="btn-cyber reassurance-btn" onClick={handleReassurance}>
+            <CheckIcon size={16} />
+            <span>{t('iAmOkayBtn')}</span>
           </button>
-        </div>
+        </aside>
       )}
 
-      {/* ── 2. Senior-First Daily Medication Progress ── */}
-      <section
-        className="hm-card"
-        style={{
-          padding: '24px 26px',
-          background: 'linear-gradient(135deg, rgba(0, 210, 211, 0.08) 0%, var(--surface) 100%)',
-          border: '1px solid var(--surface-border)'
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '18px' }}>
+      {/* ── Primary Daily Medication Overview ── */}
+      <section className="overview-hero-card">
+        <div className="overview-header-row">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span className={`chip-telemetry ${complete ? 'chip-mint' : 'chip-cyan'}`} style={{ fontSize: '0.8rem', padding: '3px 10px', fontWeight: '600' }}>
-                {complete ? '✓ All Doses Completed' : '⏳ Today\'s Doses in Progress'}
+            <div className="overview-status-pill-row">
+              <span className={`chip-telemetry ${complete ? 'chip-mint' : 'chip-cyan'}`}>
+                {complete ? <CheckIcon size={13} /> : <ActivityIcon size={13} />}
+                <span>{complete ? 'All Doses Completed' : 'Today\'s Doses in Progress'}</span>
               </span>
-              <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                {new Date().toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+              <span className="overview-date-text font-mono">
+                {new Date().toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-US', {
+                  weekday: 'long',
+                  month: 'short',
+                  day: 'numeric'
+                })}
               </span>
             </div>
-            <h2 style={{ fontSize: '1.6rem', margin: '4px 0 6px', color: '#ffffff', fontWeight: '700' }}>
-              {t('patientToday') || 'Today\'s Medicine Schedule'}
+
+            <h2 className="overview-headline">
+              {t('patientToday') || "Today's Medicine Schedule"}
             </h2>
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
+            <p className="overview-subtext">
               {today.taken} of {today.total} medicines recorded for today.
-              {pendingDoses > 0 ? ` ${pendingDoses} dose${pendingDoses > 1 ? 's' : ''} remaining.` : ' All medicines completed on time!'}
+              {pendingDoses > 0
+                ? ` ${pendingDoses} dose${pendingDoses > 1 ? 's' : ''} remaining.`
+                : ' All medicines completed on time.'}
             </p>
           </div>
 
           <button
             type="button"
-            className="btn-glass"
-            style={{ padding: '10px 16px', fontSize: '0.9rem', borderRadius: '10px' }}
-            onClick={() => openModal({ kind: 'emergencyQr', patient: dashboard.patient, medications: dashboard.medications })}
+            className="btn-glass overview-qr-btn"
+            onClick={() =>
+              openModal({
+                kind: 'emergencyQr',
+                patient: dashboard.patient,
+                medications: dashboard.medications
+              })
+            }
           >
-            🪪 {t('emergencyQrBtn') || 'Show Medical Card'}
+            <QrCodeIcon size={16} />
+            <span>{t('emergencyQrBtn') || 'Show Medical Card'}</span>
           </button>
         </div>
 
-        {/* Clear High-Contrast Progress Bar */}
-        <div style={{ marginBottom: '18px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-            <span style={{ fontSize: '2rem', fontWeight: '700', color: complete ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
+        {/* Precision Progress Track */}
+        <div className="progress-section">
+          <div className="progress-label-row">
+            <span
+              className={`progress-pct font-mono ${
+                complete ? 'color-mint' : 'color-cyan'
+              }`}
+            >
               {adherenceScore}%
             </span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              {complete ? '100% Target Met' : `${pendingDoses} more to go`}
+            <span className="progress-status-caption">
+              {complete ? '100% Target Met' : `${pendingDoses} remaining`}
             </span>
           </div>
 
-          <div
-            style={{
-              height: '12px',
-              width: '100%',
-              background: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: '9999px',
-              overflow: 'hidden'
-            }}
-          >
+          <div className="progress-track" role="progressbar" aria-valuenow={adherenceScore} aria-valuemin="0" aria-valuemax="100">
             <div
-              style={{
-                height: '100%',
-                width: `${adherenceScore}%`,
-                background: complete ? 'var(--emerald)' : 'var(--cyan)',
-                borderRadius: '9999px',
-                transition: 'width 0.5s ease'
-              }}
+              className={`progress-fill ${complete ? 'fill-mint' : 'fill-cyan'}`}
+              style={{ width: `${adherenceScore}%` }}
             />
           </div>
         </div>
 
-        {/* Big, Clear Metric Cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: '10px'
-          }}
-        >
-          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Doses Taken
-            </span>
-            <strong style={{ fontSize: '1.3rem', color: '#ffffff' }} className="font-mono">
-              {today.taken} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ {today.total}</span>
+        {/* Tabular Authoritative Metrics Grid */}
+        <div className="metrics-grid">
+          <div className="metric-cell">
+            <span className="metric-label">Doses Taken</span>
+            <strong className="metric-value font-mono">
+              {today.taken} <span className="metric-denom">/ {today.total}</span>
             </strong>
           </div>
 
-          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Remaining Today
-            </span>
-            <strong style={{ fontSize: '1.3rem', color: pendingDoses === 0 ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
+          <div className="metric-cell">
+            <span className="metric-label">Remaining Today</span>
+            <strong
+              className={`metric-value font-mono ${
+                pendingDoses === 0 ? 'color-mint' : 'color-cyan'
+              }`}
+            >
               {pendingDoses}
             </strong>
           </div>
 
-          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Routine Streak
-            </span>
-            <strong style={{ fontSize: '1.3rem', color: '#ffffff' }} className="font-mono">
-              🔥 {dashboard.streak || 1} {t('dayStreak')}
+          <div className="metric-cell">
+            <span className="metric-label">Routine Streak</span>
+            <strong className="metric-value font-mono">
+              {dashboard.streak || 1} {t('dayStreak')}
             </strong>
           </div>
 
-          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-              Safety Check
-            </span>
-            <strong style={{ fontSize: '0.95rem', color: 'var(--mint-bright)', fontWeight: '600' }}>
-              ✓ All Safe
+          <div className="metric-cell">
+            <span className="metric-label">Safety Status</span>
+            <strong className="metric-value color-mint metric-safe">
+              <CheckIcon size={14} />
+              <span>All Clear</span>
             </strong>
           </div>
         </div>
       </section>
 
-      {/* ── 3. Mitra AI Telehealth Clinical Assistant ── */}
-      <section
-        className="hm-card"
-        style={{
-          padding: '20px 22px',
-          borderLeft: '3px solid var(--cyan)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-          <div
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '9px',
-              background: 'var(--cyan-subtle)',
-              border: '1px solid var(--cyan-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--cyan)',
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              flexShrink: 0
-            }}
-          >
-            ✚
-          </div>
+      {/* ── Telehealth Intelligence & Sensors Asymmetric Row ── */}
+      <div className="telehealth-row">
+        {/* Mitra Clinical Assistant */}
+        <section className="telehealth-cell assistant-cell">
+          <div className="telehealth-cell-body">
+            <div className="telehealth-icon-wrap">
+              <SparklesIcon size={18} />
+            </div>
 
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '600', color: '#ffffff' }}>
-                  {companion.active ? 'Mitra Voice Companion Active' : 'Mitra Telehealth Assistant'}
-                </h3>
-                <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                  CLINICAL AI
+            <div className="telehealth-content">
+              <div className="telehealth-header">
+                <div className="telehealth-title-group">
+                  <h3 className="telehealth-title">
+                    {companion.active ? 'Mitra Voice Companion Active' : 'Mitra Telehealth Assistant'}
+                  </h3>
+                  <span className="chip-telemetry chip-cyan">CLINICAL AI</span>
+                </div>
+                <span className="telehealth-status-indicator font-mono">
+                  {companion.active ? 'Live Listening' : 'Ready'}
                 </span>
               </div>
-              <span style={{ fontSize: '0.74rem', color: companion.active ? 'var(--mint-bright)' : 'var(--text-muted)' }}>
-                {companion.active ? '● Live Listening' : 'Ready'}
-              </span>
-            </div>
 
-            <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-              {companion.active
-                ? (companion.speaking ? t('mitraSpeaking') : companion.listening ? t('mitraListening') : companion.statusText)
-                : 'Prescriptions calibrated. Ask clinical questions regarding food interactions, timings, or symptom relief.'}
-            </p>
+              <p className="telehealth-text">
+                {companion.active
+                  ? companion.speaking
+                    ? t('mitraSpeaking')
+                    : companion.listening
+                    ? t('mitraListening')
+                    : companion.statusText
+                  : 'Prescriptions calibrated. Ask clinical questions regarding food interactions, timings, or side effects.'}
+              </p>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className="btn-cyber"
-                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-                onClick={() => openModal({ kind: 'askMitra' })}
-              >
-                <span>🧠</span>
-                <span>{t('askMitraBtn')}</span>
-              </button>
+              <div className="telehealth-action-row">
+                <button
+                  type="button"
+                  className="btn-cyber"
+                  onClick={() => openModal({ kind: 'askMitra' })}
+                >
+                  <SparklesIcon size={15} />
+                  <span>{t('askMitraBtn')}</span>
+                </button>
 
-              <button
-                type="button"
-                className="btn-glass"
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '0.85rem',
-                  borderColor: companion.active ? 'var(--coral-border)' : undefined,
-                  color: companion.active ? '#fca5a5' : undefined
-                }}
-                onClick={companion.active ? companion.stop : companion.start}
-              >
-                <span>🎙️</span>
-                <span>{companion.active ? t('stopVoiceDialog') : t('startVoiceDialog')}</span>
-              </button>
+                <button
+                  type="button"
+                  className={`btn-glass ${companion.active ? 'btn-danger-outline' : ''}`}
+                  onClick={companion.active ? companion.stop : companion.start}
+                >
+                  <MicrophoneIcon size={15} />
+                  <span>{companion.active ? t('stopVoiceDialog') : t('startVoiceDialog')}</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 4. Acoustic Impact Guard & Emergency Sensor ── */}
-      <section
-        className="hm-card"
-        style={{
-          padding: '14px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '14px',
-          flexWrap: 'wrap'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: fallDetector.active ? 'var(--emerald-subtle)' : 'rgba(255, 255, 255, 0.04)',
-              border: `1px solid ${fallDetector.active ? 'var(--emerald-border)' : 'rgba(255, 255, 255, 0.08)'}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: fallDetector.active ? 'var(--mint-bright)' : 'var(--text-muted)',
-              fontSize: '1rem'
-            }}
-          >
-            🛡️
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: '600' }}>Acoustic Impact Guard</strong>
-              {fallDetector.active && (
-                <span
-                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--emerald)', display: 'inline-block' }}
-                />
-              )}
+        {/* Acoustic Impact Guard */}
+        <section className="telehealth-cell guard-cell">
+          <div className="telehealth-cell-body">
+            <div className={`telehealth-icon-wrap ${fallDetector.active ? 'active-guard-icon' : ''}`}>
+              <ShieldIcon size={18} />
             </div>
-            <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'block' }}>
-              {fallDetector.active ? t('fallGuardActive') : t('fallGuardInactive')}
-            </span>
+
+            <div className="telehealth-content">
+              <div className="telehealth-header">
+                <div className="telehealth-title-group">
+                  <h3 className="telehealth-title">Acoustic Impact Guard</h3>
+                  {fallDetector.active && <span className="live-dot" />}
+                </div>
+              </div>
+
+              <p className="telehealth-text">
+                {fallDetector.active ? t('fallGuardActive') : t('fallGuardInactive')}
+              </p>
+
+              <div className="guard-actions-row">
+                {fallDetector.active && (
+                  <button
+                    type="button"
+                    className="btn-glass btn-sm"
+                    onClick={fallDetector.simulateFall}
+                  >
+                    Test Sensor
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className={`btn-glass btn-sm ${fallDetector.active ? 'btn-danger-outline' : ''}`}
+                  onClick={fallDetector.active ? fallDetector.stopListening : fallDetector.startListening}
+                >
+                  {fallDetector.active ? 'Turn off' : 'Turn on'}
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-glass btn-sm"
+                  onClick={testAlarm}
+                >
+                  <BellIcon size={13} />
+                  <span>{t('testAlarmBtn')}</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {fallDetector.active && (
-            <button
-              type="button"
-              className="btn-glass"
-              style={{ padding: '5px 10px', fontSize: '0.76rem' }}
-              onClick={fallDetector.simulateFall}
-            >
-              Test Sensor
-            </button>
-          )}
-
-          <button
-            type="button"
-            className="btn-glass"
-            style={{
-              padding: '5px 10px',
-              fontSize: '0.76rem',
-              borderColor: fallDetector.active ? 'var(--coral-border)' : undefined,
-              color: fallDetector.active ? '#fca5a5' : undefined
-            }}
-            onClick={fallDetector.active ? fallDetector.stopListening : fallDetector.startListening}
-          >
-            {fallDetector.active ? 'Turn off' : 'Turn on'}
-          </button>
-
-          <button
-            type="button"
-            className="btn-glass"
-            style={{ padding: '5px 10px', fontSize: '0.76rem' }}
-            onClick={testAlarm}
-          >
-            🔔 {t('testAlarmBtn')}
-          </button>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Fall Distress Emergency Dialog */}
       {fallDetector.fallDetected && (
-        <div
-          role="alertdialog"
-          aria-modal="true"
-          className="overlay"
-          style={{ zIndex: 10000 }}
-        >
-          <div
-            className="hm-card"
-            style={{
-              maxWidth: '460px',
-              width: '100%',
-              padding: '28px 24px',
-              border: '2px solid var(--coral)',
-              textAlign: 'center',
-              boxShadow: '0 0 40px rgba(239, 68, 68, 0.3)'
-            }}
-          >
-            <h2 style={{ color: '#fca5a5', margin: '0 0 8px', fontSize: '1.4rem' }}>
-              Potential Fall Detected
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 18px', lineHeight: '1.5' }}>
-              The acoustic sensor registered a sharp impact spike. If unacknowledged, family caregivers and emergency services will be escalated automatically.
+        <div role="alertdialog" aria-modal="true" className="overlay z-modal-top">
+          <div className="fall-dialog-card">
+            <h2 className="fall-dialog-title">Potential Fall Detected</h2>
+            <p className="fall-dialog-desc">
+              The acoustic sensor registered a sharp impact spike. If unacknowledged, family caregivers will be alerted immediately.
             </p>
 
-            <div
-              className="font-mono"
-              style={{
-                fontSize: '2.4rem',
-                fontWeight: '700',
-                color: '#fca5a5',
-                background: 'var(--coral-subtle)',
-                width: '76px',
-                height: '76px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 20px',
-                border: '2px solid var(--coral-border)'
-              }}
-            >
+            <div className="fall-countdown-circle font-mono">
               {fallDetector.countdown}s
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="fall-dialog-actions">
               <button
                 type="button"
-                className="btn-cyber"
-                style={{ padding: '12px', fontSize: '0.95rem' }}
+                className="btn-cyber btn-full"
                 onClick={fallDetector.dismiss}
               >
-                ✓ I am safe and well
+                <CheckIcon size={16} />
+                <span>I am safe and well</span>
               </button>
 
               <button
                 type="button"
-                className="btn-emergency"
-                style={{ width: '100%', padding: '12px', justifyContent: 'center' }}
+                className="btn-emergency btn-full"
                 onClick={() => {
                   fallDetector.dismiss();
                   handleFallEmergency();
                 }}
               >
-                Request Emergency Assistance Now
+                Request Emergency Assistance
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── 5. Chronological Schedule Spine ── */}
-      <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff', fontWeight: '700' }}>
-              {t('today')}
-            </h3>
-            <span
-              className="chip-telemetry"
-              style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-secondary)', fontSize: '0.72rem' }}
-            >
+      {/* ── Chronological Schedule Spine ── */}
+      <section className="timeline-schedule-section">
+        <div className="timeline-header">
+          <div className="timeline-heading-left">
+            <h3 className="timeline-title">{t('today')}</h3>
+            <span className="chip-telemetry chip-neutral font-mono">
               {logs.length} scheduled
             </span>
           </div>
 
           <button
             type="button"
-            className="btn-glass"
-            style={{
-              padding: '6px 12px',
-              fontSize: '0.8rem',
-              color: 'var(--cyan)',
-              borderColor: 'var(--cyan-border)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
+            className="btn-glass timeline-add-btn"
             onClick={() => openModal({ kind: 'medicine' })}
           >
-            <span>＋</span>
+            <PlusIcon size={14} />
             <span>{t('addMedicine')}</span>
           </button>
         </div>
 
         {/* Timeline Dose Cards List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="timeline-dose-stack">
           {logs.length ? (
             logs.map((log) => (
               <DoseCard
@@ -533,33 +423,24 @@ export function TodayPage() {
               />
             ))
           ) : (
-            <div
-              className="hm-card"
-              style={{
-                padding: '40px 20px',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '12px'
-              }}
-            >
-              <span style={{ fontSize: '2rem' }}>💊</span>
-              <div>
-                <strong style={{ display: 'block', fontSize: '1rem', color: '#ffffff', marginBottom: '4px' }}>
+            <div className="empty-schedule-card">
+              <div className="empty-schedule-icon">
+                <PillIcon size={32} />
+              </div>
+              <div className="empty-schedule-text">
+                <strong className="empty-schedule-title">
                   No medications scheduled for today
                 </strong>
-                <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>
-                  Your prescription schedule is clear. Add medications to begin receiving automated alerts and telemetry.
+                <p className="empty-schedule-desc">
+                  Your prescription schedule is clear. Add medications to begin receiving automated reminders and telemetry.
                 </p>
               </div>
               <button
                 type="button"
                 className="btn-cyber"
-                style={{ padding: '8px 18px', fontSize: '0.85rem', marginTop: '4px' }}
                 onClick={() => openModal({ kind: 'medicine' })}
               >
-                <span>＋</span>
+                <PlusIcon size={15} />
                 <span>{t('addMedicine')}</span>
               </button>
             </div>

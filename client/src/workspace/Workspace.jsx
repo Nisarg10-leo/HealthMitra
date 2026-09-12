@@ -11,6 +11,7 @@ import { useSpeechInput } from '../hooks/useSpeech.js';
 import { useToast } from '../hooks/useToast.js';
 import { useWorkspaceData } from '../hooks/useWorkspaceData.js';
 import { isToday } from '../utils/format.js';
+import { CheckIcon, CrossMedicalIcon } from '../components/ui/Icons.jsx';
 import { ModalHost } from './ModalHost.jsx';
 import { WorkspaceContext } from './WorkspaceContext.jsx';
 import { defaultTabFor, navigationFor } from './navigation.js';
@@ -107,7 +108,7 @@ export function Workspace({ onLogout }) {
       <main className="content">
         <Topbar session={session} patients={data.patients} selectedPatient={data.dashboard?.patient} selectedPatientId={data.selectedPatientId} onSelectPatient={data.setSelectedPatientId} onToggleLanguage={toggleLanguage} onSos={() => setModal({ kind: 'sos' })} />
         {!data.dashboard
-          ? <div className="loading"><div className="loading-mark">✚</div><p>{session.role === 'caregiver' ? t('noLinkedPatients') : t('loadingPlan')}</p>{session.role === 'caregiver' && <button className="primary" onClick={() => setModal({ kind: 'join' })}>{t('joinWithCode')}</button>}</div>
+          ? <div className="loading"><div className="loading-mark"><CrossMedicalIcon size={24} /></div><p>{session.role === 'caregiver' ? t('noLinkedPatients') : t('loadingPlan')}</p>{session.role === 'caregiver' && <button className="primary" onClick={() => setModal({ kind: 'join' })}>{t('joinWithCode')}</button>}</div>
           : <>
             {dueReminder && <ReminderBanner notification={dueReminder} onDismissed={data.refresh} />}
             <Screen />
@@ -127,7 +128,7 @@ export function Workspace({ onLogout }) {
       )}
 
       <ModalHost modal={modal} onClose={() => setModal(null)} />
-      {toast && <div className="toast" role="status">✓ {toast}</div>}
+      {toast && <div className="toast" role="status"><CheckIcon size={16} /><span>{toast}</span></div>}
       <nav className="mobile-nav" aria-label={t('mainNavigation')}><NavButtons items={navItems} activeTab={tab} onSelect={setTab} unreadAlerts={unreadAlerts} /></nav>
     </div>
   </WorkspaceContext.Provider>;

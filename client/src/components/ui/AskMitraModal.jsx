@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { guidanceApi } from '../../api/index.js';
 import { useSpeechInput } from '../../hooks/useSpeech.js';
+import { Volume2Icon, MicIcon } from './Icons.jsx';
 
 // Clean text formatting utility to strip any residual markdown artifacts
 function cleanText(text) {
@@ -268,16 +269,16 @@ export function AskMitraModal({ onClose }) {
                 {msg.role === 'mitra' && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 8px' }}>
-                      ✚ Mitra
+                      Mitra
                     </span>
                     <button
                       type="button"
                       className="btn-glass"
                       onClick={() => speakAnswer(msg.text)}
-                      style={{ padding: '2px 8px', fontSize: '0.72rem' }}
+                      style={{ padding: '2px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       title="Listen aloud"
                     >
-                      🔊 Speak
+                      <Volume2Icon size={13} /> Speak
                     </button>
                   </div>
                 )}
@@ -296,7 +297,7 @@ export function AskMitraModal({ onClose }) {
 
                 {msg.disclaimer && (
                   <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginTop: '10px', paddingTop: '8px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    ℹ {msg.disclaimer}
+                    Notice: {msg.disclaimer}
                   </div>
                 )}
               </div>
@@ -350,9 +351,9 @@ export function AskMitraModal({ onClose }) {
             onClick={handleVoiceInput}
             title="Speak query"
             className="btn-glass"
-            style={{ padding: '0 14px', fontSize: '1.1rem' }}
+            style={{ padding: '0 14px', display: 'grid', placeItems: 'center' }}
           >
-            🎙️
+            <MicIcon size={18} />
           </button>
           <button
             type="button"

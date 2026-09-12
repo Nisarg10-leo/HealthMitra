@@ -3,10 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { contactsApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
+import {
+  CrossMedicalIcon,
+  LinkIcon,
+  PhoneIcon,
+  PlusIcon,
+  UserIcon
+} from '../../components/ui/Icons.jsx';
 
 const SECTIONS = [
-  { type: 'doctors', labelKey: 'doctors', detail: 'specialty', icon: '⚕' },
-  { type: 'chemists', labelKey: 'pharmacies', detail: 'address', icon: '✚' }
+  { type: 'doctors', labelKey: 'doctors', detail: 'specialty', iconKey: 'doctor' },
+  { type: 'chemists', labelKey: 'pharmacies', detail: 'address', iconKey: 'chemist' }
 ];
 
 export function ContactsPage() {
@@ -23,105 +30,87 @@ export function ContactsPage() {
   }, [patientId, notify]);
 
   return (
-    <div style={{ maxWidth: '880px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div className="page-shell-container max-w-prose">
       {/* ── Page Header ── */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <section className="page-intro-header">
         <div>
-          <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '2px 8px', marginBottom: '6px' }}>
+          <span className="chip-telemetry chip-cyan">
             {t('patientTool')}
           </span>
-          <h1 style={{ fontSize: '1.75rem', margin: '4px 0 2px', color: '#ffffff', fontWeight: '700' }}>
+          <h1 className="page-intro-title">
             {t('helpfulContacts')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
+          <p className="page-intro-desc">
             {t('contactsSubtitle')}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="page-intro-actions">
           {session.role === 'patient' && (
             <button
               type="button"
               className="btn-glass"
-              style={{ padding: '9px 15px', fontSize: '0.85rem' }}
               onClick={() => openModal({ kind: 'link' })}
             >
-              🔗 {t('linkCaregiver')}
+              <LinkIcon size={15} />
+              <span>{t('linkCaregiver')}</span>
             </button>
           )}
           {dashboard.permissions?.canEdit && (
             <button
               type="button"
               className="btn-cyber"
-              style={{ padding: '9px 15px', fontSize: '0.85rem' }}
               onClick={() => openModal({ kind: 'contact' })}
             >
-              ＋ {t('addContact')}
+              <PlusIcon size={15} />
+              <span>{t('addContact')}</span>
             </button>
           )}
         </div>
       </section>
 
       {/* ── Directory Sections ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '18px' }}>
-        {SECTIONS.map(({ type, labelKey, detail, icon }) => (
-          <section key={type} className="hm-card" style={{ padding: '20px 22px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '1.1rem', color: 'var(--cyan)' }}>{icon}</span>
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+      <div className="contacts-columns-grid">
+        {SECTIONS.map(({ type, labelKey, detail, iconKey }) => (
+          <section key={type} className="contacts-section-card">
+            <div className="contacts-section-header">
+              <div className="contacts-section-title-wrap">
+                <span className="contacts-section-icon" aria-hidden="true">
+                  {iconKey === 'doctor' ? <UserIcon size={18} /> : <CrossMedicalIcon size={18} />}
+                </span>
+                <h3 className="contacts-section-title">
                   {t(labelKey)}
                 </h3>
               </div>
-              <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>
+              <span className="chip-telemetry chip-cyan font-mono">
                 {contacts[type].length} Listed
               </span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="contacts-list-stack">
               {contacts[type].map((contact) => (
-                <article
-                  key={contact.id}
-                  style={{
-                    background: 'var(--surface-dim)',
-                    border: '1px solid var(--surface-border)',
-                    borderRadius: '10px',
-                    padding: '14px 16px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '12px'
-                  }}
-                >
-                  <div>
-                    <strong style={{ fontSize: '0.94rem', color: '#ffffff', display: 'block' }}>
+                <article key={contact.id} className="contact-card-item">
+                  <div className="contact-card-info">
+                    <strong className="contact-card-name">
                       {contact.name}
                     </strong>
-                    <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                    <p className="contact-card-detail">
                       {contact[detail] || t('detailsNotAdded')}
                     </p>
                   </div>
 
                   <a
                     href={`tel:${contact.phone}`}
-                    className="btn-glass"
-                    style={{
-                      padding: '6px 12px',
-                      fontSize: '0.8rem',
-                      textDecoration: 'none',
-                      color: 'var(--cyan)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
+                    className="btn-glass contact-call-btn"
                   >
-                    ☎ {contact.phone}
+                    <PhoneIcon size={13} />
+                    <span className="font-mono">{contact.phone}</span>
                   </a>
                 </article>
               ))}
 
               {!contacts[type].length && (
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', margin: '8px 0' }}>
+                <p className="contacts-empty-hint">
                   {t('noContacts')}
                 </p>
               )}

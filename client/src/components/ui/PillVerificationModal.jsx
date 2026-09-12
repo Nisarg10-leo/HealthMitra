@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PillIcon } from './Icons.jsx';
 
 // Converts hex (#4f67d8) to [r, g, b]
 function hexToRgb(hex) {
@@ -123,7 +124,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div style={{ textAlign: 'left' }}>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>👁️ Computer Vision Pill Verification</h2>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>Computer Vision Pill Verification</h2>
             <small style={{ color: '#00f2fe', fontSize: '0.78rem' }}>Align pill inside target reticle</small>
           </div>
           <button
@@ -182,7 +183,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
               transition: 'all 0.3s ease'
             }}
           >
-            <span style={{ fontSize: '1.8rem' }}>💊</span>
+            <PillIcon size={32} />
           </div>
 
           {!cameraActive && (
@@ -245,7 +246,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
           }}
         >
           {effectiveMatch
-            ? `✓ Pill Verified: Matches ${medication?.name} (${medication?.dosage})`
+            ? `Verified: Matches ${medication?.name} (${medication?.dosage})`
             : 'Hold pill steady inside the target circle to verify color'}
         </div>
 
@@ -258,7 +259,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
             style={{ width: '100%', padding: '14px', fontSize: '1rem' }}
             onClick={() => onConfirm(dose, 'taken')}
           >
-            ✓ Confirm Verified Pill Taken
+            Confirm Verified Pill Taken
           </button>
 
           <button
@@ -267,7 +268,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
             style={{ fontSize: '0.84rem', color: '#00f2fe', borderColor: 'rgba(0, 242, 254, 0.2)' }}
             onClick={() => setSimulatedMatch(true)}
           >
-            ⚡ Manual Match Override (Sensor Fallback)
+            Manual Match Override (Sensor Fallback)
           </button>
         </div>
       </div>

@@ -3,97 +3,85 @@ import { useTranslation } from 'react-i18next';
 import { Empty } from '../../components/ui/Empty.jsx';
 import { formatDate, formatTime } from '../../utils/format.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
+import {
+  ActivityIcon,
+  AlertCircleIcon,
+  CheckIcon,
+  ClockIcon,
+  PillIcon
+} from '../../components/ui/Icons.jsx';
 
 export function HistoryPage() {
   const { t, i18n } = useTranslation();
   const { dashboard } = useWorkspace();
-  const logs = dashboard.logs.slice(0, 30);
+  const logs = (dashboard?.logs || []).slice(0, 30);
 
   return (
-    <div style={{ maxWidth: '880px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div className="page-shell-container max-w-prose">
       {/* ── Page Header ── */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <section className="page-intro-header">
         <div>
-          <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '2px 8px', marginBottom: '6px' }}>
+          <span className="chip-telemetry chip-cyan">
             {t('caregiverView')}
           </span>
-          <h1 style={{ fontSize: '1.75rem', margin: '4px 0 2px', color: '#ffffff', fontWeight: '700' }}>
+          <h1 className="page-intro-title">
             {t('medicationHistory')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
-            {t('historySubtitle', { name: dashboard.patient.name })}
+          <p className="page-intro-desc">
+            {t('historySubtitle', { name: dashboard.patient?.name || 'Patient' })}
           </p>
         </div>
 
-        <span className="chip-telemetry chip-mint" style={{ fontSize: '0.78rem', padding: '4px 12px' }}>
-          🔥 {dashboard.streak} {t('dayStreak')}
+        <span className="chip-telemetry chip-mint">
+          <ActivityIcon size={12} />
+          <span className="font-mono">{dashboard.streak || 1} {t('dayStreak')}</span>
         </span>
       </section>
 
       {/* ── Chronological Log Feed ── */}
-      <section style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3 style={{ margin: '4px 0 2px', fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+      <section className="history-stream-section">
+        <h3 className="section-subtitle">
           Verified Dose Stream
         </h3>
 
-        {logs.map((log) => {
-          const medication = dashboard.medications.find((item) => item.id === log.medicationId);
-          const isTaken = log.status === 'taken';
+        <div className="history-stream-stack">
+          {logs.map((log) => {
+            const medication = dashboard.medications?.find((item) => item.id === log.medicationId);
+            const isTaken = log.status === 'taken';
 
-          return (
-            <article
-              key={log.id}
-              className="hm-card"
-              style={{
-                padding: '16px 20px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '16px',
-                borderLeft: isTaken ? '4px solid var(--emerald)' : '4px solid var(--coral)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: isTaken ? 'var(--emerald-subtle)' : 'var(--coral-subtle)',
-                    color: isTaken ? 'var(--emerald)' : 'var(--coral)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1rem',
-                    fontWeight: '700',
-                    flexShrink: 0
-                  }}
-                >
-                  {isTaken ? '✓' : '!'}
+            return (
+              <article
+                key={log.id}
+                className={`history-log-item ${isTaken ? 'log-taken' : 'log-missed'}`}
+              >
+                <div className="history-log-left">
+                  <div className={`history-log-badge ${isTaken ? 'badge-taken' : 'badge-missed'}`}>
+                    {isTaken ? <CheckIcon size={16} /> : <AlertCircleIcon size={16} />}
+                  </div>
+
+                  <div>
+                    <strong className="history-med-title">
+                      {medication?.name || 'Medication'}
+                      <span className="history-med-dosage font-mono">
+                        {medication?.dosage}
+                      </span>
+                    </strong>
+                    <p className="history-med-time font-mono">
+                      {formatDate(log.scheduledTime, i18n.language)} • {formatTime(log.scheduledTime, i18n.language)}
+                      {log.responseMethod ? ` (${log.responseMethod})` : ''}
+                    </p>
+                  </div>
                 </div>
 
-                <div>
-                  <strong style={{ fontSize: '1rem', color: '#ffffff', display: 'block' }}>
-                    {medication?.name || 'Medication'}
-                    <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: '400', marginLeft: '6px' }}>
-                      {medication?.dosage}
-                    </span>
-                  </strong>
-                  <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', fontSize: '0.82rem' }} className="font-mono">
-                    {formatDate(log.scheduledTime, i18n.language)} : {formatTime(log.scheduledTime, i18n.language)}
-                    {log.responseMethod ? ` (${log.responseMethod})` : ''}
-                  </p>
-                </div>
-              </div>
+                <span className={`chip-telemetry ${isTaken ? 'chip-mint' : 'chip-error'}`}>
+                  {t(log.status)}
+                </span>
+              </article>
+            );
+          })}
 
-              <span className={`chip-telemetry ${isTaken ? 'chip-mint' : 'chip-error'}`}>
-                {t(log.status)}
-              </span>
-            </article>
-          );
-        })}
-
-        {!logs.length && <Empty text={t('noHistory')} />}
+          {!logs.length && <Empty text={t('noHistory')} />}
+        </div>
       </section>
     </div>
   );

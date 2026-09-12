@@ -2,6 +2,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatTime, isToday } from '../../utils/format.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
+import {
+  ActivityIcon,
+  AlertCircleIcon,
+  CheckIcon,
+  ClockIcon,
+  PlusIcon,
+  ShieldIcon,
+  SparklesIcon
+} from '../../components/ui/Icons.jsx';
 import { AdherenceChart } from './AdherenceChart.jsx';
 
 export function DashboardPage() {
@@ -24,79 +33,53 @@ export function DashboardPage() {
   const activePatient = dashboard?.patient || { name: 'Meera Shah' };
 
   return (
-    <div style={{ maxWidth: '1180px', margin: '0 auto', paddingBottom: '80px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="page-shell-container">
       {/* ── 1. Active Patient Clinical Header ── */}
-      <section
-        className="hm-card"
-        style={{
-          padding: '22px 26px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '50%',
-              background: '#151d2f',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--cyan)',
-              fontWeight: '700',
-              fontSize: '1.2rem',
-              flexShrink: 0
-            }}
-          >
+      <section className="dashboard-patient-header">
+        <div className="patient-header-left">
+          <div className="patient-header-avatar font-mono" aria-hidden="true">
             {activePatient.name[0]}
           </div>
 
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '700', color: '#ffffff' }}>
+            <div className="patient-name-row">
+              <h2 className="patient-name-text">
                 {activePatient.name}
               </h2>
-              <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-                Telemetry Active
+              <span className="chip-telemetry chip-mint">
+                <ActivityIcon size={12} />
+                <span>Telemetry Active</span>
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '4px', fontSize: '0.8rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
-              <span>Age: <strong style={{ color: '#ffffff' }}>68</strong></span>
-              <span>•</span>
-              <span>Blood Group: <strong style={{ color: 'var(--cyan)' }}>O+</strong></span>
-              <span>•</span>
-              <span>Hospital: <strong style={{ color: '#ffffff' }}>Lilavati, Mumbai</strong></span>
-              <span>•</span>
-              <span>Doctor: <strong style={{ color: 'var(--cyan)' }}>Dr. R. Nair</strong></span>
+            <div className="patient-details-tags">
+              <span>Age: <strong className="color-white font-mono">68</strong></span>
+              <span className="tag-dot">•</span>
+              <span>Blood Group: <strong className="color-cyan font-mono">O+</strong></span>
+              <span className="tag-dot">•</span>
+              <span>Hospital: <strong className="color-white">Lilavati, Mumbai</strong></span>
+              <span className="tag-dot">•</span>
+              <span>Doctor: <strong className="color-cyan">Dr. R. Nair</strong></span>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="patient-header-actions">
           <button
             type="button"
             className="btn-cyber"
-            style={{ padding: '9px 16px', fontSize: '0.85rem' }}
             onClick={() => openModal({ kind: 'medicine' })}
           >
-            <span>+</span>
+            <PlusIcon size={15} />
             <span>{t('addMedicine')}</span>
           </button>
 
           <button
             type="button"
             className="btn-glass"
-            style={{ padding: '9px 16px', fontSize: '0.85rem' }}
             onClick={() => openModal({ kind: 'askMitra' })}
           >
-            <span>🧠</span>
+            <SparklesIcon size={15} />
             <span>Ask Clinical AI</span>
           </button>
         </div>
@@ -104,46 +87,24 @@ export function DashboardPage() {
 
       {/* Multi-patient Selector Bar if > 1 patient */}
       {patients.length > 1 && (
-        <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div className="patient-selector-scroll">
           {patients.map((item) => (
             <button
               key={item.patient.id}
+              type="button"
               onClick={() => selectPatient(item.patient.id)}
-              className={`hm-card ${item.patient.id === selectedPatientId ? 'glass-matrix-active' : ''}`}
-              style={{
-                padding: '10px 16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                background: item.patient.id === selectedPatientId ? 'var(--cyan-subtle)' : 'var(--surface)',
-                borderColor: item.patient.id === selectedPatientId ? 'var(--cyan-border)' : 'var(--surface-border)'
-              }}
+              className={`patient-tab-btn ${item.patient.id === selectedPatientId ? 'patient-tab-active' : ''}`}
             >
-              <span
-                style={{
-                  width: '26px',
-                  height: '26px',
-                  borderRadius: '50%',
-                  background: 'var(--cyan)',
-                  color: '#05080f',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '700',
-                  fontSize: '0.8rem'
-                }}
-              >
+              <span className="patient-tab-avatar font-mono">
                 {item.patient.name[0]}
               </span>
-              <div style={{ textAlign: 'left' }}>
-                <strong style={{ display: 'block', fontSize: '0.84rem', color: '#ffffff' }}>
+              <div className="patient-tab-info">
+                <strong className="patient-tab-name">
                   {item.patient.name}
                 </strong>
-                <small style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+                <span className="patient-tab-adherence font-mono">
                   {item.today.score}% Adherence
-                </small>
+                </span>
               </div>
             </button>
           ))}
@@ -151,250 +112,192 @@ export function DashboardPage() {
       )}
 
       {/* ── 2. 4-Column Metric Overview ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+      <div className="dashboard-metrics-grid">
         {/* Metric 1: Overall Adherence Score */}
-        <div className="hm-card" style={{ padding: '18px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Adherence Index
-            </span>
-            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
-              Stable
-            </span>
+        <div className="overview-metric-tile">
+          <div className="metric-tile-top">
+            <span className="metric-tile-title">Adherence Index</span>
+            <span className="chip-telemetry chip-mint">Stable</span>
           </div>
-          <div style={{ margin: '8px 0 6px' }}>
-            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: 'var(--cyan)' }} className="font-mono">
+          <div className="metric-tile-value-wrap">
+            <strong className="metric-tile-num font-mono color-cyan">
               {dashboard.today.score}%
             </strong>
           </div>
-          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div className="metric-tile-bar">
             <div
-              style={{
-                width: `${dashboard.today.score}%`,
-                height: '100%',
-                background: 'var(--cyan)',
-                borderRadius: '999px'
-              }}
+              className="metric-tile-bar-fill fill-cyan"
+              style={{ width: `${dashboard.today.score}%` }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+          <span className="metric-tile-caption">
             Optimal adherence threshold maintained
-          </small>
+          </span>
         </div>
 
         {/* Metric 2: Today's Doses Recorded */}
-        <div className="hm-card" style={{ padding: '18px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Today's Doses
-            </span>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
+        <div className="overview-metric-tile">
+          <div className="metric-tile-top">
+            <span className="metric-tile-title">Today's Doses</span>
+            <span className="chip-telemetry chip-cyan font-mono">
               {dashboard.today.taken} of {dashboard.today.total}
             </span>
           </div>
-          <div style={{ margin: '8px 0 6px' }}>
-            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: '#ffffff' }} className="font-mono">
+          <div className="metric-tile-value-wrap">
+            <strong className="metric-tile-num font-mono color-white">
               {dashboard.today.taken}
-              <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)', fontWeight: '400' }}>/{dashboard.today.total}</span>
+              <span className="metric-tile-sub">/{dashboard.today.total}</span>
             </strong>
           </div>
-          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div className="metric-tile-bar">
             <div
+              className="metric-tile-bar-fill fill-mint"
               style={{
-                width: `${dashboard.today.total > 0 ? (dashboard.today.taken / dashboard.today.total) * 100 : 0}%`,
-                height: '100%',
-                background: 'var(--mint-bright)',
-                borderRadius: '999px'
+                width: `${dashboard.today.total > 0 ? (dashboard.today.taken / dashboard.today.total) * 100 : 0}%`
               }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+          <span className="metric-tile-caption">
             {dashboard.today.missed ? `${dashboard.today.missed} dose needs review` : 'All scheduled doses verified'}
-          </small>
+          </span>
         </div>
 
         {/* Metric 3: Clinical Risk Assessment */}
-        <div className="hm-card" style={{ padding: '18px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Clinical Risk Level
-            </span>
-            <span
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: riskColor
-              }}
-            />
+        <div className="overview-metric-tile">
+          <div className="metric-tile-top">
+            <span className="metric-tile-title">Clinical Risk Level</span>
+            <span className="risk-indicator-pip" style={{ backgroundColor: riskColor }} />
           </div>
-          <div style={{ margin: '8px 0 6px' }}>
-            <strong style={{ fontSize: '1.8rem', fontWeight: '700', color: riskColor }}>
+          <div className="metric-tile-value-wrap">
+            <strong className="metric-tile-num font-mono" style={{ color: riskColor }}>
               {riskLabel}
             </strong>
           </div>
-          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            Consistency: <strong style={{ color: '#ffffff' }}>{risk.timingConsistency}</strong>
+          <div className="metric-tile-meta">
+            Consistency: <strong className="color-white">{risk.timingConsistency}</strong>
           </div>
-          <small style={{ display: 'block', marginTop: '4px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
-            Avg response delay: ~{risk.avgDelayMinutes} min
-          </small>
+          <span className="metric-tile-caption font-mono">
+            Avg delay: ~{risk.avgDelayMinutes} min
+          </span>
         </div>
 
         {/* Metric 4: Adherence Streak */}
-        <div className="hm-card" style={{ padding: '18px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Routine Streak
-            </span>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
-              Active
-            </span>
+        <div className="overview-metric-tile">
+          <div className="metric-tile-top">
+            <span className="metric-tile-title">Routine Streak</span>
+            <span className="chip-telemetry chip-cyan">Active</span>
           </div>
-          <div style={{ margin: '8px 0 6px' }}>
-            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: '#ffffff' }} className="font-mono">
+          <div className="metric-tile-value-wrap">
+            <strong className="metric-tile-num font-mono color-white">
               {dashboard.streak} Days
             </strong>
           </div>
-          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div className="metric-tile-bar">
             <div
-              style={{
-                width: `${Math.min(100, dashboard.streak * 14)}%`,
-                height: '100%',
-                background: 'var(--cyan)',
-                borderRadius: '999px'
-              }}
+              className="metric-tile-bar-fill fill-cyan"
+              style={{ width: `${Math.min(100, dashboard.streak * 14)}%` }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+          <span className="metric-tile-caption">
             Consistent medication timing daily
-          </small>
+          </span>
         </div>
       </div>
 
       {/* ── 3. Patient Routine & Adherence Overview ── */}
-      <section
-        className="hm-card"
-        style={{
-          padding: '22px 26px',
-          background: 'linear-gradient(135deg, rgba(0, 210, 211, 0.06) 0%, var(--surface) 100%)'
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+      <section className="compliance-highlight-card">
+        <div className="compliance-header">
           <div>
-            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              DAILY CAREGIVER MONITORING
-            </span>
-            <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', color: '#ffffff', fontWeight: '700' }}>
+            <span className="section-eyebrow">Daily Caregiver Monitoring</span>
+            <h3 className="compliance-headline">
               {activePatient.name}'s Routine Compliance
             </h3>
           </div>
-          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.78rem', padding: '3px 10px' }}>
-            ✓ {dashboard.streak} Days Routine Active
+          <span className="chip-telemetry chip-mint">
+            <CheckIcon size={12} />
+            <span>{dashboard.streak} Days Routine Active</span>
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Daily Score</span>
-            <strong style={{ fontSize: '1.8rem', color: 'var(--cyan)' }} className="font-mono">{dashboard.today.score}%</strong>
-            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Optimal adherence threshold</small>
+        <div className="compliance-stats-row">
+          <div className="compliance-stat-cell">
+            <span className="compliance-stat-label">Daily Score</span>
+            <strong className="compliance-stat-num font-mono color-cyan">{dashboard.today.score}%</strong>
+            <span className="compliance-stat-sub">Optimal adherence threshold</span>
           </div>
-          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Today's Doses</span>
-            <strong style={{ fontSize: '1.8rem', color: '#ffffff' }} className="font-mono">{dashboard.today.taken} / {dashboard.today.total}</strong>
-            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Recorded by patient</small>
+          <div className="compliance-stat-cell">
+            <span className="compliance-stat-label">Today's Doses</span>
+            <strong className="compliance-stat-num font-mono color-white">{dashboard.today.taken} / {dashboard.today.total}</strong>
+            <span className="compliance-stat-sub">Recorded by patient</span>
           </div>
-          <div style={{ background: 'var(--surface-dim)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--surface-border)' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Next Scheduled Dose</span>
-            <strong style={{ fontSize: '1.8rem', color: '#34d399' }} className="font-mono">
+          <div className="compliance-stat-cell">
+            <span className="compliance-stat-label">Next Scheduled Dose</span>
+            <strong className="compliance-stat-num font-mono color-mint">
               {dashboard.logs?.find(l => l.status === 'pending')?.scheduledTime
                 ? formatTime(dashboard.logs.find(l => l.status === 'pending').scheduledTime, i18n.language)
                 : 'All Done'}
             </strong>
-            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '2px' }}>Automated reminder active</small>
+            <span className="compliance-stat-sub">Automated reminder active</span>
           </div>
         </div>
       </section>
 
       {/* ── 4. Clinical Safety & Polypharmacy Matrix ── */}
-      <section className="hm-card" style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <section className="clinical-safety-card">
+        <div className="clinical-safety-header">
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+            <h3 className="clinical-safety-title">
               Clinical Safety & Cross-Interaction
             </h3>
-            <small style={{ color: 'var(--text-muted)' }}>Automated contraindication analysis for multi-drug regimen</small>
+            <span className="clinical-safety-sub">
+              Automated contraindication analysis for multi-drug regimen
+            </span>
           </div>
-          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem', padding: '3px 10px' }}>
-            ✓ Verified Safe
+          <span className="chip-telemetry chip-mint">
+            <CheckIcon size={12} />
+            <span>Verified Safe</span>
           </span>
         </div>
 
         {safety.interactions.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+          <div className="safety-alerts-list">
             {safety.interactions.map((inter, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'var(--coral-subtle)',
-                  borderLeft: '3px solid var(--coral)',
-                  padding: '10px 14px',
-                  borderRadius: '6px',
-                  fontSize: '0.84rem',
-                  color: '#fca5a5'
-                }}
-              >
-                <strong style={{ color: '#ffffff' }}>{inter.title}: </strong>
-                {inter.message}
+              <div key={idx} className="safety-alert-item">
+                <AlertCircleIcon size={16} className="safety-alert-icon" />
+                <div>
+                  <strong className="safety-alert-title">{inter.title}: </strong>
+                  <span className="safety-alert-msg">{inter.message}</span>
+                </div>
               </div>
             ))}
           </div>
         ) : (
-          <div
-            style={{
-              color: 'var(--mint-bright)',
-              fontSize: '0.85rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              background: 'var(--emerald-subtle)',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              border: '1px solid var(--emerald-border)'
-            }}
-          >
-            <span style={{ fontSize: '1rem' }}>✓</span>
+          <div className="safety-verified-box">
+            <CheckIcon size={16} />
             <span>No high-risk drug-drug contraindications found across current active prescriptions.</span>
           </div>
         )}
       </section>
 
       {/* ── 5. 7-Day Adherence Chart ── */}
-      <section className="hm-card" style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
-              Weekly Adherence History
-            </h3>
-            <small style={{ color: 'var(--text-muted)' }}>7-day retrospective timeline of scheduled vs confirmed doses</small>
-          </div>
-        </div>
+      <section>
         <AdherenceChart logs={dashboard.logs} />
       </section>
 
       {/* ── 6. Today's Live Schedule Tracker ── */}
-      <section className="hm-card" style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+      <section className="live-schedule-card">
+        <div className="live-schedule-header">
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+            <h3 className="live-schedule-title">
               Today's Live Medication Log
             </h3>
-            <small style={{ color: 'var(--text-muted)' }}>Real-time telemetry and responses for today's routine</small>
+            <span className="live-schedule-sub">
+              Real-time telemetry and responses for today's routine
+            </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="live-schedule-list">
           {dashboard.logs.filter((log) => isToday(log.scheduledTime)).map((log) => {
             const medication = dashboard.medications.find((item) => item.id === log.medicationId);
             const isTaken = log.status === 'taken';
@@ -402,54 +305,35 @@ export function DashboardPage() {
             return (
               <div
                 key={log.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 16px',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: isTaken ? '1px solid var(--emerald-border)' : '1px solid var(--surface-border)',
-                  borderRadius: '10px'
-                }}
+                className={`live-schedule-item ${isTaken ? 'item-taken' : ''}`}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="live-item-left">
                   <span
-                    style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      background: medication?.color || 'var(--cyan)'
-                    }}
+                    className="live-med-pip"
+                    style={{ backgroundColor: medication?.color || 'var(--cyan)' }}
+                    aria-hidden="true"
                   />
                   <div>
-                    <strong style={{ fontSize: '0.94rem', color: '#ffffff', display: 'block', fontWeight: '600' }}>
+                    <strong className="live-med-name">
                       {medication?.name}
                     </strong>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    <span className="live-med-dosage">
                       {medication?.dosage}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span
-                    className="font-mono"
-                    style={{
-                      fontSize: '0.82rem',
-                      color: 'var(--cyan)',
-                      background: 'var(--cyan-subtle)',
-                      padding: '3px 8px',
-                      borderRadius: '6px'
-                    }}
-                  >
-                    {formatTime(log.scheduledTime, i18n.language)}
+                <div className="live-item-right">
+                  <span className="live-med-time font-mono">
+                    <ClockIcon size={12} />
+                    <span>{formatTime(log.scheduledTime, i18n.language)}</span>
                   </span>
 
                   <span
                     className={`chip-telemetry ${isTaken ? 'chip-mint' : 'chip-cyan'}`}
-                    style={{ fontSize: '0.74rem', padding: '3px 10px' }}
                   >
-                    {isTaken ? 'Taken ✓' : 'Pending'}
+                    {isTaken && <CheckIcon size={12} />}
+                    <span>{isTaken ? 'Taken' : 'Pending'}</span>
                   </span>
                 </div>
               </div>
