@@ -73,6 +73,10 @@ export function TodayPage() {
 
   const confirm = async (log, status, source = 'manual') => {
     try {
+      if (!log?.id || log.id === 'test-alarm-id') {
+        notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
+        return;
+      }
       await dosesApi.confirm(log.id, status, source);
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
       refresh();

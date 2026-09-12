@@ -75,6 +75,9 @@ export function DashboardPage() {
   };
 
   const todayCheckup = checkups?.find((c) => isToday(c.createdAt)) || checkups?.[0];
+  const todayLogs = (dashboard?.logs || [])
+    .filter((log) => isToday(log.scheduledTime))
+    .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
 
   return (
     <div className="page-shell-container">
