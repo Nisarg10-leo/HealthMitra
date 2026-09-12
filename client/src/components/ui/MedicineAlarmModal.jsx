@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { startCrazyAlarm, stopCrazyAlarm } from '../../utils/audio.js';
 import { formatTime } from '../../utils/format.js';
@@ -6,11 +6,12 @@ import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon } from './Icons.jsx';
 
 export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
+  const [muted, setMuted] = useState(false);
   const voiceTimeoutRef = useRef(null);
 
   // Spoken voice announcement with authoritative emergency cadence
   const announceAlarm = () => {
-    if (!window.speechSynthesis) return;
+    if (!window.speechSynthesis || muted) return;
     const medName = medication?.name || t('medication');
     const dosage = medication?.dosage || '';
     const name = patientName || 'Friend';
@@ -39,6 +40,17 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     };
   }, [dose?.id, medication?.name, i18n.language]);
+
+  const toggleMute = () => {
+    if (muted) {
+      setMuted(false);
+      startCrazyAlarm();
+    } else {
+      setMuted(true);
+      stopCrazyAlarm();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  };
 
   const handleTake = () => {
     stopCrazyAlarm();
@@ -75,12 +87,21 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
           </div>
         </div>
 
-        {/* Urgency Badge */}
+        {/* Urgency Badge & Silence Button */}
         <div className="alarm-badge-row">
           <span className="alarm-urgent-chip font-mono">
             <AlertTriangleIcon size={14} />
             <span>URGENT MEDICATION ALARM</span>
           </span>
+
+          <button
+            type="button"
+            className="alarm-mute-btn font-mono"
+            onClick={toggleMute}
+            title={muted ? 'Unmute alarm' : 'Silence siren'}
+          >
+            {muted ? 'Unmute 🔔' : 'Silence Siren 🔇'}
+          </button>
         </div>
 
         {/* Medicine Name & Dosage */}
@@ -231,7 +252,33 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
         }
 
         .alarm-badge-row {
-          margin-bottom: 10px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 10px !important;
+          margin-bottom: 12px !important;
+          flex-wrap: wrap !important;
+        }
+
+        .alarm-mute-btn {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          padding: 4px 12px !important;
+          border-radius: 9999px !important;
+          background: var(--cream) !important;
+          border: 1px solid var(--border-medium) !important;
+          color: var(--text-secondary) !important;
+          font-size: 11px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 140ms ease !important;
+        }
+
+        .alarm-mute-btn:hover {
+          background: #ffffff !important;
+          color: var(--ink) !important;
+          border-color: var(--ink) !important;
         }
 
         .alarm-urgent-chip {

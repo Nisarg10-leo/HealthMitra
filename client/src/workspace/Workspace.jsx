@@ -54,10 +54,19 @@ export function Workspace({ onLogout }) {
   }, [data.dashboard, session.role, alarmDose]);
 
   const handleAlarmConfirm = async (dose, status) => {
+    // 1. Instantly unmount the modal so the alarm stops immediately
+    setAlarmDose(null);
+
+    // 2. Handle test alarm demo click gracefully
+    if (!dose?.id || dose.id === 'test-alarm-id') {
+      notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
+      return;
+    }
+
+    // 3. Persist real scheduled dose confirmation
     try {
       await dosesApi.confirm(dose.id, status, 'alarm');
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
-      setAlarmDose(null);
       data.refresh();
     } catch (err) {
       notify(err.message);
