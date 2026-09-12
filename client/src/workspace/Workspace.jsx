@@ -1,28 +1,27 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dosesApi, sosApi } from '../api/index.js';
+import { NavButtons } from '../components/layout/NavButtons.jsx';
+import { ReminderBanner } from '../components/layout/ReminderBanner.jsx';
+import { Sidebar } from '../components/layout/Sidebar.jsx';
+import { Topbar } from '../components/layout/Topbar.jsx';
 import { MedicineAlarmModal } from '../components/ui/MedicineAlarmModal.jsx';
 import { useSession } from '../hooks/useSession.js';
 import { useSpeechInput } from '../hooks/useSpeech.js';
 import { useToast } from '../hooks/useToast.js';
 import { useWorkspaceData } from '../hooks/useWorkspaceData.js';
 import { isToday } from '../utils/format.js';
-import {
-  CheckIcon,
-  GlobeIcon,
-  LogoutIcon,
-  ShieldAlertIcon
-} from '../components/ui/Icons.jsx';
+import { CheckIcon, CrossMedicalIcon } from '../components/ui/Icons.jsx';
 import { ModalHost } from './ModalHost.jsx';
 import { WorkspaceContext } from './WorkspaceContext.jsx';
+import { defaultTabFor, navigationFor } from './navigation.js';
 import { SCREENS } from './screens.js';
-import { HealthMitraOverview } from '../features/overview/HealthMitraOverview.jsx';
 
-// Clean Human Care Workspace Shell matching human-care-design
+// The signed-in shell: navigation, top bar, data loading, active screen, and real-time medicine alarm.
 export function Workspace({ onLogout }) {
   const { t, i18n } = useTranslation();
   const session = useSession();
-  const [tab, setTab] = useState('today');
+  const [tab, setTab] = useState(() => defaultTabFor(session.role));
   const [modal, setModal] = useState(null);
   const [alarmDose, setAlarmDose] = useState(null);
   const handledAlarmIdsRef = useRef(new Set());
@@ -103,159 +102,61 @@ export function Workspace({ onLogout }) {
     setTab
   }), [data.dashboard, data.alerts, data.patients, data.selectedPatientId, data.setSelectedPatientId, data.refresh, notify, listen, setTab]);
 
-  const patientName = data.dashboard?.patient?.name || session?.name || 'Meera Shah';
-  const initials = patientName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase() || 'MS';
+  const navItems = navigationFor(session.role, t);
+  const unreadAlerts = data.alerts.filter((item) => !item.readBy?.includes(session.id)).length;
+  const dueReminder = data.notifications.find((item) => item.type === 'reminder' && !item.readAt);
+  const Screen = SCREENS[tab] || SCREENS.today;
 
   const alarmMedication = alarmDose
     ? data.dashboard?.medications?.find((m) => m.id === alarmDose.medicationId)
     : null;
 
-  const Screen = SCREENS[tab] || SCREENS.today;
-
   return (
     <WorkspaceContext.Provider value={workspace}>
-      <div className="hc-wrapper">
-        {/* Sticky Top Header matching human-care-design exactly */}
-        <header className="hc-header">
-          <div className="hc-header-inner">
-            <button
-              type="button"
-              onClick={() => setTab('today')}
-              className="hc-brand"
-              aria-label="HealthMitra overview"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-            >
-              <span className="hc-brand-badge">H</span>
-              <span style={{ textAlign: 'left' }}>
-                <span className="hc-brand-title">HealthMitra</span>
-                <span className="hc-brand-subtitle">personal health companion</span>
-              </span>
-            </button>
-
-            {/* Horizontal Nav Links */}
-            <nav className="hc-nav" aria-label="Primary navigation">
-              <button
-                type="button"
-                className={`hc-nav-btn ${tab === 'today' ? 'active' : ''}`}
-                onClick={() => setTab('today')}
-              >
-                Overview
-              </button>
-              <button
-                type="button"
-                className={`hc-nav-btn ${tab === 'medications' ? 'active' : ''}`}
-                onClick={() => setTab('medications')}
-              >
-                Medications
-              </button>
-              <button
-                type="button"
-                className={`hc-nav-btn ${tab === 'symptoms' ? 'active' : ''}`}
-                onClick={() => setTab('symptoms')}
-              >
-                Symptoms
-              </button>
-              <button
-                type="button"
-                className={`hc-nav-btn ${tab === 'contacts' ? 'active' : ''}`}
-                onClick={() => setTab('contacts')}
-              >
-                Caregivers
-              </button>
-              <button
-                type="button"
-                className={`hc-nav-btn ${tab === 'profile' ? 'active' : ''}`}
-                onClick={() => setTab('profile')}
-              >
-                Profile
-              </button>
-            </nav>
-
-            {/* Header Right Actions */}
-            <div className="hc-header-right">
-              {/* Language toggle */}
-              <button
-                type="button"
-                onClick={toggleLanguage}
-                className="hc-btn-subtle"
-                title={t('language')}
-              >
-                <GlobeIcon size={13} />
-                <span>{i18n.language === 'en' ? 'हिन्दी' : 'English'}</span>
-              </button>
-
-              {/* Emergency SOS button */}
-              <button
-                type="button"
-                onClick={handleSos}
-                className="hc-sos-btn"
-                aria-label="Emergency SOS"
-              >
-                <ShieldAlertIcon size={14} />
-                <span>SOS</span>
-              </button>
-
-              {/* Date */}
-              <span className="font-mono hc-date-pill">
-                Sat, 12 Sep
-              </span>
-
-              {/* User Avatar */}
-              <button
-                type="button"
-                onClick={() => setTab('profile')}
-                className="hc-avatar"
-                title={`Profile for ${patientName}`}
-                aria-label={`Profile for ${patientName}`}
-              >
-                {initials}
-              </button>
-
-              {/* Sign out */}
-              {onLogout && (
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="hc-logout-btn"
-                  title="Sign out"
-                  aria-label="Sign out"
-                >
-                  <LogoutIcon size={15} />
+      <div className="shell">
+        <Sidebar
+          session={session}
+          items={navItems}
+          activeTab={tab}
+          onSelect={setTab}
+          unreadAlerts={unreadAlerts}
+          onToggleLanguage={toggleLanguage}
+          onLogout={onLogout}
+        />
+        <main className="content">
+          <Topbar
+            session={session}
+            patients={data.patients}
+            selectedPatient={data.dashboard?.patient}
+            selectedPatientId={data.selectedPatientId}
+            onSelectPatient={data.setSelectedPatientId}
+            onToggleLanguage={toggleLanguage}
+            onSos={handleSos}
+          />
+          {!data.dashboard ? (
+            <div className="loading">
+              <div className="loading-mark"><CrossMedicalIcon size={24} /></div>
+              <p>{session.role === 'caregiver' ? t('noLinkedPatients') : t('loadingPlan')}</p>
+              {session.role === 'caregiver' && (
+                <button className="primary" onClick={() => setModal({ kind: 'join' })}>
+                  {t('joinWithCode')}
                 </button>
               )}
             </div>
-          </div>
-        </header>
-
-        {/* Screen Content */}
-        {tab === 'today' ? (
-          <HealthMitraOverview
-            session={session}
-            dashboard={data.dashboard}
-            refresh={data.refresh}
-            notify={notify}
-            hideHeader={true}
-            onSelectTab={setTab}
-            onOpenModal={setModal}
-            onLogout={onLogout}
-          />
-        ) : (
-          <main className="hc-main enter-up">
-            <Screen />
-          </main>
-        )}
+          ) : (
+            <>
+              {dueReminder && <ReminderBanner notification={dueReminder} onDismissed={data.refresh} />}
+              <Screen />
+            </>
+          )}
+        </main>
 
         {/* Real-time Medicine Alarm Overlay */}
         {alarmDose && (
           <MedicineAlarmModal
             dose={alarmDose}
             medication={alarmMedication}
-            patientName={patientName}
+            patientName={data.dashboard?.patient?.name || session.name}
             onConfirm={handleAlarmConfirm}
             onSnooze={handleAlarmSnooze}
             onClose={() => setAlarmDose(null)}
@@ -263,13 +164,15 @@ export function Workspace({ onLogout }) {
         )}
 
         <ModalHost modal={modal} onClose={() => setModal(null)} />
-
         {toast && (
           <div className="toast" role="status">
             <CheckIcon size={16} />
             <span>{toast}</span>
           </div>
         )}
+        <nav className="mobile-nav" aria-label={t('mainNavigation')}>
+          <NavButtons items={navItems} activeTab={tab} onSelect={setTab} unreadAlerts={unreadAlerts} />
+        </nav>
       </div>
     </WorkspaceContext.Provider>
   );
