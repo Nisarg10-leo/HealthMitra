@@ -51,6 +51,7 @@ export const tables = {
   sosEvents: [],
   alerts: [],
   notifications: [],
+  checkups: [],
   doctors: [{ id: 'doc-1', patientId: 'patient-1', name: 'Dr. R. Nair', specialty: 'General Physician', phone: '+919812345678', notes: 'Clinic hours: 10 AM - 1 PM' }],
   chemists: [{ id: 'chem-1', patientId: 'patient-1', name: 'CarePlus Pharmacy', phone: '+919898765432', address: '14, Lake Road, Mumbai' }]
 };
@@ -75,6 +76,19 @@ function seedHistory() {
     }));
   }
   tables.alerts.push({ id: 'alert-welcome', patientId: 'patient-1', type: 'info', message: 'Welcome back. Your medication plan is ready.', createdAt: nowIso(), readBy: [] });
+  tables.checkups.push({
+    id: 'checkup-seed-1',
+    patientId: 'patient-1',
+    createdAt: nowIso(),
+    date: today(),
+    time: '09:15 AM',
+    mood: 'great',
+    bloodPressure: '122/82',
+    bloodSugar: '108',
+    sleepQuality: 'good',
+    painLevel: 'none',
+    notes: 'Took morning Metformin on time with warm water. Feeling energetic and healthy.'
+  });
 }
 
 // Restore saved data from local_store.json if it exists
@@ -98,7 +112,7 @@ function restoreSavedData() {
     }
 
     // Merge other entities
-    ['links', 'medications', 'doseLogs', 'alerts', 'notifications', 'doctors', 'chemists', 'sosEvents'].forEach((key) => {
+    ['links', 'medications', 'doseLogs', 'alerts', 'notifications', 'doctors', 'chemists', 'sosEvents', 'checkups'].forEach((key) => {
       if (Array.isArray(saved[key])) {
         saved[key].forEach((item) => {
           if (!tables[key].some((existing) => existing.id === item.id)) {

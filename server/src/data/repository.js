@@ -99,6 +99,10 @@ if (config.databaseUrl) {
     contacts: {
       forPatient: (type, patientId) => where(type)((item) => item.patientId === patientId),
       insert: (type, item) => insert(type)(item)
+    },
+    checkups: {
+      forPatient: (patientId) => where('checkups')((item) => item.patientId === patientId),
+      insert: insert('checkups', { atFront: true })
     }
   };
   console.log('[data] Using in-memory prototype store');

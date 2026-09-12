@@ -63,3 +63,13 @@ export const profileApi = {
   get: () => get('/profile'),
   update: (data) => put('/profile', data)
 };
+
+export const checkupApi = {
+  list: (patientId) => get(`/patients/${patientId}/checkups`),
+  create: (patientId, payload) => post(`/patients/${patientId}/checkup`, payload),
+  request: (patientId) => post(`/patients/${patientId}/request-checkup`)
+};
+
+export const caregiversApi = {
+  list: () => get('/caregivers')
+};

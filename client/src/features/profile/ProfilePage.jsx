@@ -3,7 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi, medicationsApi, profileApi } from '../../api/index.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
-import { BellIcon, CheckIcon, FileTextIcon, PlusIcon, SparklesIcon, ToneIcon, Volume2Icon } from '../../components/ui/Icons.jsx';
+import {
+  BellIcon,
+  CheckIcon,
+  FileTextIcon,
+  HeartIcon,
+  PhoneIcon,
+  PlusIcon,
+  ShieldIcon,
+  SparklesIcon,
+  ToneIcon,
+  UserIcon,
+  Volume2Icon
+} from '../../components/ui/Icons.jsx';
 import {
   ALARM_TONES,
   getSelectedAlarmTone,
@@ -315,6 +327,25 @@ export function ProfilePage() {
       <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
         <p>Loading your clinical health profile…</p>
       </div>
+    );
+  }
+
+  if (session?.role === 'caregiver') {
+    return (
+      <CaregiverProfileView
+        session={session}
+        formData={formData}
+        setFormData={setFormData}
+        saving={saving}
+        handleSave={handleSave}
+        handleToneSelect={handleToneSelect}
+        handleTonePreview={handleTonePreview}
+        previewingTone={previewingTone}
+        toastMessage={toastMessage}
+        setTab={setTab}
+        t={t}
+        i18n={i18n}
+      />
     );
   }
 
@@ -1003,6 +1034,398 @@ export function ProfilePage() {
         style={{ padding: '14px', fontSize: '1rem', width: '100%' }}
       >
         {saving ? 'Saving Health Profile…' : 'Save Health Profile'}
+      </button>
+
+      {toastMessage && (
+        <div className="toast" role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <CheckIcon size={16} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CaregiverProfileView({
+  session,
+  formData,
+  setFormData,
+  saving,
+  handleSave,
+  handleToneSelect,
+  handleTonePreview,
+  previewingTone,
+  toastMessage,
+  setTab,
+  t,
+  i18n
+}) {
+  const [morningTime, setMorningTime] = useState('09:00');
+  const [eveningTime, setEveningTime] = useState('20:00');
+  const [inactivityThreshold, setInactivityThreshold] = useState('4');
+  const [whatsappAlerts, setWhatsappAlerts] = useState(true);
+  const [relation, setRelation] = useState('Son');
+
+  return (
+    <div style={{ maxWidth: '860px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px', paddingBottom: '80px' }}>
+      {/* Header Banner */}
+      <div
+        className="hm-card"
+        style={{
+          padding: '24px 26px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+              <ShieldIcon size={12} />
+              <span>Caregiver Account & Settings</span>
+            </span>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+              Primary Family Guardian
+            </span>
+          </div>
+          <h1 style={{ fontSize: '1.75rem', margin: '2px 0 4px', color: '#ffffff', fontWeight: '700' }}>
+            Caregiver Settings & Preferences
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
+            Configure your caregiver contact details, everyday checkup schedules, and emergency alert sounds.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="btn-cyber"
+          style={{ padding: '10px 20px', fontSize: '0.9rem' }}
+        >
+          {saving ? 'Saving…' : (
+            <>
+              <CheckIcon size={15} />
+              <span>Save Preferences</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Section 1: Caregiver Identity */}
+      <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+              Caregiver Account Details
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              Your verified identity used for family linkage and medical escalation.
+            </p>
+          </div>
+          <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.72rem' }}>
+            Verified Guardian
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Full Name
+            </label>
+            <input
+              type="text"
+              defaultValue={session.name}
+              className="setup-input"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Email Address (Account ID)
+            </label>
+            <input
+              type="email"
+              value={session.email}
+              readOnly
+              className="setup-input font-mono"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem', opacity: 0.8 }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Phone Number (For Alerts)
+            </label>
+            <input
+              type="tel"
+              defaultValue={session.phone || '+91 98100 00002'}
+              className="setup-input font-mono"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Relationship to Patient
+            </label>
+            <select
+              value={relation}
+              onChange={(e) => setRelation(e.target.value)}
+              className="setup-input"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            >
+              <option value="Son">Son</option>
+              <option value="Daughter">Daughter</option>
+              <option value="Spouse">Spouse</option>
+              <option value="Sibling">Sibling</option>
+              <option value="Parent">Parent</option>
+              <option value="Caregiver / Nurse">Caregiver / Nurse</option>
+              <option value="Friend">Friend</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: Everyday Checkup & Telemetry Rules */}
+      <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+              Everyday Checkup & Notification Rules
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              Set check-in expectations and inactivity alerts for your monitored family members.
+            </p>
+          </div>
+          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem' }}>
+            Active Guardian Loop
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Daily Morning Checkup Reminder
+            </label>
+            <input
+              type="time"
+              value={morningTime}
+              onChange={(e) => setMorningTime(e.target.value)}
+              className="setup-input font-mono"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Daily Evening Checkup Reminder
+            </label>
+            <input
+              type="time"
+              value={eveningTime}
+              onChange={(e) => setEveningTime(e.target.value)}
+              className="setup-input font-mono"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Inactivity Alert Threshold
+            </label>
+            <select
+              value={inactivityThreshold}
+              onChange={(e) => setInactivityThreshold(e.target.value)}
+              className="setup-input"
+              style={{ width: '100%', padding: '9px 12px', fontSize: '0.9rem' }}
+            >
+              <option value="2">Alert after 2 hours of no activity</option>
+              <option value="4">Alert after 4 hours of no activity (Recommended)</option>
+              <option value="6">Alert after 6 hours of no activity</option>
+              <option value="8">Alert after 8 hours of no activity</option>
+            </select>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.88rem', color: '#ffffff' }}>
+            <input
+              type="checkbox"
+              checked={whatsappAlerts}
+              onChange={(e) => setWhatsappAlerts(e.target.checked)}
+              style={{ accentColor: 'var(--cyan)' }}
+            />
+            <span>Receive WhatsApp escalation when a critical dose is missed (&gt;60 mins)</span>
+          </label>
+        </div>
+      </section>
+
+      {/* Section 3: Monitored Patient Connection */}
+      <section className="hm-card" style={{ padding: '22px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+              Monitored Family Patient
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              Currently connected patient whose vitals and schedule you are overseeing.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-glass"
+            style={{ fontSize: '0.82rem' }}
+            onClick={() => setTab && setTab('patient')}
+          >
+            Open Patient Station →
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'var(--paper)', borderRadius: '12px', border: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                background: 'rgba(0, 242, 254, 0.12)',
+                color: 'var(--cyan)',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '1.1rem',
+                fontWeight: 700
+              }}
+              className="font-mono"
+            >
+              M
+            </div>
+            <div>
+              <strong style={{ fontSize: '1rem', color: '#ffffff' }}>Meera Shah</strong>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                Mother • Age 68 • Blood Group O+ • Type 2 Diabetes, Hypertension
+              </div>
+            </div>
+          </div>
+
+          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.74rem' }}>
+            Active Telemetry Linked
+          </span>
+        </div>
+      </section>
+
+      {/* Section 4: Caregiver Alert Sounds & Emergency Tones */}
+      <section className="glass-matrix" style={{ padding: '24px', borderRadius: '18px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <BellIcon size={18} style={{ color: 'var(--leaf)' }} />
+              <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600', color: 'var(--ink)' }}>
+                Caregiver Emergency Alert Sounds
+              </h2>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              Choose which sound alerts you on your device when a patient emergency SOS or missed dose is escalated.
+            </p>
+          </div>
+        </div>
+
+        <div className="alarm-settings-grid">
+          {ALARM_TONES.map((tone) => {
+            const isSelected = (formData.alarmTone || 'crazy-siren') === tone.id;
+            const isPlaying = previewingTone === tone.id;
+
+            return (
+              <div
+                key={tone.id}
+                className={`alarm-pref-card ${isSelected ? 'alarm-pref-card-active' : ''}`}
+                onClick={() => handleToneSelect(tone.id)}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="tone-icon-badge" style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: 'rgba(45, 122, 88, 0.1)',
+                      color: 'var(--leaf)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0
+                    }}>
+                      <ToneIcon toneId={tone.id} size={18} />
+                    </span>
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--ink)' }}>
+                        {i18n.language === 'hi' ? tone.nameHi : tone.name}
+                      </strong>
+                      <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {i18n.language === 'hi' ? tone.badgeHi : tone.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 8px',
+                      borderRadius: '9999px',
+                      background: 'rgba(45, 122, 88, 0.15)',
+                      color: 'var(--leaf)',
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
+                    }}>
+                      <CheckIcon size={12} />
+                      <span>{i18n.language === 'hi' ? 'सक्रिय' : 'Active'}</span>
+                    </span>
+                  )}
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 14px 0', lineHeight: '1.45' }}>
+                  {i18n.language === 'hi' ? tone.descHi : tone.desc}
+                </p>
+
+                <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    className={`btn-glass btn-sm ${isPlaying ? 'preview-playing' : ''}`}
+                    onClick={() => handleTonePreview(tone.id)}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    <Volume2Icon size={13} />
+                    <span>{isPlaying ? 'Playing...' : 'Preview'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-sm ${isSelected ? 'btn-cyber' : 'btn-glass'}`}
+                    onClick={() => handleToneSelect(tone.id)}
+                    style={{ flex: 1 }}
+                  >
+                    {isSelected ? 'Active Tone' : 'Set as Sound'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Save Button */}
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving}
+        className="btn-cyber"
+        style={{ padding: '14px', fontSize: '1rem', width: '100%' }}
+      >
+        {saving ? 'Saving Caregiver Preferences…' : 'Save Caregiver Preferences'}
       </button>
 
       {toastMessage && (

@@ -8,6 +8,7 @@ import {
   HeartIcon,
   PhoneIcon,
   PillIcon,
+  ShieldIcon,
   UserIcon
 } from '../ui/Icons.jsx';
 
@@ -17,6 +18,7 @@ const ICONS = {
   heart: HeartIcon,
   phone: PhoneIcon,
   user: UserIcon,
+  shield: ShieldIcon,
   activity: ActivityIcon,
   clock: ClockIcon,
   bell: BellIcon,
