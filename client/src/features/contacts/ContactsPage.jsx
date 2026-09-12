@@ -110,9 +110,22 @@ export function ContactsPage() {
               ))}
 
               {!contacts[type].length && (
-                <p className="contacts-empty-hint">
-                  {t('noContacts')}
-                </p>
+                <div className="contacts-empty-box">
+                  <p className="contacts-empty-hint">
+                    {t('noContacts')}
+                  </p>
+                  {dashboard.permissions?.canEdit && (
+                    <button
+                      type="button"
+                      className="btn-glass btn-sm"
+                      style={{ marginTop: '10px' }}
+                      onClick={() => openModal({ kind: 'contact' })}
+                    >
+                      <PlusIcon size={12} />
+                      <span>{type === 'doctors' ? 'Add Doctor' : 'Add Pharmacy'}</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </section>

@@ -76,15 +76,8 @@ export function Workspace({ onLogout }) {
     setAlarmDose(dose);
   };
 
-  const handleSos = async () => {
+  const handleSos = () => {
     setModal({ kind: 'sos' });
-    try {
-      if (session?.id) {
-        await sosApi.trigger(session.id, null);
-      }
-    } catch {
-      // offline / demo fallback
-    }
   };
 
   const workspace = useMemo(() => ({

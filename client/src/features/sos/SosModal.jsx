@@ -4,102 +4,151 @@ import { sosApi } from '../../api/index.js';
 import { ModalShell } from '../../components/ui/ModalShell.jsx';
 import { useSession } from '../../hooks/useSession.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
-
-import { ShieldAlertIcon, CheckIcon } from '../../components/ui/Icons.jsx';
+import {
+  AlertTriangleIcon,
+  CheckIcon,
+  PhoneIcon,
+  ShieldAlertIcon,
+  WhatsAppIcon
+} from '../../components/ui/Icons.jsx';
 
 // Location is best-effort: a denied or unavailable geolocation still sends the SOS.
-const currentPosition = () => new Promise((resolve) => {
-  if (!navigator.geolocation) return resolve(null);
-  navigator.geolocation.getCurrentPosition((position) => resolve(position.coords), () => resolve(null));
-});
+const currentPosition = () =>
+  new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(position.coords),
+      () => resolve(null),
+      { timeout: 5000 }
+    );
+  });
 
 export function SosModal({ onClose }) {
   const { t } = useTranslation();
   const session = useSession();
-  const { notify } = useWorkspace();
+  const { notify, refresh } = useWorkspace();
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const caregiverPhone = '919810000002'; // Arjun Shah
-  const waMessage = encodeURIComponent(`EMERGENCY MEDICAL SOS: Patient ${session.name || 'Meera Shah'} needs immediate assistance! Please check HealthMitra immediately.`);
+  const caregiverName = 'Arjun Shah';
+  const caregiverPhone = '919810000002';
+  const waMessage = encodeURIComponent(
+    `EMERGENCY MEDICAL SOS: Patient ${session?.name || 'Meera Shah'} needs immediate medical assistance! Please check HealthMitra immediately.`
+  );
   const waUrl = `https://wa.me/${caregiverPhone}?text=${waMessage}`;
 
   const send = async () => {
     setBusy(true);
     try {
-      await sosApi.trigger(session.id, await currentPosition());
+      const coords = await currentPosition();
+      await sosApi.trigger(session.id, coords);
       notify(t('sosSent'));
       setSent(true);
+      if (refresh) refresh();
     } catch (error) {
       notify(error.message);
+    } finally {
       setBusy(false);
     }
   };
 
-  return <ModalShell eyebrow={null} onClose={onClose} className="sos-modal">
-    <div className="sos-icon" style={{ display: 'grid', placeItems: 'center' }}>
-      <ShieldAlertIcon size={24} />
-    </div>
-    <p className="eyebrow">{t('emergencyAction')}</p>
-    <h2>{t('requestEmergencyHelp')}</h2>
-    <p>{t('sosModalBody')}</p>
+  return (
+    <ModalShell eyebrow={null} onClose={onClose} className="sos-modal-shell">
+      {!sent ? (
+        <div className="sos-dialog-body">
+          <div className="sos-badge-wrap">
+            <div className="sos-pulse-ring" />
+            <div className="sos-badge-icon">
+              <ShieldAlertIcon size={32} />
+            </div>
+          </div>
 
-    {!sent ? (
-      <>
-        <button className="danger full" onClick={send} disabled={busy}>{busy ? t('sending') : t('sendEmergencySos')}</button>
-        <a
-          className="secondary full"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            textDecoration: 'none',
-            background: '#25D366',
-            color: '#fff',
-            padding: '12px',
-            borderRadius: '10px',
-            fontWeight: 'bold',
-            marginTop: '10px',
-            boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)'
-          }}
-          href={waUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Alert Family on WhatsApp
-        </a>
-        <button className="text-button modal-cancel" onClick={onClose}>{t('cancel')}</button>
-      </>
-    ) : (
-      <div style={{ textAlign: 'center', marginTop: '14px' }}>
-        <p style={{ color: '#16a34a', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-          <CheckIcon size={16} /> {t('sosSent')}
-        </p>
-        <a
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            textDecoration: 'none',
-            background: '#25D366',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: '10px',
-            fontWeight: 'bold',
-            marginTop: '8px'
-          }}
-          href={waUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Open WhatsApp to Arjun Shah
-        </a>
-        <div style={{ marginTop: '16px' }}>
-          <button className="text-button" onClick={onClose}>{t('close')}</button>
+          <div className="sos-text-group">
+            <span className="sos-eyebrow font-mono">{t('emergencyAction')}</span>
+            <h2 className="sos-headline">{t('requestEmergencyHelp')}</h2>
+            <p className="sos-description">
+              {t('sosModalBody')} Caregiver <strong>{caregiverName}</strong> will be alerted with your live GPS location.
+            </p>
+          </div>
+
+          <div className="sos-action-stack">
+            <button
+              type="button"
+              className="sos-btn-emergency"
+              onClick={send}
+              disabled={busy}
+            >
+              <AlertTriangleIcon size={18} />
+              <span>{busy ? t('sending') : t('sendEmergencySos')}</span>
+            </button>
+
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="sos-btn-whatsapp"
+            >
+              <WhatsAppIcon size={18} />
+              <span>Alert {caregiverName} on WhatsApp</span>
+            </a>
+
+            <div className="sos-hotlines-row">
+              <a href="tel:108" className="sos-btn-helpline">
+                <PhoneIcon size={14} />
+                <span>Ambulance (108)</span>
+              </a>
+              <a href="tel:112" className="sos-btn-helpline">
+                <PhoneIcon size={14} />
+                <span>National (112)</span>
+              </a>
+            </div>
+          </div>
+
+          <button type="button" className="sos-btn-cancel" onClick={onClose}>
+            {t('cancel')}
+          </button>
         </div>
-      </div>
-    )}
-  </ModalShell>;
+      ) : (
+        <div className="sos-dialog-body sos-success-state">
+          <div className="sos-badge-wrap">
+            <div className="sos-badge-icon badge-icon-success">
+              <CheckIcon size={32} />
+            </div>
+          </div>
+
+          <div className="sos-text-group">
+            <span className="sos-eyebrow font-mono text-leaf">SIGNAL BROADCAST</span>
+            <h2 className="sos-headline">{t('sosSent')}</h2>
+            <p className="sos-description">
+              Your emergency signal with GPS coordinates has been dispatched to <strong>{caregiverName}</strong>. Please stay calm.
+            </p>
+          </div>
+
+          <div className="sos-action-stack">
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="sos-btn-whatsapp"
+            >
+              <WhatsAppIcon size={18} />
+              <span>Open WhatsApp with {caregiverName}</span>
+            </a>
+
+            <a
+              href={`tel:${caregiverPhone}`}
+              className="sos-btn-call"
+            >
+              <PhoneIcon size={16} />
+              <span>Call {caregiverName} (+91 98100 00002)</span>
+            </a>
+          </div>
+
+          <button type="button" className="sos-btn-close" onClick={onClose}>
+            {t('close')}
+          </button>
+        </div>
+      )}
+    </ModalShell>
+  );
 }

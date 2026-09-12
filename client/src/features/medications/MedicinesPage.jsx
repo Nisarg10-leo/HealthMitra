@@ -81,7 +81,7 @@ export function MedicinesPage() {
               {/* Left Color Indicator Rail */}
               <div
                 className="prescription-rail"
-                style={{ backgroundColor: medication.color || 'var(--cyan)' }}
+                style={{ backgroundColor: medication.color || 'var(--leaf)' }}
                 aria-hidden="true"
               />
 
