@@ -130,7 +130,7 @@ CRITICAL FORMATTING RULES:
 6. End with a simple, gentle reminder to check with their doctor.`;
 
       let answer = null;
-      const modelsToTry = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
+      const modelsToTry = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound-mini', 'qwen/qwen3.8-27b'];
 
       for (const model of modelsToTry) {
         try {
@@ -146,8 +146,8 @@ CRITICAL FORMATTING RULES:
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: question }
               ],
-              temperature: 0.2,
-              max_tokens: 1024
+              temperature: 0.3,
+              max_tokens: 500
             })
           });
 

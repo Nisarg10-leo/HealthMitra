@@ -2,7 +2,12 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { guidanceApi } from '../../api/index.js';
 import { useSpeechInput } from '../../hooks/useSpeech.js';
-import { Volume2Icon, MicIcon } from './Icons.jsx';
+import {
+  CrossMedicalIcon,
+  MicrophoneIcon,
+  SparklesIcon,
+  Volume2Icon
+} from './Icons.jsx';
 
 // Clean text formatting utility to strip any residual markdown artifacts
 function cleanText(text) {
@@ -92,57 +97,38 @@ export function AskMitraModal({ onClose }) {
       role="dialog"
       aria-modal="true"
       className="overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div
-        className="hm-card"
-        style={{
-          maxWidth: '740px',
-          width: '100%',
-          padding: '24px 26px',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '86vh',
-          maxHeight: '800px',
-          borderRadius: 'var(--radius-panel)'
-        }}
+        className="ask-mitra-dialog"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--surface-border)', paddingBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: 'var(--cyan-subtle)',
-                border: '1px solid var(--cyan-border)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--cyan)',
-                fontSize: '1rem',
-                fontWeight: '700'
-              }}
-            >
-              ✚
+        <header className="ask-mitra-header">
+          <div className="ask-mitra-brand">
+            <div className="ask-mitra-badge">
+              <SparklesIcon size={18} />
             </div>
             <div>
-              <span style={{ fontSize: '0.94rem', fontWeight: '600', color: '#ffffff', letterSpacing: '-0.01em' }}>
-                Mitra Clinical Intelligence
-              </span>
-              <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Prescription guidance, food interactions, and symptom analysis
+              <h2 className="ask-mitra-title">
+                {t('talkToMitra') || 'Mitra Clinical AI'}
+              </h2>
+              <span className="ask-mitra-subtitle">
+                {i18n.language === 'hi'
+                  ? 'दवा समय, भोजन परस्पर प्रभाव व सुरक्षा मार्गदर्शन'
+                  : 'Prescription guidance, food interactions, and safety advice'}
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="ask-mitra-actions">
             {conversation.length > 0 && (
               <button
                 type="button"
                 onClick={handleResetChat}
-                className="btn-glass"
-                style={{ padding: '5px 10px', fontSize: '0.76rem' }}
+                className="ask-mitra-clear-btn"
               >
                 ↺ Clear
               </button>
@@ -150,90 +136,48 @@ export function AskMitraModal({ onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="btn-glass"
-              style={{ padding: '4px 10px', fontSize: '0.84rem' }}
+              className="ask-mitra-close-btn"
               aria-label="Close"
             >
-              ✕
+              ×
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Center Chat View */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            paddingRight: '6px',
-            marginBottom: '14px'
-          }}
-        >
+        <div className="ask-mitra-chat-body">
           {/* Welcome Screen */}
           {conversation.length === 0 && !loading && (
-            <div
-              style={{
-                margin: 'auto',
-                textAlign: 'center',
-                maxWidth: '480px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '24px 0'
-              }}
-            >
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '12px',
-                  background: 'var(--cyan-subtle)',
-                  border: '1px solid var(--cyan-border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--cyan)',
-                  fontSize: '1.6rem',
-                  fontWeight: '700'
-                }}
-              >
-                ✚
+            <div className="ask-mitra-empty">
+              <div className="ask-mitra-empty-icon">
+                <CrossMedicalIcon size={24} strokeWidth={2.4} />
               </div>
 
-              <h2
-                style={{
-                  fontSize: '1.8rem',
-                  fontWeight: '700',
-                  color: '#ffffff',
-                  margin: 0,
-                  letterSpacing: '-0.025em'
-                }}
-              >
-                How can Mitra help you?
-              </h2>
+              <h3 className="ask-mitra-empty-title">
+                {i18n.language === 'hi' ? 'मित्रा से क्या पूछना चाहते हैं?' : 'How can Mitra assist you today?'}
+              </h3>
 
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                Ask any clinical question regarding your prescription timings, food interactions, dietary safety, or mild symptom relief.
+              <p className="ask-mitra-empty-desc">
+                {i18n.language === 'hi'
+                  ? 'अपनी दवाओं के समय, खाने के साथ परहेज़, दुष्प्रभावों या सामान्य स्वास्थ्य सावधानियों के बारे में पूछें।'
+                  : 'Ask clinical questions regarding food interactions, medicine timings, dietary precautions, or missed doses.'}
               </p>
 
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginTop: '10px' }}>
-                {['Can I take Metformin with milk?', 'What should I do if I miss my dose?', 'Are there side effects for Amlodipine?'].map((suggestion) => (
+              <div className="ask-mitra-suggestions">
+                {(i18n.language === 'hi' ? [
+                  'क्या मैं दवा दूध के साथ ले सकता हूँ?',
+                  'अगर खुराक छूट जाए तो क्या करूँ?',
+                  'पैरासिटामोल के सामान्य दुष्प्रभाव क्या हैं?'
+                ] : [
+                  'Can I take Metformin with milk?',
+                  'What should I do if I miss my dose?',
+                  'Are there food interactions with my medicines?'
+                ]).map((suggestion) => (
                   <button
                     key={suggestion}
                     type="button"
                     onClick={() => handleAsk(suggestion)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '8px',
-                      padding: '6px 10px',
-                      color: 'var(--text-secondary)',
-                      fontSize: '0.78rem',
-                      cursor: 'pointer'
-                    }}
+                    className="ask-mitra-suggestion-pill"
                   >
                     "{suggestion}"
                   </button>
@@ -246,84 +190,50 @@ export function AskMitraModal({ onClose }) {
           {conversation.map((msg, i) => (
             <div
               key={i}
-              style={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: msg.role === 'user' ? '80%' : '96%',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px'
-              }}
+              className={`ask-msg-row ${msg.role === 'user' ? 'msg-user-row' : 'msg-mitra-row'}`}
             >
-              <div
-                style={{
-                  background: msg.role === 'user' ? '#172033' : '#0B0F19',
-                  border: msg.role === 'user'
-                    ? '1px solid var(--surface-border-strong)'
-                    : '1px solid var(--surface-border)',
-                  borderLeft: msg.role === 'mitra' ? '3px solid var(--cyan)' : undefined,
-                  borderRadius: msg.role === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
-                  padding: '14px 18px',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
-                }}
-              >
+              <div className={`ask-msg-bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-mitra'}`}>
                 {msg.role === 'mitra' && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 8px' }}>
-                      Mitra
+                  <div className="ask-msg-mitra-top">
+                    <span className="chip-telemetry chip-mint">
+                      <SparklesIcon size={12} />
+                      <span>Mitra AI</span>
                     </span>
                     <button
                       type="button"
-                      className="btn-glass"
+                      className="ask-speak-btn"
                       onClick={() => speakAnswer(msg.text)}
-                      style={{ padding: '2px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       title="Listen aloud"
                     >
-                      <Volume2Icon size={13} /> Speak
+                      <Volume2Icon size={14} />
+                      <span>Listen</span>
                     </button>
                   </div>
                 )}
 
-                <div
-                  style={{
-                    color: '#f8fafc',
-                    fontSize: '0.92rem',
-                    lineHeight: '1.7',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word'
-                  }}
-                >
+                <div className="ask-msg-text">
                   {msg.text}
                 </div>
 
                 {msg.disclaimer && (
-                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginTop: '10px', paddingTop: '8px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    Notice: {msg.disclaimer}
+                  <div className="ask-msg-disclaimer">
+                    <span>Notice: {msg.disclaimer}</span>
                   </div>
                 )}
               </div>
 
-              <span className="font-mono" style={{ fontSize: '0.68rem', color: 'var(--text-muted)', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
+              <span className="ask-msg-timestamp font-mono">
                 {msg.time}
               </span>
             </div>
           ))}
 
           {loading && (
-            <div
-              style={{
-                alignSelf: 'flex-start',
-                background: '#0B0F19',
-                border: '1px solid var(--cyan-border)',
-                borderRadius: '12px 12px 12px 2px',
-                padding: '12px 16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                color: 'var(--cyan)',
-                fontSize: '0.86rem'
-              }}
-            >
-              <span>● Preparing clinical guidance…</span>
+            <div className="ask-msg-row msg-mitra-row">
+              <div className="ask-msg-bubble bubble-mitra bubble-loading">
+                <span className="loading-dot" />
+                <span>Consulting clinical knowledge base…</span>
+              </div>
             </div>
           )}
 
@@ -331,38 +241,32 @@ export function AskMitraModal({ onClose }) {
         </div>
 
         {/* Input Bar */}
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="ask-mitra-input-bar">
           <input
             ref={inputRef}
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAsk(); }}
-            placeholder={i18n.language === 'hi' ? 'अपनी समस्या या दवा के बारे में पूछें…' : 'Type your medicine, interaction, or symptom query…'}
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              fontSize: '0.9rem',
-              borderRadius: 'var(--radius-item)'
-            }}
+            placeholder={i18n.language === 'hi' ? 'अपनी समस्या या दवा के बारे में पूछें…' : 'Ask about your medicines, timings, or diet…'}
+            className="ask-mitra-input"
+            autoFocus
           />
           <button
             type="button"
             onClick={handleVoiceInput}
             title="Speak query"
-            className="btn-glass"
-            style={{ padding: '0 14px', display: 'grid', placeItems: 'center' }}
+            className="ask-mitra-voice-btn"
           >
-            <MicIcon size={18} />
+            <MicrophoneIcon size={18} />
           </button>
           <button
             type="button"
-            className="btn-cyber"
+            className="ask-mitra-send-btn"
             disabled={loading || !question.trim()}
             onClick={() => handleAsk()}
-            style={{ padding: '0 20px', fontSize: '0.9rem' }}
           >
-            {loading ? '…' : 'Send'}
+            {loading ? '…' : (i18n.language === 'hi' ? 'भेजें' : 'Ask')}
           </button>
         </div>
       </div>

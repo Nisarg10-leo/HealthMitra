@@ -1845,3 +1845,348 @@ input:focus, select:focus, textarea:focus {
 .setup-skip-btn:hover {
   color: var(--ink);
 }
+
+/* ── Ask Mitra Clinical AI Modal (Human Care Redesign) ── */
+.ask-mitra-dialog {
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 24px !important;
+  width: min(740px, calc(100vw - 32px)) !important;
+  height: min(84vh, 780px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-shadow: 0 20px 60px -15px rgba(28, 40, 38, 0.25) !important;
+  padding: 24px 28px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.ask-mitra-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 14px !important;
+  padding-bottom: 14px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.ask-mitra-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.ask-mitra-badge {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: var(--mist) !important;
+  color: var(--leaf) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.ask-mitra-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  margin: 0 0 2px !important;
+}
+
+.ask-mitra-subtitle {
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+  display: block !important;
+}
+
+.ask-mitra-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ask-mitra-clear-btn {
+  border-radius: 9999px !important;
+  border: 1px solid var(--border-medium) !important;
+  background: transparent !important;
+  padding: 5px 12px !important;
+  font-size: 11.5px !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-clear-btn:hover {
+  color: var(--ink) !important;
+  border-color: var(--ink) !important;
+}
+
+.ask-mitra-close-btn {
+  border-radius: 50% !important;
+  border: none !important;
+  background: rgba(28, 40, 38, 0.05) !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 18px !important;
+  color: var(--ink) !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-close-btn:hover {
+  background: rgba(28, 40, 38, 0.1) !important;
+}
+
+.ask-mitra-chat-body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 8px 6px 8px 0 !important;
+  margin-bottom: 14px !important;
+}
+
+.ask-mitra-empty {
+  margin: auto !important;
+  text-align: center !important;
+  max-width: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 28px 0 !important;
+}
+
+.ask-mitra-empty-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 14px !important;
+  background: var(--mist) !important;
+  color: var(--leaf) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.ask-mitra-empty-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.55rem !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.ask-mitra-empty-desc {
+  font-size: 13.5px !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+
+.ask-mitra-suggestions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+}
+
+.ask-mitra-suggestion-pill {
+  background: var(--cream) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 9999px !important;
+  padding: 7px 14px !important;
+  font-size: 12px !important;
+  color: var(--ink) !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-suggestion-pill:hover {
+  border-color: var(--leaf) !important;
+  color: var(--leaf) !important;
+  background: #ffffff !important;
+}
+
+.ask-msg-row {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.msg-user-row {
+  align-self: flex-end !important;
+  max-width: 82% !important;
+}
+
+.msg-mitra-row {
+  align-self: flex-start !important;
+  max-width: 92% !important;
+}
+
+.ask-msg-bubble {
+  padding: 14px 18px !important;
+  box-shadow: 0 1px 3px rgba(28, 40, 38, 0.03) !important;
+}
+
+.bubble-user {
+  background: var(--mist) !important;
+  border: 1px solid rgba(45, 122, 88, 0.22) !important;
+  border-radius: 18px 18px 4px 18px !important;
+  color: var(--ink) !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+}
+
+.bubble-mitra {
+  background: var(--cream) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-left: 3.5px solid var(--leaf) !important;
+  border-radius: 18px 18px 18px 4px !important;
+  padding: 16px 20px !important;
+  color: var(--ink) !important;
+}
+
+.ask-msg-mitra-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
+}
+
+.ask-speak-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  border-radius: 9999px !important;
+  border: 1px solid var(--border-medium) !important;
+  background: transparent !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-speak-btn:hover {
+  border-color: var(--leaf) !important;
+  color: var(--leaf) !important;
+}
+
+.ask-msg-text {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  color: var(--ink) !important;
+  font-size: 13.5px !important;
+  line-height: 1.65 !important;
+}
+
+.ask-msg-disclaimer {
+  margin-top: 12px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  line-height: 1.4 !important;
+}
+
+.ask-msg-timestamp {
+  font-size: 10px !important;
+  color: var(--text-muted) !important;
+  padding: 0 4px !important;
+}
+
+.bubble-loading {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: var(--leaf) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  background: var(--cream) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px 14px 14px 4px !important;
+  padding: 12px 18px !important;
+}
+
+.loading-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background-color: var(--leaf) !important;
+  animation: pulse 1s infinite alternate !important;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+.ask-mitra-input-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--border-subtle) !important;
+}
+
+.ask-mitra-input {
+  flex: 1 !important;
+  padding: 12px 18px !important;
+  background: var(--cream) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 9999px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13.5px !important;
+  color: var(--ink) !important;
+  outline: none !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-input:focus {
+  border-color: var(--leaf) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(45, 122, 88, 0.12) !important;
+}
+
+.ask-mitra-voice-btn {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border-medium) !important;
+  background: var(--cream) !important;
+  color: var(--ink) !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-voice-btn:hover {
+  border-color: var(--leaf) !important;
+  color: var(--leaf) !important;
+}
+
+.ask-mitra-send-btn {
+  padding: 11px 22px !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  background: var(--leaf) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-send-btn:hover {
+  background: #246347 !important;
+}
+
+.ask-mitra-send-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
