@@ -17,35 +17,38 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
     if (val >= 85) {
       return {
         name: 'Optimal Balance',
-        glow: 'rgba(16, 185, 129, 0.4)',
+        glow: 'rgba(16, 185, 129, 0.35)',
         primary: [16, 185, 129],    // emerald
-        secondary: [6, 182, 212],   // cyan
+        secondary: [0, 210, 211],   // surgical cyan
         core: [52, 211, 153],       // light emerald
-        badgeBg: '#ecfdf5',
-        badgeText: '#065f46',
-        rim: 'rgba(52, 211, 153, 0.8)'
+        badgeBg: 'rgba(16, 185, 129, 0.12)',
+        badgeText: '#34d399',
+        badgeBorder: 'rgba(16, 185, 129, 0.28)',
+        rim: 'rgba(52, 211, 153, 0.85)'
       };
     } else if (val >= 60) {
       return {
         name: 'Moderate Adherence',
-        glow: 'rgba(245, 158, 11, 0.4)',
-        primary: [245, 158, 11],   // amber
+        glow: 'rgba(245, 158, 11, 0.35)',
+        primary: [245, 158, 11],    // amber
         secondary: [251, 191, 36],  // gold
         core: [253, 230, 138],      // warm light
-        badgeBg: '#fffbeb',
-        badgeText: '#92400e',
-        rim: 'rgba(251, 191, 36, 0.8)'
+        badgeBg: 'rgba(245, 158, 11, 0.12)',
+        badgeText: '#fbbf24',
+        badgeBorder: 'rgba(245, 158, 11, 0.28)',
+        rim: 'rgba(251, 191, 36, 0.85)'
       };
     } else {
       return {
         name: 'Needs Attention',
-        glow: 'rgba(239, 68, 68, 0.4)',
-        primary: [239, 68, 68],    // crimson
+        glow: 'rgba(239, 68, 68, 0.35)',
+        primary: [239, 68, 68],     // coral red
         secondary: [244, 63, 94],   // rose
         core: [254, 202, 202],      // light red
-        badgeBg: '#fef2f2',
-        badgeText: '#991b1b',
-        rim: 'rgba(248, 113, 113, 0.8)'
+        badgeBg: 'rgba(239, 68, 68, 0.12)',
+        badgeText: '#f87171',
+        badgeBorder: 'rgba(239, 68, 68, 0.28)',
+        rim: 'rgba(248, 113, 113, 0.85)'
       };
     }
   };
@@ -110,9 +113,9 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
       ctx.translate(centerX + tiltX * 0.3, centerY + tiltY * 0.3);
       ctx.beginPath();
       ctx.ellipse(0, 0, orbitRadiusX, orbitRadiusY, -0.06, Math.PI, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(203, 213, 225, 0.4)';
-      ctx.setLineDash([4, 6]);
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.setLineDash([3, 5]);
+      ctx.lineWidth = 1.2;
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
@@ -125,7 +128,7 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
         if (Math.sin(p.angle) < 0) {
           ctx.beginPath();
           ctx.arc(centerX + x + tiltX * 0.5, centerY + y + tiltY * 0.5, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${theme.secondary[0]}, ${theme.secondary[1]}, ${theme.secondary[2]}, ${p.alpha * 0.5})`;
+          ctx.fillStyle = `rgba(${theme.secondary[0]}, ${theme.secondary[1]}, ${theme.secondary[2]}, ${p.alpha * 0.45})`;
           ctx.fill();
         }
       });
@@ -218,14 +221,15 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
       ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
-      ctx.shadowBlur = 6;
-      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.font = '700 28px "JetBrains Mono", monospace';
       ctx.fillStyle = '#ffffff';
       ctx.fillText(`${score}%`, sphereX, sphereY - 5);
 
-      ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.font = '700 9px Geist, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.letterSpacing = '1px';
       ctx.fillText('ADHERENCE', sphereX, sphereY + 16);
       ctx.restore();
 
@@ -234,8 +238,8 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
       ctx.translate(centerX + tiltX * 0.3, centerY + tiltY * 0.3);
       ctx.beginPath();
       ctx.ellipse(0, 0, orbitRadiusX, orbitRadiusY, -0.06, 0, Math.PI);
-      ctx.strokeStyle = `rgba(${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]}, 0.55)`;
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]}, 0.45)`;
+      ctx.lineWidth = 1.8;
       ctx.stroke();
       ctx.restore();
 
@@ -274,27 +278,27 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
 
       ctx.beginPath();
       ctx.arc(0, 0, 13, 0, Math.PI * 2);
-      ctx.fillStyle = isActive ? theme.badgeBg : '#ffffff';
-      ctx.shadowColor = isActive ? theme.glow : 'rgba(0, 0, 0, 0.1)';
-      ctx.shadowBlur = isActive ? 10 : 3;
+      ctx.fillStyle = isActive ? '#141c2e' : '#0e1422';
+      ctx.shadowColor = isActive ? theme.glow : 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = isActive ? 12 : 4;
       ctx.fill();
 
-      ctx.lineWidth = isActive ? 2.5 : 1.5;
+      ctx.lineWidth = isActive ? 2 : 1;
       ctx.strokeStyle = isActive
         ? `rgb(${theme.primary.join(',')})`
         : node.isToday
-        ? '#3b82f6'
-        : '#cbd5e1';
+        ? 'rgba(0, 210, 211, 0.8)'
+        : 'rgba(255, 255, 255, 0.14)';
       ctx.stroke();
 
-      ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillStyle = isActive ? theme.badgeText : '#334155';
+      ctx.font = '700 9px Geist, sans-serif';
+      ctx.fillStyle = isActive ? '#ffffff' : '#94a3b8';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(node.label, 0, 0);
+      ctx.fillText(node.label, 0, -1);
 
       ctx.beginPath();
-      ctx.arc(0, 9, 2.5, 0, Math.PI * 2);
+      ctx.arc(0, 8, 2, 0, Math.PI * 2);
       ctx.fillStyle = node.score >= 80 ? '#10b981' : node.score >= 60 ? '#f59e0b' : '#ef4444';
       ctx.fill();
 
@@ -328,27 +332,27 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
 
   return (
     <div
+      className="hm-card"
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        background: 'linear-gradient(180deg, #ffffff, #f8fafc)',
-        borderRadius: '20px',
-        border: '1px solid #e2e8f0',
-        padding: '20px 16px',
+        padding: '24px 20px',
         marginBottom: '20px',
-        boxShadow: '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        background: `radial-gradient(ellipse at 50% 35%, ${theme.glow.replace('0.35', '0.07')}, var(--surface) 72%)`,
+        border: '1px solid var(--surface-border)',
+        boxShadow: 'var(--shadow-card)'
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 12px', marginBottom: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 4px', marginBottom: '8px' }}>
         <div>
-          <span style={{ fontSize: '0.78em', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             TELEMETRY & ADHERENCE MATRIX
           </span>
-          <h3 style={{ margin: '2px 0 0', fontSize: '1.25em', color: '#0f172a' }}>
-            3D Adherence Health Index
+          <h3 style={{ margin: '3px 0 0', fontSize: '1.25rem', color: '#ffffff', fontWeight: '700' }}>
+            Biometric Adherence Core
           </h3>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -358,15 +362,15 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
               color: theme.badgeText,
               padding: '4px 12px',
               borderRadius: '999px',
-              fontWeight: '700',
-              fontSize: '0.82em',
+              fontWeight: '600',
+              fontSize: '0.8rem',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              border: `1px solid ${theme.glow}`
+              border: `1px solid ${theme.badgeBorder}`
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: `rgb(${theme.primary.join(',')})` }} />
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: `rgb(${theme.primary.join(',')})` }} />
             {theme.name}
           </span>
         </div>
@@ -379,12 +383,12 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
         />
       </div>
 
-      <div style={{ width: '100%', marginTop: '2px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', padding: '0 8px' }}>
-          <small style={{ color: '#64748b', fontWeight: '600' }}>7-Day Radial Timeline</small>
-          <small style={{ color: '#059669', fontWeight: '700' }}>🔥 {streak} Day Streak Active</small>
+      <div style={{ width: '100%', marginTop: '4px', borderTop: '1px solid var(--surface-border)', paddingTop: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: '600' }}>7-Day Radial Timeline</span>
+          <span style={{ color: 'var(--mint-bright)', fontSize: '0.78rem', fontWeight: '600' }} className="font-mono">{streak} Day Routine Streak</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
           {dayNodes.map((node) => {
             const isSelected = activeDayIdx === node.index;
             return (
@@ -396,20 +400,20 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
                   if (onSelectDay) onSelectDay(node);
                 }}
                 style={{
-                  background: isSelected ? theme.badgeBg : '#ffffff',
-                  border: isSelected ? `2px solid rgb(${theme.primary.join(',')})` : '1px solid #e2e8f0',
+                  background: isSelected ? 'var(--surface-elevated)' : 'var(--surface-dim)',
+                  border: isSelected ? `1px solid rgb(${theme.primary.join(',')})` : '1px solid var(--surface-border)',
                   borderRadius: '10px',
-                  padding: '8px 4px',
+                  padding: '9px 4px',
                   textAlign: 'center',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: isSelected ? `0 2px 8px ${theme.glow}` : 'none'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: isSelected ? `0 0 12px ${theme.glow}` : 'none'
                 }}
               >
-                <span style={{ display: 'block', fontSize: '0.72em', fontWeight: '700', color: isSelected ? theme.badgeText : '#64748b' }}>
+                <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', color: isSelected ? '#ffffff' : 'var(--text-muted)' }}>
                   {node.label}
                 </span>
-                <strong style={{ display: 'block', fontSize: '0.92em', color: '#0f172a', margin: '2px 0' }}>
+                <strong style={{ display: 'block', fontSize: '0.92rem', color: isSelected ? 'var(--cyan)' : '#ffffff', margin: '3px 0' }} className="font-mono">
                   {node.score}%
                 </strong>
                 <span
@@ -418,7 +422,7 @@ export function AdherenceHealthOrb({ score = 92, streak = 5, weeklyLogs = [], on
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    background: node.score >= 80 ? '#10b981' : node.score >= 60 ? '#f59e0b' : '#ef4444'
+                    background: node.score >= 80 ? 'var(--emerald)' : node.score >= 60 ? 'var(--amber)' : 'var(--coral)'
                   }}
                 />
               </button>

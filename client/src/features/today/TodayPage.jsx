@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dosesApi, guidanceApi, patientsApi, sosApi } from '../../api/index.js';
 import { DoseCelebration } from '../../components/ui/DoseCelebration.jsx';
-import { Empty } from '../../components/ui/Empty.jsx';
+import { AdherenceHealthOrb } from '../../components/ui/AdherenceHealthOrb.jsx';
 import { useFallDetector } from '../../hooks/useFallDetector.js';
 import { useVoiceCompanion } from '../../hooks/useSpeech.js';
 import { isToday } from '../../utils/format.js';
@@ -94,30 +94,31 @@ export function TodayPage() {
 
   const { today } = dashboard || { today: { total: 0, taken: 0 } };
   const adherenceScore = today?.total > 0 ? Math.round((today.taken / today.total) * 100) : 100;
-  const strokeDashOffset = 314.159 - (314.159 * adherenceScore) / 100;
+  const pendingDoses = Math.max(0, (today?.total || 0) - (today?.taken || 0));
   const complete = today.total > 0 && today.taken === today.total;
   const showInactivityBanner = dashboard?.inactivityCheck?.needsReassurance && !reassuranceSent;
 
   return (
-    <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* ── 1. Inactivity Safety Banner ── */}
       {showInactivityBanner && (
         <div
-          className="glass-matrix"
+          className="hm-card"
           style={{
-            borderLeft: '4px solid #f59e0b',
+            borderLeft: '4px solid var(--amber)',
             padding: '16px 20px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '16px'
+            gap: '16px',
+            flexWrap: 'wrap'
           }}
         >
           <div>
-            <strong style={{ display: 'block', fontSize: '1.05rem', color: '#f59e0b' }}>
+            <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--amber)', fontWeight: '600' }}>
               {t('areYouOkayTitle')}
             </strong>
-            <p style={{ margin: '4px 0 0', color: '#dfe2ef', fontSize: '0.9rem' }}>
+            <p style={{ margin: '3px 0 0', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
               {t('areYouOkayBody')}
             </p>
           </div>
@@ -127,25 +128,31 @@ export function TodayPage() {
         </div>
       )}
 
-      {/* ── 2. Biometric Diagnostic Score & Adherence Centerpiece ── */}
-      <section className="glass-matrix" style={{ padding: '24px 26px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+      {/* ── 2. 3D Biometric Adherence Core ── */}
+      <AdherenceHealthOrb
+        score={adherenceScore}
+        streak={dashboard?.streak || 1}
+        weeklyLogs={dashboard?.logs || []}
+      />
+
+      {/* ── 3. Daily Schedule Telemetry & Quick Actions ── */}
+      <section className="hm-card" style={{ padding: '20px 22px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <span
-              className="chip-telemetry chip-cyan"
-              style={{ fontSize: '0.72rem', letterSpacing: '0.12em', padding: '3px 8px' }}
-            >
-              Biometric Telemetry Diagnostic
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '6px' }}>
-              <h2 style={{ fontSize: '1.65rem', margin: 0 }}>Routine Adherence Index</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: '700' }}>
+                Daily Schedule Telemetry
+              </h3>
               <span
-                className="chip-telemetry chip-violet"
+                className={`chip-telemetry ${complete ? 'chip-mint' : 'chip-cyan'}`}
                 style={{ fontSize: '0.68rem', padding: '2px 8px' }}
               >
-                AI SYNTHESIS
+                {complete ? 'COMPLETE' : 'IN PROGRESS'}
               </span>
             </div>
+            <p style={{ margin: '3px 0 0', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+              {today.taken} of {today.total} doses recorded for today
+            </p>
           </div>
 
           <button
@@ -158,255 +165,106 @@ export function TodayPage() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '28px', alignItems: 'center' }}>
-          {/* Futuristic Radial Gauge SVG */}
-          <div style={{ position: 'relative', width: '150px', height: '150px', flexShrink: 0, margin: '0 auto' }}>
-            <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }} viewBox="0 0 120 120">
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="rgba(255, 255, 255, 0.08)"
-                strokeWidth="8"
-              />
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="url(#vitalisCyanVioletGrad)"
-                strokeDasharray="314.159"
-                strokeDashoffset={strokeDashOffset}
-                strokeLinecap="round"
-                strokeWidth="8"
-                style={{ transition: 'stroke-dashoffset 1s ease-out' }}
-              />
-              <defs>
-                <linearGradient id="vitalisCyanVioletGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00F2FE" />
-                  <stop offset="60%" stopColor="#4FACFE" />
-                  <stop offset="100%" stopColor="#8B5CF6" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center'
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'Plus Jakarta Sans, sans-serif',
-                  fontSize: '2.4rem',
-                  fontWeight: '800',
-                  color: '#00f2fe',
-                  lineHeight: '1'
-                }}
-              >
-                {adherenceScore}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'Inter, monospace',
-                  fontSize: '0.65rem',
-                  fontWeight: '700',
-                  color: complete ? '#6ffbbe' : '#8b5cf6',
-                  letterSpacing: '0.1em',
-                  marginTop: '4px'
-                }}
-              >
-                {complete ? 'OPTIMAL' : 'ACTIVE'}
-              </span>
-              <span style={{ fontSize: '0.62rem', color: '#849495', fontFamily: 'monospace' }}>
-                / 100 BASELINE
-              </span>
-            </div>
+        {/* Key Metrics Strip */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '10px'
+          }}
+        >
+          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Doses Taken
+            </span>
+            <strong style={{ fontSize: '1.2rem', color: '#ffffff' }} className="font-mono">
+              {today.taken} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ {today.total}</span>
+            </strong>
           </div>
 
-          {/* Metric Breakdown Chips Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div
-              style={{
-                background: 'rgba(10, 14, 23, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px',
-                padding: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#6ffbbe' }}>✓</span>
-                <span style={{ fontSize: '0.84rem', color: '#94a3b8' }}>{t('dosesTaken')}</span>
-              </div>
-              <strong style={{ fontSize: '1.2rem', color: '#ffffff' }}>
-                {today.taken} <span style={{ fontSize: '0.75rem', color: '#849495' }}>/ {today.total}</span>
-              </strong>
-            </div>
+          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Pending Doses
+            </span>
+            <strong style={{ fontSize: '1.2rem', color: pendingDoses === 0 ? 'var(--mint-bright)' : 'var(--cyan)' }} className="font-mono">
+              {pendingDoses}
+            </strong>
+          </div>
 
-            <div
-              style={{
-                background: 'rgba(10, 14, 23, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px',
-                padding: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#00f2fe' }}>⏳</span>
-                <span style={{ fontSize: '0.84rem', color: '#94a3b8' }}>{t('pending')}</span>
-              </div>
-              <strong style={{ fontSize: '1.2rem', color: '#00f2fe' }}>
-                {today.total - today.taken}
-              </strong>
-            </div>
+          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Active Streak
+            </span>
+            <strong style={{ fontSize: '1.2rem', color: '#ffffff' }} className="font-mono">
+              {dashboard.streak || 1} {t('dayStreak')}
+            </strong>
+          </div>
 
-            <div
-              style={{
-                background: 'rgba(10, 14, 23, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px',
-                padding: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#d0bcff' }}>🔥</span>
-                <span style={{ fontSize: '0.84rem', color: '#94a3b8' }}>Streak</span>
-              </div>
-              <strong style={{ fontSize: '1.2rem', color: '#d0bcff' }}>
-                {dashboard.streak || 1} {t('dayStreak')}
-              </strong>
-            </div>
-
-            <div
-              style={{
-                background: 'rgba(10, 14, 23, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px',
-                padding: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#6ffbbe' }}>🛡️</span>
-                <span style={{ fontSize: '0.84rem', color: '#94a3b8' }}>Regimen Safety</span>
-              </div>
-              <strong style={{ fontSize: '0.9rem', color: '#6ffbbe' }}>
-                VERIFIED
-              </strong>
-            </div>
+          <div style={{ background: 'var(--surface-dim)', border: '1px solid var(--surface-border)', borderRadius: '10px', padding: '12px 14px' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+              Regimen Safety
+            </span>
+            <strong style={{ fontSize: '0.92rem', color: 'var(--mint-bright)', fontWeight: '600' }}>
+              ✓ Verified Safe
+            </strong>
           </div>
         </div>
       </section>
 
-      {/* ── 3. VITA Neural Engine AI Insight Card (Vitalis AI) ── */}
+      {/* ── 3. Mitra AI Telehealth Clinical Assistant ── */}
       <section
+        className="hm-card"
         style={{
-          position: 'relative',
-          borderRadius: '20px',
-          padding: '22px 24px',
-          overflow: 'hidden',
-          border: '1px solid rgba(0, 242, 254, 0.35)',
-          background: 'linear-gradient(135deg, rgba(13, 21, 39, 0.95) 0%, rgba(16, 25, 50, 0.9) 50%, rgba(22, 18, 47, 0.95) 100%)',
-          boxShadow: '0 4px 30px rgba(0, 242, 254, 0.12)'
+          padding: '20px 22px',
+          borderLeft: '3px solid var(--cyan)'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', position: 'relative', zIndex: 1 }}>
-          {/* Glowing Multi-color AI Orb Avatar */}
-          <div style={{ position: 'relative', width: '52px', height: '52px', flexShrink: 0 }}>
-            <div
-              className="animate-orb"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #00f2fe, #8b5cf6, #6ffbbe)',
-                filter: 'blur(6px)',
-                opacity: 0.8
-              }}
-            />
-            <div
-              style={{
-                position: 'relative',
-                width: '46px',
-                height: '46px',
-                margin: '3px',
-                borderRadius: '50%',
-                background: '#080c15',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#00f2fe',
-                fontSize: '1.4rem'
-              }}
-            >
-              🧠
-            </div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '9px',
+              background: 'var(--cyan-subtle)',
+              border: '1px solid var(--cyan-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--cyan)',
+              fontSize: '1.2rem',
+              fontWeight: '700',
+              flexShrink: 0
+            }}
+          >
+            ✚
           </div>
 
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span
-                style={{
-                  fontFamily: 'Inter, monospace',
-                  fontSize: '0.72rem',
-                  fontWeight: '700',
-                  color: '#00f2fe',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em'
-                }}
-              >
-                VITA Neural Intelligence 4.2
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '600', color: '#ffffff' }}>
+                  {companion.active ? 'Mitra Voice Companion Active' : 'Mitra Telehealth Assistant'}
+                </h3>
+                <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                  CLINICAL AI
+                </span>
+              </div>
+              <span style={{ fontSize: '0.74rem', color: companion.active ? 'var(--mint-bright)' : 'var(--text-muted)' }}>
+                {companion.active ? '● Live Listening' : 'Ready'}
               </span>
-              <span style={{ fontSize: '0.68rem', color: '#849495', fontFamily: 'monospace' }}>LIVE</span>
             </div>
 
-            <h4 style={{ fontSize: '1.15rem', color: '#e0fdff', margin: '4px 0 6px' }}>
-              {companion.active ? 'Mitra Voice Companion Active' : 'Mitra AI Telehealth Reasoning'}
-            </h4>
-
-            <p style={{ margin: 0, fontSize: '0.88rem', color: '#b9cacb', lineHeight: '1.5' }}>
+            <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
               {companion.active
                 ? (companion.speaking ? t('mitraSpeaking') : companion.listening ? t('mitraListening') : companion.statusText)
-                : 'Active prescriptions calibrated. Ask clinical questions about food interactions, meal timings, or side effects.'}
+                : 'Prescriptions calibrated. Ask clinical questions regarding food interactions, timings, or symptom relief.'}
             </p>
 
-            {/* Metric Trend Chips */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-              <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
-                ↑ Adherence {adherenceScore}%
-              </span>
-              <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
-                ✓ Regimen Synchronized
-              </span>
-              <span className="chip-telemetry chip-violet" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
-                ⚡ DDI Safety Check Clean
-              </span>
-            </div>
-
-            {/* Dual Action Buttons */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="btn-cyber"
+                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
                 onClick={() => openModal({ kind: 'askMitra' })}
               >
                 <span>🧠</span>
@@ -416,11 +274,13 @@ export function TodayPage() {
               <button
                 type="button"
                 className="btn-glass"
-                onClick={companion.active ? companion.stop : companion.start}
                 style={{
-                  borderColor: companion.active ? '#ef4444' : undefined,
-                  color: companion.active ? '#ffb4ab' : undefined
+                  padding: '8px 16px',
+                  fontSize: '0.85rem',
+                  borderColor: companion.active ? 'var(--coral-border)' : undefined,
+                  color: companion.active ? '#fca5a5' : undefined
                 }}
+                onClick={companion.active ? companion.stop : companion.start}
               >
                 <span>🎙️</span>
                 <span>{companion.active ? t('stopVoiceDialog') : t('startVoiceDialog')}</span>
@@ -430,46 +290,45 @@ export function TodayPage() {
         </div>
       </section>
 
-      {/* ── 4. Acoustic Fall Monitor & Test Alarm Strip ── */}
+      {/* ── 4. Acoustic Impact Guard & Emergency Sensor ── */}
       <section
-        className="glass-matrix"
+        className="hm-card"
         style={{
-          padding: '16px 20px',
+          padding: '14px 18px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '16px',
+          gap: '14px',
           flexWrap: 'wrap'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div
             style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              background: fallDetector.active ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${fallDetector.active ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: fallDetector.active ? 'var(--emerald-subtle)' : 'rgba(255, 255, 255, 0.04)',
+              border: `1px solid ${fallDetector.active ? 'var(--emerald-border)' : 'rgba(255, 255, 255, 0.08)'}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: fallDetector.active ? '#6ffbbe' : '#94a3b8',
-              fontSize: '1.2rem'
+              color: fallDetector.active ? 'var(--mint-bright)' : 'var(--text-muted)',
+              fontSize: '1rem'
             }}
           >
             🛡️
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ fontSize: '0.95rem', color: '#ffffff' }}>Acoustic Impact Guard</strong>
+              <strong style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: '600' }}>Acoustic Impact Guard</strong>
               {fallDetector.active && (
                 <span
-                  className="animate-ping"
-                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#6ffbbe', display: 'inline-block' }}
+                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--emerald)', display: 'inline-block' }}
                 />
               )}
             </div>
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8', display: 'block' }}>
+            <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'block' }}>
               {fallDetector.active ? t('fallGuardActive') : t('fallGuardInactive')}
             </span>
           </div>
@@ -480,10 +339,10 @@ export function TodayPage() {
             <button
               type="button"
               className="btn-glass"
-              style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+              style={{ padding: '5px 10px', fontSize: '0.76rem' }}
               onClick={fallDetector.simulateFall}
             >
-              Test sensor
+              Test Sensor
             </button>
           )}
 
@@ -491,10 +350,10 @@ export function TodayPage() {
             type="button"
             className="btn-glass"
             style={{
-              padding: '6px 12px',
-              fontSize: '0.78rem',
-              borderColor: fallDetector.active ? '#ef4444' : undefined,
-              color: fallDetector.active ? '#ffb4ab' : undefined
+              padding: '5px 10px',
+              fontSize: '0.76rem',
+              borderColor: fallDetector.active ? 'var(--coral-border)' : undefined,
+              color: fallDetector.active ? '#fca5a5' : undefined
             }}
             onClick={fallDetector.active ? fallDetector.stopListening : fallDetector.startListening}
           >
@@ -504,7 +363,7 @@ export function TodayPage() {
           <button
             type="button"
             className="btn-glass"
-            style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+            style={{ padding: '5px 10px', fontSize: '0.76rem' }}
             onClick={testAlarm}
           >
             🔔 {t('testAlarmBtn')}
@@ -512,65 +371,57 @@ export function TodayPage() {
         </div>
       </section>
 
-      {/* Fall Distress Overlay */}
+      {/* Fall Distress Emergency Dialog */}
       {fallDetector.fallDetected && (
         <div
           role="alertdialog"
           aria-modal="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(8, 12, 21, 0.92)',
-            backdropFilter: 'blur(16px)',
-            zIndex: 10000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
+          className="overlay"
+          style={{ zIndex: 10000 }}
         >
           <div
-            className="glass-matrix"
+            className="hm-card"
             style={{
-              maxWidth: '480px',
+              maxWidth: '460px',
               width: '100%',
-              padding: '32px 26px',
-              border: '2px solid #ef4444',
+              padding: '28px 24px',
+              border: '2px solid var(--coral)',
               textAlign: 'center',
               boxShadow: '0 0 40px rgba(239, 68, 68, 0.3)'
             }}
           >
-            <h2 style={{ color: '#ffb4ab', margin: '0 0 10px', fontSize: '1.6rem' }}>
+            <h2 style={{ color: '#fca5a5', margin: '0 0 8px', fontSize: '1.4rem' }}>
               Potential Fall Detected
             </h2>
-            <p style={{ color: '#dfe2ef', fontSize: '0.95rem', margin: '0 0 20px', lineHeight: '1.5' }}>
-              The acoustic sensor registered a sharp impact spike. If unacknowledged, family caregivers and Lilavati emergency services will be escalated automatically.
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 18px', lineHeight: '1.5' }}>
+              The acoustic sensor registered a sharp impact spike. If unacknowledged, family caregivers and emergency services will be escalated automatically.
             </p>
 
             <div
+              className="font-mono"
               style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: '#ffb4ab',
-                background: 'rgba(239, 68, 68, 0.15)',
-                width: '84px',
-                height: '84px',
+                fontSize: '2.4rem',
+                fontWeight: '700',
+                color: '#fca5a5',
+                background: 'var(--coral-subtle)',
+                width: '76px',
+                height: '76px',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 24px',
-                border: '2px solid rgba(239, 68, 68, 0.4)'
+                margin: '0 auto 20px',
+                border: '2px solid var(--coral-border)'
               }}
             >
               {fallDetector.countdown}s
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 type="button"
                 className="btn-cyber"
-                style={{ padding: '14px', fontSize: '1.05rem' }}
+                style={{ padding: '12px', fontSize: '0.95rem' }}
                 onClick={fallDetector.dismiss}
               >
                 ✓ I am safe and well
@@ -592,44 +443,42 @@ export function TodayPage() {
         </div>
       )}
 
-      {/* ── 5. Chronological Health Timeline Spine (Prescription Schedule) ── */}
+      {/* ── 5. Chronological Schedule Spine ── */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#00f2fe', fontSize: '1.1rem' }}>⏱</span>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>
+            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff', fontWeight: '700' }}>
               {t('today')}
             </h3>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span
               className="chip-telemetry"
-              style={{ fontSize: '0.72rem', color: '#94a3b8' }}
+              style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-secondary)', fontSize: '0.72rem' }}
             >
-              {logs.length} DOSES LOGGED
+              {logs.length} scheduled
             </span>
-            <button
-              type="button"
-              className="btn-glass"
-              style={{
-                padding: '6px 12px',
-                fontSize: '0.8rem',
-                color: '#00f2fe',
-                borderColor: 'rgba(0, 242, 254, 0.3)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}
-              onClick={() => openModal({ kind: 'medicine' })}
-            >
-              <span>＋</span>
-              <span>{t('addMedicine')}</span>
-            </button>
           </div>
+
+          <button
+            type="button"
+            className="btn-glass"
+            style={{
+              padding: '6px 12px',
+              fontSize: '0.8rem',
+              color: 'var(--cyan)',
+              borderColor: 'var(--cyan-border)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            onClick={() => openModal({ kind: 'medicine' })}
+          >
+            <span>＋</span>
+            <span>{t('addMedicine')}</span>
+          </button>
         </div>
 
-        {/* Timeline List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {/* Timeline Dose Cards List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {logs.length ? (
             logs.map((log) => (
               <DoseCard
@@ -653,9 +502,9 @@ export function TodayPage() {
             ))
           ) : (
             <div
-              className="glass-matrix"
+              className="hm-card"
               style={{
-                padding: '36px 20px',
+                padding: '40px 20px',
                 textAlign: 'center',
                 display: 'flex',
                 flexDirection: 'column',
@@ -664,13 +513,18 @@ export function TodayPage() {
               }}
             >
               <span style={{ fontSize: '2rem' }}>💊</span>
-              <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.9rem' }}>
-                No medicines scheduled for today.
-              </p>
+              <div>
+                <strong style={{ display: 'block', fontSize: '1rem', color: '#ffffff', marginBottom: '4px' }}>
+                  No medications scheduled for today
+                </strong>
+                <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>
+                  Your prescription schedule is clear. Add medications to begin receiving automated alerts and telemetry.
+                </p>
+              </div>
               <button
                 type="button"
                 className="btn-cyber"
-                style={{ padding: '10px 18px', fontSize: '0.88rem' }}
+                style={{ padding: '8px 18px', fontSize: '0.85rem', marginTop: '4px' }}
                 onClick={() => openModal({ kind: 'medicine' })}
               >
                 <span>＋</span>
@@ -685,7 +539,7 @@ export function TodayPage() {
       {celebratingMed && (
         <DoseCelebration
           medicationName={celebratingMed}
-          patientName={dashboard.patient?.name || 'Meera'}
+          patientName={dashboard.patient?.name || 'Patient'}
           onClose={() => setCelebratingMed(null)}
         />
       )}

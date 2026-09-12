@@ -7,10 +7,10 @@ import { useSpeechInput } from '../../hooks/useSpeech.js';
 function cleanText(text) {
   if (!text) return '';
   return text
-    .replace(/^#{1,6}\s+/gm, '') // remove ###, ##
-    .replace(/^\s*[-*_]{3,}\s*$/gm, '') // remove ---, ***
-    .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1') // remove **bold** or *italic*
-    .replace(/^[|\s]+|[|\s]+$/gm, '') // remove table pipes
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^\s*[-*_]{3,}\s*$/gm, '')
+    .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+    .replace(/^[|\s]+|[|\s]+$/gm, '')
     .replace(/\|\s*/g, ' - ')
     .replace(/^[-\s]{4,}$/gm, '')
     .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
@@ -45,7 +45,7 @@ export function AskMitraModal({ onClose }) {
       const aiMsg = {
         role: 'mitra',
         text: cleanText(result?.answer || 'I could not generate an answer at this time.'),
-        source: 'Mitra AI',
+        source: 'Mitra Clinical AI',
         disclaimer: result?.disclaimer,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -54,7 +54,7 @@ export function AskMitraModal({ onClose }) {
     } catch (err) {
       const errorMsg = {
         role: 'mitra',
-        text: 'Sorry, I encountered a problem: ' + err.message,
+        text: 'I encountered an issue connecting to the clinical reasoning engine: ' + err.message,
         source: 'Mitra Support',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -90,58 +90,47 @@ export function AskMitraModal({ onClose }) {
     <div
       role="dialog"
       aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 8, 14, 0.90)',
-        backdropFilter: 'blur(24px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '16px'
-      }}
+      className="overlay"
     >
       <div
-        className="glass-matrix"
+        className="hm-card"
         style={{
-          maxWidth: '760px',
+          maxWidth: '740px',
           width: '100%',
-          padding: '28px',
-          border: '1px solid rgba(0, 242, 254, 0.35)',
-          boxShadow: '0 0 60px rgba(0, 242, 254, 0.15)',
+          padding: '24px 26px',
           display: 'flex',
           flexDirection: 'column',
-          height: '88vh',
-          maxHeight: '840px',
-          borderRadius: '24px'
+          height: '86vh',
+          maxHeight: '800px',
+          borderRadius: 'var(--radius-panel)'
         }}
       >
         {/* Top Header Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--surface-border)', paddingBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'rgba(0, 242, 254, 0.12)',
-                border: '1px solid rgba(0, 242, 254, 0.4)',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: 'var(--cyan-subtle)',
+                border: '1px solid var(--cyan-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#00f2fe',
-                fontSize: '1.2rem'
+                color: 'var(--cyan)',
+                fontSize: '1rem',
+                fontWeight: '700'
               }}
             >
-              🧠
+              ✚
             </div>
             <div>
-              <span style={{ fontSize: '0.92rem', fontWeight: '700', color: '#ffffff', letterSpacing: '0.02em' }}>
-                Mitra Health Assistant
+              <span style={{ fontSize: '0.94rem', fontWeight: '600', color: '#ffffff', letterSpacing: '-0.01em' }}>
+                Mitra Clinical Intelligence
               </span>
-              <span style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8' }}>
-                Clinical Health & Medication Intelligence
+              <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Prescription guidance, food interactions, and symptom analysis
               </span>
             </div>
           </div>
@@ -152,120 +141,113 @@ export function AskMitraModal({ onClose }) {
                 type="button"
                 onClick={handleResetChat}
                 className="btn-glass"
-                style={{ padding: '6px 12px', fontSize: '0.76rem', color: '#94a3b8', borderRadius: '10px' }}
+                style={{ padding: '5px 10px', fontSize: '0.76rem' }}
               >
-                ↺ New Question
+                ↺ Clear
               </button>
             )}
             <button
               type="button"
               onClick={onClose}
-              style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '50%',
-                width: '34px',
-                height: '34px',
-                cursor: 'pointer',
-                color: '#94a3b8',
-                fontSize: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className="btn-glass"
+              style={{ padding: '4px 10px', fontSize: '0.84rem' }}
+              aria-label="Close"
             >
               ✕
             </button>
           </div>
         </div>
 
-        {/* Center / Chat Screen */}
+        {/* Center Chat View */}
         <div
           style={{
             flex: 1,
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
+            gap: '14px',
             paddingRight: '6px',
-            marginBottom: '16px'
+            marginBottom: '14px'
           }}
         >
-          {/* Welcome Screen with BIG BOLD LETTER TITLE */}
+          {/* Welcome Screen */}
           {conversation.length === 0 && !loading && (
             <div
               style={{
                 margin: 'auto',
                 textAlign: 'center',
-                maxWidth: '540px',
+                maxWidth: '480px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '14px',
-                padding: '20px 0'
+                gap: '12px',
+                padding: '24px 0'
               }}
             >
-              {/* Glowing Orb */}
-              <div style={{ position: 'relative', width: '70px', height: '70px', marginBottom: '8px' }}>
-                <div
-                  className="animate-orb"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #00f2fe, #8b5cf6)',
-                    filter: 'blur(10px)',
-                    opacity: 0.8
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '64px',
-                    height: '64px',
-                    margin: '3px',
-                    borderRadius: '50%',
-                    background: '#080c15',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#00f2fe',
-                    fontSize: '2rem',
-                    border: '1px solid rgba(0, 242, 254, 0.5)'
-                  }}
-                >
-                  ✚
-                </div>
+              <div
+                style={{
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '12px',
+                  background: 'var(--cyan-subtle)',
+                  border: '1px solid var(--cyan-border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--cyan)',
+                  fontSize: '1.6rem',
+                  fontWeight: '700'
+                }}
+              >
+                ✚
               </div>
 
-              {/* Big Bold Headline */}
-              <h1
+              <h2
                 style={{
-                  fontSize: '2.5rem',
-                  fontWeight: '800',
+                  fontSize: '1.8rem',
+                  fontWeight: '700',
                   color: '#ffffff',
                   margin: 0,
-                  letterSpacing: '-0.02em',
-                  lineHeight: '1.15'
+                  letterSpacing: '-0.025em'
                 }}
               >
                 How can Mitra help you?
-              </h1>
+              </h2>
 
-              {/* Gentle Subtitle */}
-              <p style={{ margin: 0, fontSize: '0.98rem', color: '#94a3b8', lineHeight: '1.6' }}>
-                Ask anything about your medicines, dosage timing, food safety, or symptoms.
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Ask any clinical question regarding your prescription timings, food interactions, dietary safety, or mild symptom relief.
               </p>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginTop: '10px' }}>
+                {['Can I take Metformin with milk?', 'What should I do if I miss my dose?', 'Are there side effects for Amlodipine?'].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => handleAsk(suggestion)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '8px',
+                      padding: '6px 10px',
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.78rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    "{suggestion}"
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Chat Messages */}
+          {/* Messages */}
           {conversation.map((msg, i) => (
             <div
               key={i}
               style={{
                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: msg.role === 'user' ? '78%' : '94%',
+                maxWidth: msg.role === 'user' ? '80%' : '96%',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px'
@@ -273,38 +255,37 @@ export function AskMitraModal({ onClose }) {
             >
               <div
                 style={{
-                  background: msg.role === 'user'
-                    ? 'linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(139, 92, 246, 0.25))'
-                    : 'rgba(12, 17, 29, 0.95)',
+                  background: msg.role === 'user' ? '#172033' : '#0B0F19',
                   border: msg.role === 'user'
-                    ? '1px solid rgba(0, 242, 254, 0.45)'
-                    : '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                  padding: '16px 20px',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                    ? '1px solid var(--surface-border-strong)'
+                    : '1px solid var(--surface-border)',
+                  borderLeft: msg.role === 'mitra' ? '3px solid var(--cyan)' : undefined,
+                  borderRadius: msg.role === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                  padding: '14px 18px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
                 }}
               >
                 {msg.role === 'mitra' && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.74rem', color: '#00f2fe', background: 'rgba(0, 242, 254, 0.12)', padding: '3px 10px', borderRadius: '8px', fontWeight: '600' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 8px' }}>
                       ✚ Mitra
                     </span>
                     <button
                       type="button"
                       className="btn-glass"
                       onClick={() => speakAnswer(msg.text)}
-                      style={{ padding: '3px 10px', fontSize: '0.74rem', color: '#94a3b8', borderRadius: '8px' }}
+                      style={{ padding: '2px 8px', fontSize: '0.72rem' }}
                       title="Listen aloud"
                     >
-                      🔊 Listen
+                      🔊 Speak
                     </button>
                   </div>
                 )}
 
                 <div
                   style={{
-                    color: '#ffffff',
-                    fontSize: '0.95rem',
+                    color: '#f8fafc',
+                    fontSize: '0.92rem',
                     lineHeight: '1.7',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word'
@@ -314,13 +295,13 @@ export function AskMitraModal({ onClose }) {
                 </div>
 
                 {msg.disclaimer && (
-                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginTop: '12px', paddingTop: '8px', fontSize: '0.74rem', color: '#94a3b8' }}>
-                    ℹ️ {msg.disclaimer}
+                  <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginTop: '10px', paddingTop: '8px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                    ℹ {msg.disclaimer}
                   </div>
                 )}
               </div>
 
-              <span style={{ fontSize: '0.7rem', color: '#64748b', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
+              <span className="font-mono" style={{ fontSize: '0.68rem', color: 'var(--text-muted)', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
                 {msg.time}
               </span>
             </div>
@@ -330,19 +311,18 @@ export function AskMitraModal({ onClose }) {
             <div
               style={{
                 alignSelf: 'flex-start',
-                background: 'rgba(12, 17, 29, 0.95)',
-                border: '1px solid rgba(0, 242, 254, 0.3)',
-                borderRadius: '18px 18px 18px 4px',
-                padding: '14px 20px',
+                background: '#0B0F19',
+                border: '1px solid var(--cyan-border)',
+                borderRadius: '12px 12px 12px 2px',
+                padding: '12px 16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                color: '#00f2fe',
-                fontSize: '0.9rem'
+                gap: '10px',
+                color: 'var(--cyan)',
+                fontSize: '0.86rem'
               }}
             >
-              <span style={{ display: 'inline-block', animation: 'spin 1s infinite linear' }}>⚙️</span>
-              Thinking and preparing clinical guidance…
+              <span>● Preparing clinical guidance…</span>
             </div>
           )}
 
@@ -350,31 +330,27 @@ export function AskMitraModal({ onClose }) {
         </div>
 
         {/* Input Bar */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <input
             ref={inputRef}
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAsk(); }}
-            placeholder={i18n.language === 'hi' ? 'अपनी समस्या या दवा के बारे में पूछें…' : 'Type your health or medicine question…'}
+            placeholder={i18n.language === 'hi' ? 'अपनी समस्या या दवा के बारे में पूछें…' : 'Type your medicine, interaction, or symptom query…'}
             style={{
               flex: 1,
-              padding: '14px 18px',
-              fontSize: '0.95rem',
-              background: 'rgba(8, 12, 21, 0.85)',
-              border: '1px solid rgba(255, 255, 255, 0.16)',
-              borderRadius: '14px',
-              color: '#ffffff',
-              outline: 'none'
+              padding: '12px 16px',
+              fontSize: '0.9rem',
+              borderRadius: 'var(--radius-item)'
             }}
           />
           <button
             type="button"
             onClick={handleVoiceInput}
-            title="Speak your question"
+            title="Speak query"
             className="btn-glass"
-            style={{ padding: '0 16px', fontSize: '1.25rem', borderRadius: '14px' }}
+            style={{ padding: '0 14px', fontSize: '1.1rem' }}
           >
             🎙️
           </button>
@@ -383,9 +359,9 @@ export function AskMitraModal({ onClose }) {
             className="btn-cyber"
             disabled={loading || !question.trim()}
             onClick={() => handleAsk()}
-            style={{ padding: '0 24px', borderRadius: '14px', fontWeight: '600', fontSize: '0.95rem' }}
+            style={{ padding: '0 20px', fontSize: '0.9rem' }}
           >
-            {loading ? '…' : 'Ask'}
+            {loading ? '…' : 'Send'}
           </button>
         </div>
       </div>

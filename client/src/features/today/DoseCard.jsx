@@ -9,29 +9,45 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
   const isMissed = log.status === 'missed';
   const isSkipped = log.status === 'skipped';
 
+  const cardBorderColor = isTaken
+    ? 'var(--emerald-border)'
+    : isMissed
+    ? 'var(--coral-border)'
+    : isPending
+    ? 'rgba(255, 255, 255, 0.1)'
+    : 'var(--surface-border)';
+
+  const cardBg = isTaken
+    ? 'rgba(16, 185, 129, 0.04)'
+    : isMissed
+    ? 'rgba(239, 68, 68, 0.04)'
+    : 'var(--surface)';
+
   return (
     <article
-      className={`glass-matrix glass-matrix-hover ${isTaken ? 'glass-matrix-active' : ''}`}
+      className="hm-card"
       style={{
-        padding: '20px 22px',
-        marginBottom: '16px',
+        padding: '18px 20px',
+        backgroundColor: cardBg,
+        borderColor: cardBorderColor,
         display: 'flex',
         flexDirection: 'column',
-        gap: '14px',
-        position: 'relative'
+        gap: '12px',
+        position: 'relative',
+        transition: 'all 0.2s ease'
       }}
     >
-      {/* Header: Time, Color Dot, Name & Status */}
+      {/* Header: Time, Pill Dot, Medicine Name & Status */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-          {/* Glowing pill color dot */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          {/* Solid Color Pill Dot */}
           <div
             style={{
-              width: '16px',
-              height: '16px',
+              width: '12px',
+              height: '12px',
               borderRadius: '50%',
-              background: medication?.color || '#00f2fe',
-              boxShadow: `0 0 10px ${medication?.color || '#00f2fe'}`,
+              background: medication?.color || 'var(--cyan)',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
               marginTop: '4px',
               flexShrink: 0
             }}
@@ -40,30 +56,28 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
+                className="font-mono"
                 style={{
-                  fontFamily: 'Inter, monospace',
-                  fontSize: '0.8rem',
-                  fontWeight: '700',
-                  color: '#00f2fe',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
+                  fontSize: '0.82rem',
+                  fontWeight: '600',
+                  color: isTaken ? 'var(--mint-bright)' : 'var(--cyan)',
+                  letterSpacing: '0.02em'
                 }}
               >
                 {formatTime(log.scheduledTime, i18n.language)}
               </span>
-              <span style={{ color: '#849495', fontSize: '0.75rem' }}>•</span>
-              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                {medication?.dosage || 'Prescription'}
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>•</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                {medication?.dosage || 'Prescription dose'}
               </span>
             </div>
 
             <h3
               style={{
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontSize: '1.35rem',
-                fontWeight: '700',
+                fontSize: '1.2rem',
+                fontWeight: '600',
                 color: '#ffffff',
-                margin: '2px 0 2px'
+                margin: '3px 0 2px'
               }}
             >
               {medication?.name || t('medication')}
@@ -76,10 +90,10 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
           <span
             className={`chip-telemetry ${isTaken ? 'chip-mint' : isMissed ? 'chip-error' : 'chip-telemetry'}`}
             style={{
-              fontSize: '0.78rem',
-              padding: '4px 12px',
+              fontSize: '0.74rem',
+              padding: '3px 10px',
               background: isSkipped ? 'rgba(255,255,255,0.05)' : undefined,
-              color: isSkipped ? '#94a3b8' : undefined,
+              color: isSkipped ? 'var(--text-muted)' : undefined,
               border: isSkipped ? '1px solid rgba(255,255,255,0.1)' : undefined
             }}
           >
@@ -90,33 +104,33 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
         )}
       </div>
 
-      {/* Safety guideline notes in dark glass accent callout */}
+      {/* Safety guideline notes */}
       {medication?.safety && (
         <div
           style={{
-            background: 'rgba(0, 242, 254, 0.05)',
-            borderLeft: '3px solid #00f2fe',
-            padding: '8px 12px',
+            background: 'rgba(0, 210, 211, 0.05)',
+            borderLeft: '3px solid var(--cyan)',
+            padding: '7px 12px',
             borderRadius: '0 8px 8px 0',
-            fontSize: '0.84rem',
-            color: '#b9cacb',
+            fontSize: '0.82rem',
+            color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}
         >
-          <span style={{ color: '#00f2fe' }}>ℹ</span>
+          <span style={{ color: 'var(--cyan)', fontSize: '0.9rem' }}>ℹ</span>
           <span>{medication.safety.instruction}</span>
         </div>
       )}
 
       {/* Action Strip for Pending Dose */}
       {isPending && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '4px' }}>
           <button
             type="button"
             className="btn-cyber"
-            style={{ width: '100%', padding: '14px', fontSize: '1.05rem' }}
+            style={{ width: '100%', padding: '12px', fontSize: '0.98rem' }}
             onClick={() => onConfirm(log, 'taken')}
           >
             <span>✓</span>
@@ -128,7 +142,7 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
               <button
                 type="button"
                 className="btn-glass"
-                style={{ padding: '8px 12px', fontSize: '0.82rem' }}
+                style={{ padding: '7px 10px', fontSize: '0.8rem' }}
                 onClick={() => onVerifyPill(log, medication)}
               >
                 <span>📷</span>
@@ -139,7 +153,7 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
             <button
               type="button"
               className="btn-glass"
-              style={{ padding: '8px 12px', fontSize: '0.82rem' }}
+              style={{ padding: '7px 10px', fontSize: '0.8rem' }}
               onClick={() => onSpeak(log)}
             >
               <span>🎙️</span>
@@ -150,10 +164,9 @@ export function DoseCard({ log, medication, onConfirm, onSpeak, onVerifyPill }) 
               type="button"
               className="btn-glass"
               style={{
-                padding: '8px 12px',
-                fontSize: '0.82rem',
-                color: '#94a3b8',
-                borderColor: 'rgba(255, 255, 255, 0.06)'
+                padding: '7px 10px',
+                fontSize: '0.8rem',
+                color: 'var(--text-muted)'
               }}
               onClick={() => onConfirm(log, 'skipped')}
             >

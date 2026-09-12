@@ -19,18 +19,18 @@ export function DashboardPage() {
   };
   const safety = dashboard?.safety || { interactions: [], polypharmacyWarning: { flag: false } };
 
-  const riskColor = risk.level === 'high' ? '#ffb4ab' : risk.level === 'moderate' ? '#f59e0b' : '#6ffbbe';
+  const riskColor = risk.level === 'high' ? 'var(--coral)' : risk.level === 'moderate' ? 'var(--amber)' : 'var(--mint-bright)';
   const riskLabel = risk.level === 'high' ? t('riskHigh') : risk.level === 'moderate' ? t('riskModerate') : t('riskLow');
 
   const activePatient = dashboard?.patient || { name: 'Meera Shah' };
 
   return (
-    <div style={{ maxWidth: '1240px', margin: '0 auto', paddingBottom: '80px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* ── 1. Vitalis Header & Active Patient Banner ── */}
+    <div style={{ maxWidth: '1180px', margin: '0 auto', paddingBottom: '80px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* ── 1. Active Patient Clinical Header ── */}
       <section
-        className="glass-matrix"
+        className="hm-card"
         style={{
-          padding: '24px 28px',
+          padding: '22px 26px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -38,70 +38,53 @@ export function DashboardPage() {
           gap: '16px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-          {/* Avatar with Neon Gradient Ring */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div
             style={{
-              width: '58px',
-              height: '58px',
+              width: '50px',
+              height: '50px',
               borderRadius: '50%',
-              padding: '2px',
-              background: 'linear-gradient(135deg, #00f2fe 0%, #8b5cf6 100%)',
-              boxShadow: '0 0 16px rgba(0, 242, 254, 0.35)',
+              background: '#151d2f',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              color: 'var(--cyan)',
+              fontWeight: '700',
+              fontSize: '1.2rem',
               flexShrink: 0
             }}
           >
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                background: '#0a0e17',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#00f2fe',
-                fontWeight: '800',
-                fontSize: '1.4rem'
-              }}
-            >
-              {activePatient.name[0]}
-            </div>
+            {activePatient.name[0]}
           </div>
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: '#ffffff' }}>
+              <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '700', color: '#ffffff' }}>
                 {activePatient.name}
               </h2>
               <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-                <span
-                  className="animate-ping"
-                  style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#6ffbbe', display: 'inline-block' }}
-                />
-                AI Telemetry Synchronized
+                Telemetry Active
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '0.82rem', color: '#94a3b8', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '4px', fontSize: '0.8rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
               <span>Age: <strong style={{ color: '#ffffff' }}>68</strong></span>
               <span>•</span>
-              <span>Blood Group: <strong style={{ color: '#ffb4ab' }}>O+</strong></span>
+              <span>Blood Group: <strong style={{ color: 'var(--cyan)' }}>O+</strong></span>
               <span>•</span>
               <span>Hospital: <strong style={{ color: '#ffffff' }}>Lilavati, Mumbai</strong></span>
               <span>•</span>
-              <span>Doctor: <strong style={{ color: '#00f2fe' }}>Dr. R. Nair</strong></span>
+              <span>Doctor: <strong style={{ color: 'var(--cyan)' }}>Dr. R. Nair</strong></span>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
             type="button"
             className="btn-cyber"
+            style={{ padding: '9px 16px', fontSize: '0.85rem' }}
             onClick={() => openModal({ kind: 'medicine' })}
           >
             <span>+</span>
@@ -111,6 +94,7 @@ export function DashboardPage() {
           <button
             type="button"
             className="btn-glass"
+            style={{ padding: '9px 16px', fontSize: '0.85rem' }}
             onClick={() => openModal({ kind: 'askMitra' })}
           >
             <span>🧠</span>
@@ -126,7 +110,7 @@ export function DashboardPage() {
             <button
               key={item.patient.id}
               onClick={() => selectPatient(item.patient.id)}
-              className={`glass-matrix ${item.patient.id === selectedPatientId ? 'glass-matrix-active' : ''}`}
+              className={`hm-card ${item.patient.id === selectedPatientId ? 'glass-matrix-active' : ''}`}
               style={{
                 padding: '10px 16px',
                 display: 'flex',
@@ -134,30 +118,31 @@ export function DashboardPage() {
                 gap: '10px',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                border: item.patient.id === selectedPatientId ? '1px solid #00f2fe' : undefined
+                background: item.patient.id === selectedPatientId ? 'var(--cyan-subtle)' : 'var(--surface)',
+                borderColor: item.patient.id === selectedPatientId ? 'var(--cyan-border)' : 'var(--surface-border)'
               }}
             >
               <span
                 style={{
-                  width: '28px',
-                  height: '28px',
+                  width: '26px',
+                  height: '26px',
                   borderRadius: '50%',
-                  background: '#00f2fe',
-                  color: '#090d16',
+                  background: 'var(--cyan)',
+                  color: '#05080f',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: '800',
-                  fontSize: '0.85rem'
+                  fontWeight: '700',
+                  fontSize: '0.8rem'
                 }}
               >
                 {item.patient.name[0]}
               </span>
               <div style={{ textAlign: 'left' }}>
-                <strong style={{ display: 'block', fontSize: '0.86rem', color: '#ffffff' }}>
+                <strong style={{ display: 'block', fontSize: '0.84rem', color: '#ffffff' }}>
                   {item.patient.name}
                 </strong>
-                <small style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                <small style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>
                   {item.today.score}% Adherence
                 </small>
               </div>
@@ -166,150 +151,146 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* ── 2. Vitalis 4-Column Live Telemetry Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+      {/* ── 2. 4-Column Metric Overview ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
         {/* Metric 1: Overall Adherence Score */}
-        <div className="glass-matrix glass-matrix-hover" style={{ padding: '20px' }}>
+        <div className="hm-card" style={{ padding: '18px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Adherence Index
             </span>
-            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-              +4% vs Baseline
+            <span className="chip-telemetry chip-mint" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
+              Stable
             </span>
           </div>
-          <div style={{ margin: '10px 0 6px' }}>
-            <strong style={{ fontSize: '2.4rem', fontWeight: '800', color: '#00f2fe', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <div style={{ margin: '8px 0 6px' }}>
+            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: 'var(--cyan)' }} className="font-mono">
               {dashboard.today.score}%
             </strong>
           </div>
-          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${dashboard.today.score}%`,
                 height: '100%',
-                background: 'linear-gradient(90deg, #00f2fe, #10b981)',
-                borderRadius: '999px',
-                boxShadow: '0 0 10px rgba(0, 242, 254, 0.4)'
+                background: 'var(--cyan)',
+                borderRadius: '999px'
               }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: '#849495', fontSize: '0.78rem' }}>
+          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
             Optimal adherence threshold maintained
           </small>
         </div>
 
         {/* Metric 2: Today's Doses Recorded */}
-        <div className="glass-matrix glass-matrix-hover" style={{ padding: '20px' }}>
+        <div className="hm-card" style={{ padding: '18px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Today's Doses
             </span>
-            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-              {dashboard.today.taken} of {dashboard.today.total} Completed
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
+              {dashboard.today.taken} of {dashboard.today.total}
             </span>
           </div>
-          <div style={{ margin: '10px 0 6px' }}>
-            <strong style={{ fontSize: '2.4rem', fontWeight: '800', color: '#ffffff', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <div style={{ margin: '8px 0 6px' }}>
+            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: '#ffffff' }} className="font-mono">
               {dashboard.today.taken}
-              <span style={{ fontSize: '1.4rem', color: '#849495', fontWeight: '500' }}>/{dashboard.today.total}</span>
+              <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)', fontWeight: '400' }}>/{dashboard.today.total}</span>
             </strong>
           </div>
-          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${dashboard.today.total > 0 ? (dashboard.today.taken / dashboard.today.total) * 100 : 0}%`,
                 height: '100%',
-                background: '#00f2fe',
-                borderRadius: '999px',
-                boxShadow: '0 0 10px rgba(0, 242, 254, 0.4)'
+                background: 'var(--mint-bright)',
+                borderRadius: '999px'
               }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: '#849495', fontSize: '0.78rem' }}>
-            {dashboard.today.missed ? `${dashboard.today.missed} dose needs family review` : 'All morning doses confirmed'}
+          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+            {dashboard.today.missed ? `${dashboard.today.missed} dose needs review` : 'All scheduled doses verified'}
           </small>
         </div>
 
-        {/* Metric 3: Clinical Risk Telemetry */}
-        <div className="glass-matrix glass-matrix-hover" style={{ padding: '20px' }}>
+        {/* Metric 3: Clinical Risk Assessment */}
+        <div className="hm-card" style={{ padding: '18px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Clinical Risk Telemetry
+            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Clinical Risk Level
             </span>
             <span
               style={{
-                width: '10px',
-                height: '10px',
+                width: '8px',
+                height: '8px',
                 borderRadius: '50%',
-                background: riskColor,
-                boxShadow: `0 0 8px ${riskColor}`
+                background: riskColor
               }}
             />
           </div>
-          <div style={{ margin: '10px 0 6px' }}>
-            <strong style={{ fontSize: '2.1rem', fontWeight: '800', color: riskColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <div style={{ margin: '8px 0 6px' }}>
+            <strong style={{ fontSize: '1.8rem', fontWeight: '700', color: riskColor }}>
               {riskLabel}
             </strong>
           </div>
-          <div style={{ fontSize: '0.84rem', color: '#dfe2ef', marginTop: '4px' }}>
-            Consistency: <strong style={{ color: '#00f2fe' }}>{risk.timingConsistency}</strong>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            Consistency: <strong style={{ color: '#ffffff' }}>{risk.timingConsistency}</strong>
           </div>
-          <small style={{ display: 'block', marginTop: '4px', color: '#849495', fontSize: '0.78rem' }}>
+          <small style={{ display: 'block', marginTop: '4px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
             Avg response delay: ~{risk.avgDelayMinutes} min
           </small>
         </div>
 
         {/* Metric 4: Adherence Streak */}
-        <div className="glass-matrix glass-matrix-hover" style={{ padding: '20px' }}>
+        <div className="hm-card" style={{ padding: '18px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Routine Streak
             </span>
-            <span className="chip-telemetry chip-violet" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-              Goal on track
+            <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 7px' }}>
+              Active
             </span>
           </div>
-          <div style={{ margin: '10px 0 6px' }}>
-            <strong style={{ fontSize: '2.4rem', fontWeight: '800', color: '#d0bcff', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <div style={{ margin: '8px 0 6px' }}>
+            <strong style={{ fontSize: '2.2rem', fontWeight: '700', color: '#ffffff' }} className="font-mono">
               {dashboard.streak} Days
             </strong>
           </div>
-          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${Math.min(100, dashboard.streak * 14)}%`,
                 height: '100%',
-                background: '#8b5cf6',
-                borderRadius: '999px',
-                boxShadow: '0 0 10px rgba(139, 92, 246, 0.4)'
+                background: 'var(--cyan)',
+                borderRadius: '999px'
               }}
             />
           </div>
-          <small style={{ display: 'block', marginTop: '8px', color: '#849495', fontSize: '0.78rem' }}>
-            Consistent timing reinforced daily
+          <small style={{ display: 'block', marginTop: '8px', color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+            Consistent medication timing daily
           </small>
         </div>
       </div>
 
-      {/* ── 3. 3D Adherence Health Orb Centerpiece ── */}
+      {/* ── 3. Adherence Centerpiece ── */}
       <AdherenceHealthOrb
         score={dashboard.today.score}
         streak={dashboard.streak}
         weeklyLogs={dashboard.logs}
       />
 
-      {/* ── 4. Clinical Drug Interactions & Polypharmacy Matrix ── */}
-      <section className="glass-matrix" style={{ padding: '22px 26px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+      {/* ── 4. Clinical Safety & Polypharmacy Matrix ── */}
+      <section className="hm-card" style={{ padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff', fontWeight: '700' }}>
-              Clinical Safety & Polypharmacy Matrix
+            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+              Clinical Safety & Cross-Interaction
             </h3>
-            <small style={{ color: '#94a3b8' }}>Real-time cross-interaction analysis for multi-drug regimen</small>
+            <small style={{ color: 'var(--text-muted)' }}>Automated contraindication analysis for multi-drug regimen</small>
           </div>
-          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.75rem', padding: '4px 12px' }}>
-            ✓ Safety Verified
+          <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem', padding: '3px 10px' }}>
+            ✓ Verified Safe
           </span>
         </div>
 
@@ -319,12 +300,12 @@ export function DashboardPage() {
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  borderLeft: '4px solid #ef4444',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  fontSize: '0.88rem',
-                  color: '#ffb4ab'
+                  background: 'var(--coral-subtle)',
+                  borderLeft: '3px solid var(--coral)',
+                  padding: '10px 14px',
+                  borderRadius: '6px',
+                  fontSize: '0.84rem',
+                  color: '#fca5a5'
                 }}
               >
                 <strong style={{ color: '#ffffff' }}>{inter.title}: </strong>
@@ -335,48 +316,48 @@ export function DashboardPage() {
         ) : (
           <div
             style={{
-              color: '#6ffbbe',
-              fontSize: '0.88rem',
+              color: 'var(--mint-bright)',
+              fontSize: '0.85rem',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              background: 'rgba(16, 185, 129, 0.1)',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              border: '1px solid rgba(16, 185, 129, 0.25)'
+              background: 'var(--emerald-subtle)',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              border: '1px solid var(--emerald-border)'
             }}
           >
-            <span style={{ fontSize: '1.2rem' }}>✓</span>
-            <span>No high-risk drug-drug contraindications found in current prescriptions.</span>
+            <span style={{ fontSize: '1rem' }}>✓</span>
+            <span>No high-risk drug-drug contraindications found across current active prescriptions.</span>
           </div>
         )}
       </section>
 
       {/* ── 5. 7-Day Adherence Chart ── */}
-      <section className="glass-matrix" style={{ padding: '22px 26px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <section className="hm-card" style={{ padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff', fontWeight: '700' }}>
-              Weekly Adherence Overview
+            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+              Weekly Adherence History
             </h3>
-            <small style={{ color: '#94a3b8' }}>Detailed breakdown of dose confirmations over the last 7 days</small>
+            <small style={{ color: 'var(--text-muted)' }}>7-day retrospective timeline of scheduled vs confirmed doses</small>
           </div>
         </div>
         <AdherenceChart logs={dashboard.logs} />
       </section>
 
-      {/* ── 6. Today's Live Medication Tracker ── */}
-      <section className="glass-matrix" style={{ padding: '22px 26px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      {/* ── 6. Today's Live Schedule Tracker ── */}
+      <section className="hm-card" style={{ padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff', fontWeight: '700' }}>
-              Today's Live Medication Schedule
+            <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: '600' }}>
+              Today's Live Medication Log
             </h3>
-            <small style={{ color: '#94a3b8' }}>Real-time telemetry and responses for today's routine</small>
+            <small style={{ color: 'var(--text-muted)' }}>Real-time telemetry and responses for today's routine</small>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {dashboard.logs.filter((log) => isToday(log.scheduledTime)).map((log) => {
             const medication = dashboard.medications.find((item) => item.id === log.medicationId);
             const isTaken = log.status === 'taken';
@@ -388,51 +369,48 @@ export function DashboardPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '14px 18px',
-                  background: 'rgba(10, 14, 23, 0.65)',
-                  border: isTaken ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '12px'
+                  padding: '12px 16px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: isTaken ? '1px solid var(--emerald-border)' : '1px solid var(--surface-border)',
+                  borderRadius: '10px'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span
                     style={{
-                      width: '12px',
-                      height: '12px',
+                      width: '10px',
+                      height: '10px',
                       borderRadius: '50%',
-                      background: medication?.color || '#00f2fe',
-                      boxShadow: `0 0 8px ${medication?.color || '#00f2fe'}`
+                      background: medication?.color || 'var(--cyan)'
                     }}
                   />
                   <div>
-                    <strong style={{ fontSize: '0.98rem', color: '#ffffff', display: 'block' }}>
+                    <strong style={{ fontSize: '0.94rem', color: '#ffffff', display: 'block', fontWeight: '600' }}>
                       {medication?.name}
                     </strong>
-                    <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                       {medication?.dosage}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span
+                    className="font-mono"
                     style={{
-                      fontFamily: 'Inter, monospace',
-                      fontSize: '0.84rem',
-                      fontWeight: '700',
-                      color: '#00f2fe',
-                      background: 'rgba(0, 242, 254, 0.1)',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(0, 242, 254, 0.25)'
+                      fontSize: '0.82rem',
+                      color: 'var(--cyan)',
+                      background: 'var(--cyan-subtle)',
+                      padding: '3px 8px',
+                      borderRadius: '6px'
                     }}
                   >
                     {formatTime(log.scheduledTime, i18n.language)}
                   </span>
 
                   <span
-                    className={`chip-telemetry ${isTaken ? 'chip-mint' : 'chip-violet'}`}
-                    style={{ fontSize: '0.78rem', padding: '4px 12px' }}
+                    className={`chip-telemetry ${isTaken ? 'chip-mint' : 'chip-cyan'}`}
+                    style={{ fontSize: '0.74rem', padding: '3px 10px' }}
                   >
                     {isTaken ? 'Taken ✓' : 'Pending'}
                   </span>
