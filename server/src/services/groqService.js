@@ -339,7 +339,7 @@ async function callGeminiVision({ apiKey, image, question, systemPrompt, languag
         const candidateText = json.candidates?.[0]?.content?.parts?.[0]?.text;
         if (candidateText && candidateText.trim().length > 10) {
           return {
-            source: `Mitra Gemini Vision (${model})`,
+            source: 'Mitra Vision AI',
             answer: candidateText.trim()
           };
         }
@@ -403,7 +403,7 @@ async function callOpenRouterVision({ apiKey, image, question, systemPrompt, lan
         const content = json.choices?.[0]?.message?.content;
         if (content && content.trim().length > 10) {
           return {
-            source: `Mitra OpenRouter Vision (${model})`,
+            source: 'Mitra Vision AI',
             answer: content.trim()
           };
         }
@@ -529,7 +529,7 @@ CRITICAL FORMATTING RULES:
             const text = json.choices?.[0]?.message?.content;
             if (text) {
               rawAnswer = text;
-              sourceTag = image ? 'Mitra OCR+Groq AI' : 'Mitra AI';
+              sourceTag = image ? 'Mitra Vision AI' : 'Mitra AI';
               break;
             }
           }
@@ -583,7 +583,7 @@ CRITICAL FORMATTING RULES:
   }
 
   return {
-    source: image ? 'clinical-vision-engine' : 'clinical-rules-engine',
+    source: image ? 'Mitra Vision AI' : 'Mitra AI',
     question,
     answer: answerText,
     hasImage: Boolean(image),

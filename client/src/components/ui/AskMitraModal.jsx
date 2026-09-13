@@ -113,7 +113,9 @@ export function AskMitraModal({ onClose }) {
       const aiMsg = {
         role: 'mitra',
         text: cleanText(result?.answer || 'I could not generate an answer at this time.'),
-        source: isVision ? (result?.source || 'Mitra Gemini Vision') : (result?.source || 'Mitra Clinical AI'),
+        source: isVision
+          ? (i18n.language === 'hi' ? 'मित्रा विज़न एआई' : 'Mitra Vision AI')
+          : (i18n.language === 'hi' ? 'मित्रा एआई' : 'Mitra AI'),
         isVision,
         disclaimer: result?.disclaimer,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })

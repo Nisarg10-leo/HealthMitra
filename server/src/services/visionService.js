@@ -98,8 +98,8 @@ Return ONLY valid JSON matching this schema:
             if (parsed && Array.isArray(parsed.medicines) && parsed.medicines.length > 0) {
               return {
                 ...parsed,
-                raw: extractedText || 'Extracted via Google Gemini Vision',
-                source: `gemini-${model}-vision`
+                raw: extractedText || 'Extracted via Clinical Vision AI',
+                source: 'Mitra Vision AI'
               };
             }
           }
@@ -168,7 +168,7 @@ Return ONLY a valid JSON object matching this exact schema, with NO markdown bac
             return {
               ...parsed,
               raw: extractedText,
-              source: `groq-${model}+tesseract-ocr`
+              source: 'Mitra Clinical AI'
             };
           }
         }
