@@ -34,6 +34,20 @@ export function useWorkspaceData(session, notify) {
         }
         const [nextDashboard, nextAlerts, nextNotifications] = await Promise.all([patientsApi.dashboard(patientId), alertsApi.list(patientId), alertsApi.notifications()]);
         if (!active) return;
+
+        // Auto-clean any notifications whose dose is already recorded (taken/skipped)
+        if (nextDashboard?.logs && Array.isArray(nextNotifications)) {
+          nextNotifications.forEach((n) => {
+            if (n.type === 'reminder' && !n.readAt && n.doseLogId) {
+              const log = nextDashboard.logs.find((l) => l.id === n.doseLogId);
+              if (log && log.status !== 'pending') {
+                alertsApi.markNotificationRead(n.id).catch(() => {});
+                n.readAt = new Date().toISOString();
+              }
+            }
+          });
+        }
+
         setDashboard(nextDashboard);
         setAlerts(nextAlerts);
         setNotifications(nextNotifications);

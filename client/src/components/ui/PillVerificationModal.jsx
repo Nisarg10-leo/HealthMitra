@@ -124,8 +124,8 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div style={{ textAlign: 'left' }}>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff' }}>Computer Vision Pill Verification</h2>
-            <small style={{ color: '#00f2fe', fontSize: '0.78rem' }}>Align pill inside target reticle</small>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--ink)' }}>Computer Vision Pill Verification</h2>
+            <small style={{ color: 'var(--leaf)', fontSize: '0.78rem' }}>Align pill inside target reticle</small>
           </div>
           <button
             type="button"
@@ -213,7 +213,7 @@ export function PillVerificationModal({ dose, medication, onConfirm, onClose }) 
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginTop: '4px' }}>
               <span style={{ width: '14px', height: '14px', borderRadius: '50%', background: medication?.color || '#00f2fe', boxShadow: `0 0 8px ${medication?.color || '#00f2fe'}` }} />
-              <strong style={{ color: '#ffffff' }}>{medication?.name}</strong>
+              <strong style={{ color: 'var(--ink)' }}>{medication?.name}</strong>
             </div>
           </div>
 

@@ -176,7 +176,7 @@ export function CaregiverPage() {
               <HeartIcon size={12} />
               <span>Everyday Checkup</span>
             </span>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '2px 0 4px', color: '#ffffff' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '2px 0 4px', color: 'var(--ink)' }}>
               Daily Well-Being & Checkup
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', margin: 0 }}>
@@ -227,7 +227,7 @@ export function CaregiverPage() {
                 />
                 <div>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Mood</span>
-                  <strong style={{ display: 'block', fontSize: '0.95rem', color: '#ffffff' }}>
+                  <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--ink)' }}>
                     {i18n.language === 'hi'
                       ? MOODS.find((m) => m.id === todayCheckup.mood)?.labelHi
                       : MOODS.find((m) => m.id === todayCheckup.mood)?.label || 'Great'}
@@ -238,7 +238,7 @@ export function CaregiverPage() {
               {todayCheckup.bloodPressure && (
                 <div style={{ borderLeft: '1px solid var(--border-subtle)', paddingLeft: '14px' }}>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Blood Pressure</span>
-                  <strong className="font-mono" style={{ display: 'block', fontSize: '0.95rem', color: 'var(--cyan)' }}>
+                  <strong className="font-mono" style={{ display: 'block', fontSize: '0.95rem', color: 'var(--leaf)' }}>
                     {todayCheckup.bloodPressure} mmHg
                   </strong>
                 </div>
@@ -247,7 +247,7 @@ export function CaregiverPage() {
               {todayCheckup.bloodSugar && (
                 <div style={{ borderLeft: '1px solid var(--border-subtle)', paddingLeft: '14px' }}>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Blood Sugar</span>
-                  <strong className="font-mono" style={{ display: 'block', fontSize: '0.95rem', color: 'var(--mint-bright)' }}>
+                  <strong className="font-mono" style={{ display: 'block', fontSize: '0.95rem', color: 'var(--leaf)' }}>
                     {todayCheckup.bloodSugar} mg/dL
                   </strong>
                 </div>
@@ -256,7 +256,7 @@ export function CaregiverPage() {
               {todayCheckup.sleepQuality && (
                 <div style={{ borderLeft: '1px solid var(--border-subtle)', paddingLeft: '14px' }}>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Sleep</span>
-                  <strong style={{ display: 'block', fontSize: '0.95rem', color: '#ffffff', textTransform: 'capitalize' }}>
+                  <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--ink)', textTransform: 'capitalize' }}>
                     {todayCheckup.sleepQuality}
                   </strong>
                 </div>
@@ -274,7 +274,7 @@ export function CaregiverPage() {
         {/* Everyday Checkup Interactive Form */}
         {showCheckupForm && (
           <form onSubmit={handleSaveCheckup} style={{ background: 'var(--paper)', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '18px', marginTop: '16px' }}>
-            <h3 style={{ fontSize: '0.95rem', margin: '0 0 14px', color: '#ffffff' }}>
+            <h3 style={{ fontSize: '0.95rem', margin: '0 0 14px', color: 'var(--ink)' }}>
               How are you feeling right now?
             </h3>
 
@@ -294,8 +294,8 @@ export function CaregiverPage() {
                       padding: '10px 12px',
                       borderRadius: '10px',
                       border: isSelected ? `1.5px solid ${m.color}` : '1px solid var(--border-subtle)',
-                      background: isSelected ? 'rgba(0, 242, 254, 0.08)' : 'transparent',
-                      color: isSelected ? '#ffffff' : 'var(--text-secondary)',
+                      background: isSelected ? 'rgba(45, 122, 88, 0.08)' : 'transparent',
+                      color: isSelected ? 'var(--leaf)' : 'var(--text-secondary)',
                       cursor: 'pointer',
                       fontWeight: isSelected ? 600 : 400,
                       fontSize: '0.86rem',
@@ -403,7 +403,7 @@ export function CaregiverPage() {
       {/* ── 3. Connected Caregivers Directory ── */}
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#ffffff', margin: 0 }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>
             Active Care Circle ({caregivers.length})
           </h2>
           <span className="chip-telemetry chip-mint" style={{ fontSize: '0.72rem' }}>
@@ -435,8 +435,8 @@ export function CaregiverPage() {
                       width: '44px',
                       height: '44px',
                       borderRadius: '50%',
-                      background: isAlt ? 'rgba(139, 92, 246, 0.12)' : 'rgba(0, 242, 254, 0.12)',
-                      color: isAlt ? 'var(--violet)' : 'var(--cyan)',
+                      background: isAlt ? 'rgba(217, 119, 70, 0.12)' : 'rgba(45, 122, 88, 0.12)',
+                      color: isAlt ? 'var(--apricot)' : 'var(--leaf)',
                       display: 'grid',
                       placeItems: 'center',
                       fontSize: '1.1rem',
@@ -449,7 +449,7 @@ export function CaregiverPage() {
 
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <strong style={{ fontSize: '1.02rem', color: '#ffffff' }}>{cg.name}</strong>
+                      <strong style={{ fontSize: '1.02rem', color: 'var(--ink)' }}>{cg.name}</strong>
                       <span className="chip-telemetry chip-cyan" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
                         {relation}
                       </span>
@@ -506,7 +506,7 @@ export function CaregiverPage() {
 
       {/* ── 4. Connect Another Family Member ── */}
       <section className="hm-card" style={{ padding: '22px' }}>
-        <h2 style={{ fontSize: '1.08rem', fontWeight: 600, color: '#ffffff', margin: '0 0 6px' }}>
+        <h2 style={{ fontSize: '1.08rem', fontWeight: 600, color: 'var(--ink)', margin: '0 0 6px' }}>
           Connect a New Caregiver
         </h2>
         <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', margin: '0 0 16px' }}>
@@ -519,8 +519,8 @@ export function CaregiverPage() {
               padding: '12px 20px',
               borderRadius: '10px',
               background: 'var(--paper)',
-              border: '1.5px dashed var(--cyan)',
-              color: 'var(--cyan)',
+              border: '1.5px dashed var(--leaf)',
+              color: 'var(--leaf)',
               fontSize: '1.25rem',
               fontWeight: 700,
               letterSpacing: '0.08em'
@@ -575,7 +575,7 @@ export function CaregiverPage() {
       {/* ── 5. Past Checkup History ── */}
       {checkups.length > 0 && (
         <section>
-          <h2 style={{ fontSize: '1.08rem', fontWeight: 600, color: '#ffffff', margin: '0 0 12px' }}>
+          <h2 style={{ fontSize: '1.08rem', fontWeight: 600, color: 'var(--ink)', margin: '0 0 12px' }}>
             Recent Checkup Timeline
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -585,12 +585,19 @@ export function CaregiverPage() {
                 className="hm-card"
                 style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>
-                    {MOODS.find((m) => m.id === chk.mood)?.icon || '😄'}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: MOODS.find((m) => m.id === chk.mood)?.color || 'var(--leaf)',
+                      boxShadow: `0 0 6px ${MOODS.find((m) => m.id === chk.mood)?.color || 'var(--leaf)'}`,
+                      flexShrink: 0
+                    }}
+                  />
                   <div>
-                    <strong style={{ fontSize: '0.9rem', color: '#ffffff' }}>
+                    <strong style={{ fontSize: '0.9rem', color: 'var(--ink)' }}>
                       {chk.date} at {chk.time}
                     </strong>
                     {chk.notes && (

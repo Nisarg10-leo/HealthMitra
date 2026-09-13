@@ -57,14 +57,14 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
               <ShieldAlertIcon size={24} />
             </span>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#ffffff', fontWeight: '800' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--ink)', fontWeight: '800' }}>
                 Universal Medical ID
               </h3>
               <span
                 style={{
                   fontFamily: 'Inter, monospace',
                   fontSize: '0.68rem',
-                  color: '#ffb4ab',
+                  color: 'var(--apricot)',
                   letterSpacing: '0.08em',
                   fontWeight: '700'
                 }}
@@ -153,31 +153,31 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.84rem' }}>
             <div>
-              <span style={{ fontSize: '0.68rem', color: '#ffb4ab', fontWeight: '700', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.68rem', color: 'var(--apricot)', fontWeight: '700', letterSpacing: '0.05em' }}>
                 ALLERGIES & ADVERSE REACTIONS
               </span>
-              <p style={{ margin: '2px 0 0', color: '#ffffff', fontWeight: '600' }}>
+              <p style={{ margin: '2px 0 0', color: 'var(--ink)', fontWeight: '600' }}>
                 Penicillin (Anaphylaxis risk), Sulfa
               </p>
             </div>
 
             <div>
-              <span style={{ fontSize: '0.68rem', color: '#849495', fontWeight: '700', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.05em' }}>
                 ACTIVE PRESCRIPTIONS
               </span>
-              <p style={{ margin: '2px 0 0', color: '#94a3b8', lineHeight: '1.3' }}>
+              <p style={{ margin: '2px 0 0', color: 'var(--text-secondary)', lineHeight: '1.3' }}>
                 {medNames}
               </p>
             </div>
 
             <div>
-              <span style={{ fontSize: '0.68rem', color: '#849495', fontWeight: '700', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '0.05em' }}>
                 PRIMARY EMERGENCY CONTACT
               </span>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
                 <div>
-                  <strong style={{ color: '#ffffff', display: 'block' }}>{contactName}{contactRel}</strong>
-                  <span style={{ color: '#00f2fe' }}>{contactPhone}</span>
+                  <strong style={{ color: 'var(--ink)', display: 'block' }}>{contactName}{contactRel}</strong>
+                  <span style={{ color: 'var(--leaf)', fontWeight: 600 }}>{contactPhone}</span>
                 </div>
                 <a
                   href={`tel:${contactPhone.replace(/[^0-9+]/g, '')}`}
@@ -185,12 +185,12 @@ export function EmergencyQrModal({ patient, medications, onClose }) {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    background: 'rgba(0, 242, 254, 0.15)',
-                    border: '1px solid rgba(0, 242, 254, 0.4)',
+                    background: 'rgba(45, 122, 88, 0.12)',
+                    border: '1px solid rgba(45, 122, 88, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#00f2fe',
+                    color: 'var(--leaf)',
                     textDecoration: 'none'
                   }}
                   title={`Call ${contactName}`}

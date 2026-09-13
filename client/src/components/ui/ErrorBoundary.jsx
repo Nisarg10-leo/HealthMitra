@@ -23,10 +23,10 @@ export class ErrorBoundary extends React.Component {
             <div style={{ display: 'grid', placeItems: 'center', marginBottom: '16px', color: 'var(--amber)' }}>
               <AlertTriangleIcon size={36} />
             </div>
-            <h2 style={{ color: '#ffffff', fontSize: '1.5rem', margin: '0 0 8px' }}>
+            <h2 style={{ color: 'var(--ink)', fontSize: '1.5rem', margin: '0 0 8px' }}>
               Something went wrong
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5', margin: '0 0 20px' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', margin: '0 0 20px' }}>
               {this.state.error?.message || 'An unexpected error occurred while loading this view.'}
             </p>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>

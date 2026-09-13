@@ -1020,6 +1020,57 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-1px) !important;
 }
 
+/* Fallback styles for legacy or unstyled reminder banner DOM elements */
+.reminder-banner .reminder-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.reminder-banner .reminder-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: rgba(217, 119, 70, 0.12) !important;
+  color: var(--apricot) !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.reminder-banner .reminder-time {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.reminder-banner strong {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+
+.reminder-banner p {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  margin: 0 !important;
+}
+
+.color-white {
+  color: var(--ink) !important;
+}
+
+.color-cyan, .color-mint {
+  color: var(--leaf) !important;
+}
+
+.chip-amber {
+  background: rgba(217, 119, 70, 0.12) !important;
+  color: var(--apricot) !important;
+  border: 1px solid rgba(217, 119, 70, 0.25) !important;
+}
+
 /* ── Reassurance Banner ── */
 .reassurance-card {
   display: flex !important;
@@ -1102,6 +1153,97 @@ input:focus, select:focus, textarea:focus {
 
 .mobile-nav {
   display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex !important;
+    position: fixed !important;
+    z-index: 1000 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    background: var(--paper) !important;
+    border-top: 1px solid var(--border-medium) !important;
+    box-shadow: 0 -4px 20px rgba(28, 40, 38, 0.08) !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 0 4px !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+
+  .mobile-nav button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    font-family: var(--font-sans) !important;
+    padding: 4px 6px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 140ms ease !important;
+    position: relative !important;
+    min-width: 44px !important;
+    text-decoration: none !important;
+  }
+
+  .mobile-nav button:hover {
+    color: var(--ink) !important;
+  }
+
+  .mobile-nav button.selected {
+    color: var(--leaf) !important;
+    font-weight: 700 !important;
+  }
+
+  .mobile-nav button.selected .nav-icon-wrap {
+    color: var(--leaf) !important;
+    background: rgba(45, 122, 88, 0.1) !important;
+  }
+
+  .mobile-nav .nav-icon-wrap {
+    display: grid !important;
+    place-items: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 7px !important;
+    color: currentColor !important;
+    transition: all 140ms ease !important;
+  }
+
+  .mobile-nav .nav-label {
+    font-size: 10px !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.1 !important;
+  }
+
+  .mobile-nav .nav-badge {
+    position: absolute !important;
+    top: 2px !important;
+    right: 6px !important;
+    background: var(--apricot) !important;
+    color: #FFFFFF !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-mono) !important;
+    padding: 1px 5px !important;
+    border-radius: 9999px !important;
+    min-width: 14px !important;
+    text-align: center !important;
+    line-height: 14px !important;
+  }
+
+  .content {
+    padding-bottom: 84px !important;
+  }
 }
 
 /* ── Auth Page (Human Care Design) ── */

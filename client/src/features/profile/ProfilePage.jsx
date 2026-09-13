@@ -372,7 +372,7 @@ export function ProfilePage() {
               {formData.conditions.length} conditions • {formData.allergies.length} allergies logged
             </span>
           </div>
-          <h1 style={{ fontSize: '1.75rem', margin: '2px 0 4px', color: '#ffffff', fontWeight: '700' }}>
+          <h1 style={{ fontSize: '1.75rem', margin: '2px 0 4px', color: 'var(--ink)', fontWeight: '700' }}>
             Health Profile & Records
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
@@ -398,9 +398,9 @@ export function ProfilePage() {
 
       {/* Section 1: Diagnosed Conditions */}
       <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--surface-border)', pb: '12px', paddingBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', pb: '12px', paddingBottom: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600' }}>Medical Conditions & Diagnoses</h2>
+            <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600', color: 'var(--ink)' }}>Medical Conditions & Diagnoses</h2>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
               Selected conditions enable automated drug-disease interaction checks.
             </p>
@@ -424,9 +424,9 @@ export function ProfilePage() {
                   borderRadius: 'var(--radius-item)',
                   fontSize: '0.82rem',
                   fontWeight: '500',
-                  border: isSelected ? '1px solid var(--cyan)' : '1px solid rgba(255, 255, 255, 0.1)',
-                  background: isSelected ? 'var(--cyan-subtle)' : 'rgba(255, 255, 255, 0.03)',
-                  color: isSelected ? 'var(--cyan)' : 'var(--text-secondary)',
+                  border: isSelected ? '1px solid var(--leaf)' : '1px solid var(--border-medium)',
+                  background: isSelected ? 'var(--mist)' : 'var(--cream)',
+                  color: isSelected ? 'var(--leaf)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
@@ -542,7 +542,7 @@ export function ProfilePage() {
               <>
                 <FileTextIcon size={36} className="color-cyan" />
                 <div>
-                  <strong style={{ display: 'block', fontSize: '0.9rem', color: '#ffffff' }}>Upload Prescription or Receipt</strong>
+                  <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--ink)' }}>Upload Prescription or Receipt</strong>
                   <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>PNG, JPG, or camera photo</span>
                 </div>
                 <button
@@ -567,8 +567,8 @@ export function ProfilePage() {
           {/* Results Area */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
             {scanning && (
-              <div style={{ padding: '24px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-card)', border: '1px solid var(--surface-border)', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: 'var(--cyan)', fontWeight: '600', fontSize: '0.9rem' }}>{scanStatusText}</p>
+              <div style={{ padding: '24px', background: 'var(--cream)', borderRadius: 'var(--radius-card)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: 'var(--leaf)', fontWeight: '600', fontSize: '0.9rem' }}>{scanStatusText}</p>
                 <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '0.78rem' }}>Transcribing medicine names, dosages, and schedules…</p>
               </div>
             )}
@@ -592,20 +592,20 @@ export function ProfilePage() {
                       style={{
                         padding: '8px 12px',
                         borderRadius: '8px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: 'var(--cream)',
+                        border: '1px solid var(--border-subtle)',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
                       }}
                     >
                       <div>
-                        <strong style={{ display: 'block', fontSize: '0.85rem', color: '#ffffff' }}>{med.name}</strong>
+                        <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--ink)' }}>{med.name}</strong>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                           {med.dosage} • {med.frequencyPerDay || 1}x daily
                         </span>
                       </div>
-                      <span className="font-mono" style={{ fontSize: '0.76rem', color: 'var(--cyan)', background: 'var(--cyan-subtle)', padding: '2px 6px', borderRadius: '4px' }}>
+                      <span className="font-mono" style={{ fontSize: '0.76rem', color: 'var(--leaf)', background: 'var(--mist)', padding: '2px 6px', borderRadius: '4px' }}>
                         {Array.isArray(med.times) ? med.times.join(', ') : '08:00'}
                       </span>
                     </div>
@@ -686,9 +686,9 @@ export function ProfilePage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                  <FileTextIcon size={18} style={{ color: 'var(--cyan)' }} />
+                  <FileTextIcon size={18} style={{ color: 'var(--leaf)' }} />
                   <div style={{ minWidth: 0 }}>
-                    <strong style={{ display: 'block', fontSize: '0.84rem', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <strong style={{ display: 'block', fontSize: '0.84rem', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {file.name}
                     </strong>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -712,9 +712,9 @@ export function ProfilePage() {
 
       {/* Section 4: Allergies */}
       <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--surface-border)', paddingBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600' }}>Drug & Food Allergies</h2>
+            <h2 style={{ fontSize: '1.15rem', margin: 0, fontWeight: '600', color: 'var(--ink)' }}>Drug & Food Allergies</h2>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
               Mitra checks every newly added prescription against these allergy records.
             </p>
@@ -734,8 +734,8 @@ export function ProfilePage() {
               onClick={() => addAllergy(a)}
               style={{
                 fontSize: '0.78rem',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'var(--cream)',
+                border: '1px solid var(--border-medium)',
                 padding: '4px 10px',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)',
@@ -755,8 +755,8 @@ export function ProfilePage() {
             gap: '8px',
             minHeight: '44px',
             padding: '10px 12px',
-            background: '#0b0f19',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+            background: 'var(--cream)',
+            border: '1px solid var(--border-medium)',
             borderRadius: 'var(--radius-item)',
             alignItems: 'center'
           }}
@@ -768,19 +768,20 @@ export function ProfilePage() {
                 padding: '3px 10px',
                 borderRadius: '8px',
                 fontSize: '0.8rem',
-                background: 'var(--coral-subtle)',
-                border: '1px solid var(--coral-border)',
-                color: '#fca5a5',
+                background: 'rgba(217, 119, 70, 0.12)',
+                border: '1px solid rgba(217, 119, 70, 0.25)',
+                color: 'var(--apricot)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '6px',
+                fontWeight: 500
               }}
             >
               {a}
               <button
                 type="button"
                 onClick={() => removeAllergy(a)}
-                style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontWeight: '700', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: 'var(--apricot)', cursor: 'pointer', fontWeight: '700', padding: 0 }}
               >
                 ×
               </button>
@@ -802,7 +803,7 @@ export function ProfilePage() {
               flex: 1,
               background: 'transparent',
               border: 'none',
-              color: '#ffffff',
+              color: 'var(--ink)',
               fontSize: '0.86rem',
               minWidth: '180px',
               padding: '2px 6px',
@@ -1095,7 +1096,7 @@ function CaregiverProfileView({
               Primary Family Guardian
             </span>
           </div>
-          <h1 style={{ fontSize: '1.75rem', margin: '2px 0 4px', color: '#ffffff', fontWeight: '700' }}>
+          <h1 style={{ fontSize: '1.75rem', margin: '2px 0 4px', color: 'var(--ink)', fontWeight: '700' }}>
             Caregiver Settings & Preferences
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
@@ -1123,7 +1124,7 @@ function CaregiverProfileView({
       <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: 'var(--ink)', fontWeight: '600' }}>
               Caregiver Account Details
             </h2>
             <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
@@ -1200,7 +1201,7 @@ function CaregiverProfileView({
       <section className="hm-card" style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
           <div>
-            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: 'var(--ink)', fontWeight: '600' }}>
               Everyday Checkup & Notification Rules
             </h2>
             <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
@@ -1258,12 +1259,12 @@ function CaregiverProfileView({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.88rem', color: '#ffffff' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.88rem', color: 'var(--ink)' }}>
             <input
               type="checkbox"
               checked={whatsappAlerts}
               onChange={(e) => setWhatsappAlerts(e.target.checked)}
-              style={{ accentColor: 'var(--cyan)' }}
+              style={{ accentColor: 'var(--leaf)' }}
             />
             <span>Receive WhatsApp escalation when a critical dose is missed (&gt;60 mins)</span>
           </label>
@@ -1274,7 +1275,7 @@ function CaregiverProfileView({
       <section className="hm-card" style={{ padding: '22px 24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: '#ffffff', fontWeight: '600' }}>
+            <h2 style={{ fontSize: '1.1rem', margin: '0 0 2px', color: 'var(--ink)', fontWeight: '600' }}>
               Monitored Family Patient
             </h2>
             <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
@@ -1298,8 +1299,8 @@ function CaregiverProfileView({
                 width: '42px',
                 height: '42px',
                 borderRadius: '50%',
-                background: 'rgba(0, 242, 254, 0.12)',
-                color: 'var(--cyan)',
+                background: 'rgba(45, 122, 88, 0.12)',
+                color: 'var(--leaf)',
                 display: 'grid',
                 placeItems: 'center',
                 fontSize: '1.1rem',
@@ -1310,7 +1311,7 @@ function CaregiverProfileView({
               {pInitial}
             </div>
             <div>
-              <strong style={{ fontSize: '1rem', color: '#ffffff' }}>{pName}</strong>
+              <strong style={{ fontSize: '1rem', color: 'var(--ink)' }}>{pName}</strong>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                 {relation} • Active Health Plan Synchronized
               </div>

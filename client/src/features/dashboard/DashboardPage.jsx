@@ -25,7 +25,7 @@ const MOOD_MAP = {
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
-  const { dashboard, alerts, patients, selectedPatientId, selectPatient, openModal, notify, refresh } = useWorkspace();
+  const { dashboard, alerts, patients, selectedPatientId, selectPatient, openModal, notify, refresh, setTab } = useWorkspace();
   const [checkups, setCheckups] = useState([]);
   const [pinging, setPinging] = useState(false);
 
@@ -78,9 +78,37 @@ export function DashboardPage() {
   const todayLogs = (dashboard?.logs || [])
     .filter((log) => isToday(log.scheduledTime))
     .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
+  const hasLinkedPatient = Boolean(dashboard?.patient?.id || patients?.length > 0);
 
   return (
     <div className="page-shell-container">
+      {!hasLinkedPatient && (
+        <section className="hm-card" style={{ padding: '20px 24px', marginBottom: '20px', border: '1.5px dashed var(--leaf)', background: 'var(--cream)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span className="chip-telemetry chip-mint font-mono">
+                <ShieldIcon size={12} />
+                <span>Family Caregiver Hub</span>
+              </span>
+            </div>
+            <h3 style={{ fontSize: '1.15rem', margin: '2px 0 4px', color: 'var(--ink)' }}>
+              No Patient Connected Yet
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              Connect to your parent or family member using their 6-character code to begin live routine tracking and everyday checkups.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-cyber"
+            onClick={() => setTab && setTab('patient')}
+            style={{ padding: '9px 18px', fontSize: '0.88rem' }}
+          >
+            Connect Patient Now →
+          </button>
+        </section>
+      )}
+
       {/* ── 1. Active Patient Clinical Header ── */}
       <section className="dashboard-patient-header">
         <div className="patient-header-left">
@@ -248,7 +276,7 @@ export function DashboardPage() {
                     boxShadow: `0 0 8px ${MOOD_MAP[todayCheckup.mood]?.color || 'var(--mint-bright)'}`
                   }}
                 />
-                <strong className="compliance-stat-num" style={{ fontSize: '1.05rem', color: '#ffffff' }}>
+                <strong className="compliance-stat-num" style={{ fontSize: '1.05rem', color: 'var(--ink)' }}>
                   {MOOD_MAP[todayCheckup.mood]?.label || 'Good & Active'}
                 </strong>
               </div>
