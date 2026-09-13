@@ -42,6 +42,76 @@ export async function scanPrescriptionImage(base64Image, optionalText = '') {
     }
   }
 
+  // 1.5. If GEMINI_API_KEY is available, use Gemini's direct visual understanding (superior for handwritten prescriptions)
+  if (process.env.GEMINI_API_KEY && base64Image) {
+    try {
+      const mimeType = base64Image.includes('data:image/png')
+        ? 'image/png'
+        : base64Image.includes('data:image/webp')
+        ? 'image/webp'
+        : 'image/jpeg';
+      const cleanBase64 = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
+
+      const prompt = `You are an expert clinical pharmacist and prescription recognition AI.
+Examine this medical prescription image and extract all prescribed medicines, dosages, frequencies, consumption instructions, and doctor name.
+Return ONLY valid JSON matching this schema:
+{
+  "medicines": [
+    {
+      "name": "Exact medicine name (e.g. Metformin 500mg)",
+      "dosage": "Dosage string (e.g. 500 mg, 1 tablet)",
+      "frequencyPerDay": 2,
+      "times": ["08:00", "20:00"],
+      "instructions": "Dietary/consumption instructions (e.g. Take after meals)"
+    }
+  ],
+  "doctorName": "Doctor name or clinic name if detected, otherwise empty",
+  "dietaryAdvice": "Any dietary or lifestyle advice found, otherwise empty"
+}`;
+
+      for (const model of ['gemini-2.0-flash', 'gemini-1.5-flash']) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    { inline_data: { mime_type: mimeType, data: cleanBase64 } }
+                  ]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.1,
+                response_mime_type: 'application/json'
+              }
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            const parsed = JSON.parse(text);
+            if (parsed && Array.isArray(parsed.medicines) && parsed.medicines.length > 0) {
+              return {
+                ...parsed,
+                raw: extractedText || 'Extracted via Google Gemini Vision',
+                source: `gemini-${model}-vision`
+              };
+            }
+          }
+        } catch (gErr) {
+          console.warn(`[vision] Gemini ${model} failed:`, gErr.message);
+        }
+      }
+    } catch (err) {
+      console.warn('[vision] Gemini vision parsing error:', err.message);
+    }
+  }
+
   // 2. If we have extracted text and GROQ_API_KEY, use Groq LLM for clinical extraction
   if (process.env.GROQ_API_KEY && extractedText && extractedText.trim().length > 5) {
     const prompt = `You are an expert clinical pharmacist and prescription OCR parsing AI.

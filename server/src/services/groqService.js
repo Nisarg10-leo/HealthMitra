@@ -292,6 +292,129 @@ For personalized interpretations or changes to therapy, review this document dir
   }
 }
 
+// Multimodal Vision with Google Gemini (Free API from Google AI Studio)
+async function callGeminiVision({ apiKey, image, question, systemPrompt, language }) {
+  if (!apiKey || !image) return null;
+  const mimeType = image.includes('data:image/png')
+    ? 'image/png'
+    : image.includes('data:image/webp')
+    ? 'image/webp'
+    : 'image/jpeg';
+  const cleanBase64 = image.includes(',') ? image.split(',')[1] : image;
+
+  const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const userPrompt = (question || 'Please analyze this medical image in detail. Identify any symptoms, disease signs, skin condition, diagnostic test parameters, or medications. Check safety with active medications and explain next steps.') +
+        (language === 'hi' ? '\n\nकृपया उत्तर पूर्ण रूप से हिंदी में दें।' : '');
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: systemPrompt + '\n\nUser Request: ' + userPrompt },
+                {
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: cleanBase64
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 1024
+          }
+        })
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        const candidateText = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText && candidateText.trim().length > 10) {
+          return {
+            source: `Mitra Gemini Vision (${model})`,
+            answer: candidateText.trim()
+          };
+        }
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        console.warn(`[ai:gemini] Model ${model} returned error:`, response.status, errJson.error?.message || '');
+      }
+    } catch (e) {
+      console.warn(`[ai:gemini] Model ${model} request failed:`, e.message);
+    }
+  }
+  return null;
+}
+
+// Multimodal Vision with OpenRouter (Free tier vision models)
+async function callOpenRouterVision({ apiKey, image, question, systemPrompt, language }) {
+  if (!apiKey || !image) return null;
+  const models = [
+    'google/gemini-2.0-flash-exp:free',
+    'qwen/qwen-2.5-vl-72b-instruct:free',
+    'meta-llama/llama-3.2-11b-vision-instruct:free'
+  ];
+  for (const model of models) {
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://healthmitra.app',
+          'X-Title': 'HealthMitra'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: (question || 'Please analyze this medical image in detail. Identify any condition, disease symptoms, diagnostic results, or medication.') +
+                    (language === 'hi' ? '\n\nकृपया उत्तर हिंदी में दें।' : '')
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
+                  }
+                }
+              ]
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 800
+        })
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        const content = json.choices?.[0]?.message?.content;
+        if (content && content.trim().length > 10) {
+          return {
+            source: `Mitra OpenRouter Vision (${model})`,
+            answer: content.trim()
+          };
+        }
+      }
+    } catch (e) {
+      console.warn(`[ai:openrouter] Model ${model} request failed:`, e.message);
+    }
+  }
+  return null;
+}
+
 export async function askMitra({ question, image = null, patientId, language = 'en' }) {
   const [patient, medications] = await Promise.all([
     repository.users.findById(patientId),
@@ -312,13 +435,26 @@ Allergies: ${patient.allergies?.join(', ') || 'None recorded'}` : '';
     ocrText = await extractOcrFromImage(image);
   }
 
-  // 1. Call Groq AI model if GROQ_API_KEY is configured
-  if (process.env.GROQ_API_KEY) {
-    try {
-      const systemPrompt = `You are Mitra, an empathetic, warm, and highly skilled clinical AI medical assistant for patients and caregivers.
+  const systemPrompt = `You are Mitra, an empathetic, highly skilled Clinical AI Medical Assistant for patients and caregivers.
 Patient Name: ${patient?.name || 'Patient'}
 ${patientProfile}
 Active Medications: ${medsSummary}
+
+CLINICAL VISION GUIDELINES FOR IMAGE ANALYSIS:
+1. Physical Condition / Disease / Symptoms (e.g. skin rash, swelling, lesion, discoloration, eye inflammation, wound):
+   - Visually describe the lesion or symptom characteristics (location, color, pattern, border, texture).
+   - Offer potential clinical differential considerations (what common medical conditions cause this appearance, e.g. Contact Dermatitis, Eczema, Tinea/Fungal, Urticaria, Cellulitis, Conjunctivitis).
+   - Clarify clearly that this is an AI observational evaluation and NOT a definitive doctor diagnosis.
+   - List key "red-flag" symptoms that require urgent emergency care (spreading rapidly, severe pain, fever, shortness of breath, pus).
+2. Diagnostic Lab Reports / Blood Tests:
+   - Identify every visible biomarker (e.g., HbA1c, Fasting Blood Sugar, Lipid Profile, SGPT, Creatinine, Hemoglobin, Platelets).
+   - Compare observed values against standard normal clinical reference ranges.
+   - Explain what abnormal values indicate in simple, understandable terms.
+3. Medication Strips / Packaging / Pills:
+   - Identify medication name, dosage strength, therapeutic purpose, food timing (before/with/after food), and interactions.
+   - Cross-check against the patient's active prescriptions (${medsSummary}).
+4. Meal & Dietary Analysis:
+   - Analyze carbohydrate, glycemic impact, and sodium levels for diabetic/hypertensive safety.
 
 CRITICAL FORMATTING RULES:
 1. Do NOT use markdown symbols like hashtags (### or ##), divider lines (---), bold or italic asterisks (** or *), or pipe tables (|).
@@ -328,121 +464,109 @@ CRITICAL FORMATTING RULES:
 5. Answer in ${language === 'hi' ? 'Hindi' : 'English'}.
 6. End with a simple, gentle reminder to check with their doctor.`;
 
-      let answer = null;
+  let rawAnswer = null;
+  let sourceTag = image ? 'Mitra Vision AI' : 'Mitra AI';
 
-      // If image is provided, try multimodal vision models first
-      if (image) {
-        const visionModels = ['llama-3.2-11b-vision-preview', 'llama-3.2-90b-vision-preview'];
-        for (const model of visionModels) {
-          try {
-            const promptText = (question || 'Please analyze this medical image / report in detail. Identify any medication, test parameters, or dietary items, explain clinical safety with my active medications, and provide clear next steps.') +
-              (ocrText ? `\n\n[Extracted OCR Text Reference]:\n${ocrText}` : '');
-
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.GROQ_API_KEY}`
-              },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: 'system', content: systemPrompt },
-                  {
-                    role: 'user',
-                    content: [
-                      { type: 'text', text: promptText },
-                      {
-                        type: 'image_url',
-                        image_url: {
-                          url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
-                        }
-                      }
-                    ]
-                  }
-                ],
-                temperature: 0.2,
-                max_tokens: 600
-              })
-            });
-
-            if (response.ok) {
-              const json = await response.json();
-              answer = json.choices?.[0]?.message?.content;
-              if (answer) break;
-            }
-          } catch (vErr) {
-            console.warn(`[groqService] Vision model ${model} failed:`, vErr.message);
-          }
-        }
-      }
-
-      // If text query or vision fallback, call text models with OCR context
-      if (!answer) {
-        const textModels = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound-mini', 'qwen/qwen3.8-27b'];
-        const userPrompt = image && ocrText
-          ? `${question ? question + '\n\n' : ''}[Medical Image Extracted Text]:\n${ocrText}\n\nPlease analyze this medical image text, identify medications or lab results, explain safety with my active prescriptions, and provide clear guidance.`
-          : (question || 'How should I take my medications today?');
-
-        for (const model of textModels) {
-          try {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.GROQ_API_KEY}`
-              },
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: 'system', content: systemPrompt },
-                  { role: 'user', content: userPrompt }
-                ],
-                temperature: 0.3,
-                max_tokens: 600
-              })
-            });
-
-            if (response.ok) {
-              const json = await response.json();
-              answer = json.choices?.[0]?.message?.content;
-              if (answer) break;
-            }
-          } catch (mErr) {
-            console.warn('[ai] Model attempt failed, trying fallback:', mErr.message);
-          }
-        }
-      }
-
-      if (answer) {
-        // Strip any stray markdown symbols (###, ---, **, tables)
-        const cleanAnswer = answer
-          .replace(/^#{1,6}\s+/gm, '')
-          .replace(/^\s*[-*_]{3,}\s*$/gm, '')
-          .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-          .replace(/^[|\s]+|[|\s]+$/gm, '')
-          .replace(/\|\s*/g, ' - ')
-          .replace(/^[-\s]{4,}$/gm, '')
-          .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
-          .replace(/\n{3,}/g, '\n\n')
-          .trim();
-
-        return {
-          source: image ? 'Mitra Vision AI' : 'Mitra AI',
-          question,
-          answer: cleanAnswer,
-          hasImage: Boolean(image),
-          disclaimer: language === 'hi'
-            ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल मार्गदर्शन के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
-            : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
-        };
-      }
-    } catch (err) {
-      console.error('[ai] Service error:', err);
+  // 1. If image is provided, try Google Gemini Vision FIRST (free & highest accuracy for disease identification)
+  if (image && process.env.GEMINI_API_KEY) {
+    const geminiRes = await callGeminiVision({
+      apiKey: process.env.GEMINI_API_KEY,
+      image,
+      question,
+      systemPrompt,
+      language
+    });
+    if (geminiRes) {
+      rawAnswer = geminiRes.answer;
+      sourceTag = geminiRes.source;
     }
   }
 
-  // 2. Intelligent Clinical Reasoning Engine Fallback (Supports both Text and Images)
+  // 2. Try OpenRouter Vision if GEMINI_API_KEY was not provided or failed
+  if (image && !rawAnswer && process.env.OPENROUTER_API_KEY) {
+    const openRouterRes = await callOpenRouterVision({
+      apiKey: process.env.OPENROUTER_API_KEY,
+      image,
+      question,
+      systemPrompt,
+      language
+    });
+    if (openRouterRes) {
+      rawAnswer = openRouterRes.answer;
+      sourceTag = openRouterRes.source;
+    }
+  }
+
+  // 3. Try Groq AI (Text models with OCR context)
+  if (!rawAnswer && process.env.GROQ_API_KEY) {
+    try {
+      const textModels = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound-mini', 'qwen/qwen3.8-27b'];
+      const userPrompt = image && ocrText
+        ? `${question ? question + '\n\n' : ''}[Medical Image Extracted Text]:\n${ocrText}\n\nPlease analyze this medical image text, identify medications or lab results, explain safety with my active prescriptions, and provide clear guidance.`
+        : (question || 'How should I take my medications today?');
+
+      for (const model of textModels) {
+        try {
+          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${process.env.GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+              ],
+              temperature: 0.3,
+              max_tokens: 600
+            })
+          });
+
+          if (response.ok) {
+            const json = await response.json();
+            const text = json.choices?.[0]?.message?.content;
+            if (text) {
+              rawAnswer = text;
+              sourceTag = image ? 'Mitra OCR+Groq AI' : 'Mitra AI';
+              break;
+            }
+          }
+        } catch (mErr) {
+          console.warn('[ai] Model attempt failed, trying fallback:', mErr.message);
+        }
+      }
+    } catch (err) {
+      console.error('[ai] Groq service error:', err);
+    }
+  }
+
+  if (rawAnswer) {
+    // Strip any stray markdown symbols (###, ---, **, tables)
+    const cleanAnswer = rawAnswer
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/^\s*[-*_]{3,}\s*$/gm, '')
+      .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+      .replace(/^[|\s]+|[|\s]+$/gm, '')
+      .replace(/\|\s*/g, ' - ')
+      .replace(/^[-\s]{4,}$/gm, '')
+      .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    return {
+      source: sourceTag,
+      question,
+      answer: cleanAnswer,
+      hasImage: Boolean(image),
+      disclaimer: language === 'hi'
+        ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल मार्गदर्शन के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
+        : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
+    };
+  }
+
+  // 4. Intelligent Clinical Reasoning Engine Fallback (Supports both Text and Images)
   let answerText = '';
 
   if (image || ocrText) {
