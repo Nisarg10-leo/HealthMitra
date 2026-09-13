@@ -29,6 +29,10 @@ export function Workspace({ onLogout }) {
   const listen = useSpeechInput(notify);
   const data = useWorkspaceData(session, notify);
 
+  const alarmMedication = alarmDose
+    ? data.dashboard?.medications?.find((m) => m.id === alarmDose.medicationId)
+    : null;
+
   // Real-time Medicine Alarm trigger loop for both Patient and Caregiver
   useEffect(() => {
     if (!data.dashboard?.logs) return;
@@ -160,10 +164,6 @@ export function Workspace({ onLogout }) {
     return true;
   });
   const Screen = SCREENS[tab] || SCREENS.today;
-
-  const alarmMedication = alarmDose
-    ? data.dashboard?.medications?.find((m) => m.id === alarmDose.medicationId)
-    : null;
 
   return (
     <WorkspaceContext.Provider value={workspace}>
