@@ -72,6 +72,16 @@ export function AskMitraModal({ onClose }) {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleAddSymptomChip = (symptom) => {
+    setQuestion((prev) => {
+      const trimmed = prev.trim();
+      if (!trimmed) return symptom;
+      if (trimmed.includes(symptom)) return trimmed;
+      return `${trimmed}, ${symptom}`;
+    });
+    inputRef.current?.focus();
+  };
+
   const handleAsk = async (queryToAsk) => {
     const hasImage = Boolean(attachedImage?.base64);
     let q = (queryToAsk || question).trim();
@@ -80,8 +90,8 @@ export function AskMitraModal({ onClose }) {
 
     if (!q && hasImage) {
       q = i18n.language === 'hi'
-        ? 'कृपया इस मेडिकल छवि (दवा, लैब रिपोर्ट या भोजन) का विश्लेषण करें।'
-        : 'Please analyze this medical image (medication, lab report, or meal) in detail.';
+        ? 'कृपया इस छवि का विस्तार से विश्लेषण करें। किसी भी दिखाई देने वाले दाने, त्वचा की स्थिति, शारीरिक लक्षण या बीमारी के संभावित कारणों की पहचान करें, खतरे के संकेतों की जांच करें और मेरी दवाओं के साथ सुरक्षा बताएं।'
+        : 'Please analyze this clinical image in detail. Identify any visible rash, skin lesion, physical symptoms, disease characteristics, or health condition, evaluate potential causes (differential diagnosis), red-flag symptoms, and check against my medical profile.';
     }
 
     const currentImage = attachedImage?.base64 || null;
@@ -103,7 +113,7 @@ export function AskMitraModal({ onClose }) {
       const aiMsg = {
         role: 'mitra',
         text: cleanText(result?.answer || 'I could not generate an answer at this time.'),
-        source: isVision ? 'Mitra Vision AI' : (result?.source || 'Mitra Clinical AI'),
+        source: isVision ? (result?.source || 'Mitra Gemini Vision') : (result?.source || 'Mitra Clinical AI'),
         isVision,
         disclaimer: result?.disclaimer,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -216,8 +226,8 @@ export function AskMitraModal({ onClose }) {
               </h2>
               <span className="ask-mitra-subtitle">
                 {i18n.language === 'hi'
-                  ? 'दवा समय, पर्चा व लैब रिपोर्ट विश्लेषण व सुरक्षा मार्गदर्शन'
-                  : 'Prescription guidance, lab reports, image analysis & safety'}
+                  ? 'रोग व त्वचा लक्षण, पर्चा व लैब रिपोर्ट विश्लेषण व सुरक्षा मार्गदर्शन'
+                  : 'Symptom & disease analysis, prescriptions, lab reports & safety'}
               </span>
             </div>
           </div>
@@ -258,8 +268,8 @@ export function AskMitraModal({ onClose }) {
 
               <p className="ask-mitra-empty-desc">
                 {i18n.language === 'hi'
-                  ? 'अपनी दवाओं, खुराक, लैब रिपोर्ट या भोजन की फोटो अपलोड करें और तुरंत क्लिनिकल सलाह पाएं।'
-                  : 'Ask clinical questions or attach a photo of your medicine strip, diagnostic lab report, food plate, or prescription for instant AI analysis.'}
+                  ? 'त्वचा पर दाने, घाव, सूजन, दवाओं, लैब रिपोर्ट या भोजन की फोटो अपलोड करें और तुरंत क्लिनिकल सलाह पाएं।'
+                  : 'Upload or snap a photo of any skin rash, physical symptom, medicine strip, lab report, or meal for instant AI clinical reasoning.'}
               </p>
 
               {/* Visual Prompt Suggestions */}
@@ -267,15 +277,15 @@ export function AskMitraModal({ onClose }) {
                 {attachedImage ? (
                   // Suggestions when an image is attached
                   (i18n.language === 'hi' ? [
+                    'यह दाने या त्वचा की क्या समस्या हो सकती है?',
+                    'क्या यह त्वचा की समस्या गंभीर है? खतरे के लक्षण क्या हैं?',
                     'इस दवा के पत्ते की जांच करें',
-                    'इस लैब रिपोर्ट की व्याख्या करें',
-                    'क्या यह भोजन मेरी दवाइयों के साथ सुरक्षित है?',
-                    'डॉक्टर का पर्चा पढ़ें और समय समझाएं'
+                    'इस लैब रिपोर्ट की व्याख्या करें'
                   ] : [
+                    'What is this rash or skin condition?',
+                    'Is this skin condition serious? What are the red flags?',
                     'Analyze this medicine packaging',
-                    'Explain this lab test report',
-                    'Is this food safe with my medicines?',
-                    'Read doctor prescription & schedule'
+                    'Explain this lab test report'
                   ]).map((suggestion) => (
                     <button
                       key={suggestion}
@@ -316,8 +326,8 @@ export function AskMitraModal({ onClose }) {
                       <CameraIcon size={14} />
                       <span>
                         {i18n.language === 'hi'
-                          ? 'दवा का पत्ता या रिपोर्ट स्कैन करें'
-                          : 'Scan medicine packaging or lab report'}
+                          ? 'दाने, दवा का पत्ता या रिपोर्ट स्कैन करें'
+                          : 'Scan rash, medicine packaging, or lab report'}
                       </span>
                     </button>
                   </>
@@ -401,7 +411,8 @@ export function AskMitraModal({ onClose }) {
 
         {/* Image Attachment Preview Bar */}
         {imagePreview && (
-          <div className="ask-mitra-preview-bar">
+          <>
+            <div className="ask-mitra-preview-bar">
             <div
               className="ask-mitra-preview-thumb-wrap"
               onClick={() => setEnlargedImage(imagePreview)}
@@ -429,6 +440,40 @@ export function AskMitraModal({ onClose }) {
               </button>
             </div>
           </div>
+
+          {/* Quick Symptom Description Chips */}
+          <div className="ask-mitra-symptom-chips-bar">
+            <span className="ask-mitra-symptom-label font-mono">
+              {i18n.language === 'hi' ? 'लक्षण जोड़ें:' : 'Add Symptoms:'}
+            </span>
+            <div className="ask-mitra-symptom-chips">
+              {(i18n.language === 'hi' ? [
+                'खुजली है',
+                'हल्का दर्द',
+                'जलन का अहसास',
+                '1-2 दिन पहले शुरू हुआ',
+                'फैल रहा है',
+                'हल्का बुखार है'
+              ] : [
+                'Itching',
+                'Mild pain',
+                'Burning sensation',
+                'Started 1-2 days ago',
+                'Spreading',
+                'Fever / Chills'
+              ]).map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => handleAddSymptomChip(chip)}
+                  className={`ask-mitra-symptom-chip ${question.includes(chip) ? 'is-active' : ''}`}
+                >
+                  + {chip}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
         )}
 
         {/* Input Bar */}
@@ -443,7 +488,7 @@ export function AskMitraModal({ onClose }) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title={i18n.language === 'hi' ? 'छवि या पर्चा जोड़ें' : 'Attach medicine strip, lab report, or prescription'}
+            title={i18n.language === 'hi' ? 'छवि या पर्चा जोड़ें' : 'Attach medicine strip, lab report, or rash photo'}
             className={`ask-mitra-attach-btn ${attachedImage ? 'is-attached' : ''}`}
           >
             <CameraIcon size={18} />
@@ -456,7 +501,7 @@ export function AskMitraModal({ onClose }) {
             onKeyDown={(e) => { if (e.key === 'Enter') handleAsk(); }}
             placeholder={
               attachedImage
-                ? (i18n.language === 'hi' ? 'छवि के बारे में कोई विशिष्ट सवाल पूछें या सीधे भेजें…' : 'Ask a question about this image or press Ask…')
+                ? (i18n.language === 'hi' ? 'लक्षण बताएं (जैसे: खुजली, दर्द, जलन, कब शुरू हुआ) या सीधे भेजें…' : 'Describe symptoms (e.g., itchy, painful, when it started) or press Ask…')
                 : (i18n.language === 'hi' ? 'अपनी समस्या, दवा या रिपोर्ट के बारे में पूछें…' : 'Ask about your medicines, timings, or diet…')
             }
             className="ask-mitra-input"

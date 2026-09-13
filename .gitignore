@@ -14,3 +14,5 @@ outputs/
 .data/
 *.local_store.json
 local_store.json
+*.traineddata
+

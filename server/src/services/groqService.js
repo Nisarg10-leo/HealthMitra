@@ -329,7 +329,7 @@ async function callGeminiVision({ apiKey, image, question, systemPrompt, languag
           ],
           generationConfig: {
             temperature: 0.2,
-            maxOutputTokens: 1024
+            maxOutputTokens: 4096
           }
         })
       });
