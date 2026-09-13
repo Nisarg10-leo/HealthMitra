@@ -69,7 +69,7 @@ Return ONLY valid JSON matching this schema:
   "dietaryAdvice": "Any dietary or lifestyle advice found, otherwise empty"
 }`;
 
-      for (const model of ['gemini-2.0-flash', 'gemini-1.5-flash']) {
+      for (const model of ['gemini-3-flash-preview', 'gemini-3.5-flash', 'gemini-flash-latest']) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
             method: 'POST',

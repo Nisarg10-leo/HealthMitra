@@ -302,7 +302,7 @@ async function callGeminiVision({ apiKey, image, question, systemPrompt, languag
     : 'image/jpeg';
   const cleanBase64 = image.includes(',') ? image.split(',')[1] : image;
 
-  const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+  const models = ['gemini-3-flash-preview', 'gemini-3.5-flash', 'gemini-flash-latest'];
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
