@@ -365,6 +365,33 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #c46435 !important;
 }
 
+.topbar-lang-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 9999px !important;
+  padding: 2px !important;
+  gap: 2px !important;
+}
+
+.topbar-lang-btn {
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+}
+
+.topbar-lang-btn.active {
+  background: var(--leaf) !important;
+  color: #FFFFFF !important;
+}
+
 /* ── Primary Overview Hero Section ── */
 .overview-hero-card {
   background: var(--paper) !important;

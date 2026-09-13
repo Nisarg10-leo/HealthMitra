@@ -25,7 +25,17 @@ export async function raiseAlert(patientId, type, message, extra = {}, audience 
   const item = await repository.alerts.insert({ patientId, type, message, createdAt: nowIso(), readBy: [], ...extra });
   const caregiverIds = (await repository.links.forPatient(patientId)).map((link) => link.caregiverId);
   const recipients = [...new Set(audience === 'all' ? [patientId, ...caregiverIds] : caregiverIds)];
-  const title = type === 'sos' ? 'Emergency SOS' : 'HealthMitra update';
+  const title = type === 'sos'
+    ? 'Emergency SOS'
+    : type === 'dose-taken'
+    ? 'Dose Confirmed'
+    : type === 'dose-skipped'
+    ? 'Dose Skipped'
+    : type === 'missed-dose'
+    ? 'Missed Dose Alert'
+    : type === 'reminder'
+    ? 'Medication Reminder'
+    : 'HealthMitra update';
   await Promise.all(recipients.map((recipientId) => pushNotification(recipientId, patientId, type, title, message, { alertId: item.id })));
   return item;
 }

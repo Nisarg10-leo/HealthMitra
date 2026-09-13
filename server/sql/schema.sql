@@ -122,3 +122,18 @@ CREATE INDEX dose_logs_medication_scheduled_idx ON dose_logs (medication_id, sch
 CREATE INDEX notifications_user_created_idx ON notifications (user_id, created_at DESC);
 CREATE INDEX alerts_patient_created_idx ON alerts (patient_id, created_at DESC);
 CREATE INDEX sos_events_patient_idx ON sos_events (patient_id, triggered_at DESC);
+
+CREATE TABLE checkups (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  patient_id      UUID REFERENCES users(id) ON DELETE CASCADE,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  date            DATE NOT NULL,
+  time            TEXT NOT NULL,
+  mood            TEXT NOT NULL DEFAULT 'good',
+  blood_pressure  TEXT,
+  blood_sugar     TEXT,
+  sleep_quality   TEXT NOT NULL DEFAULT 'good',
+  pain_level      TEXT NOT NULL DEFAULT 'none',
+  notes           TEXT
+);
+CREATE INDEX checkups_patient_idx ON checkups (patient_id, created_at DESC);

@@ -29,9 +29,9 @@ export function Workspace({ onLogout }) {
   const listen = useSpeechInput(notify);
   const data = useWorkspaceData(session, notify);
 
-  // Real-time Medicine Alarm trigger loop
+  // Real-time Medicine Alarm trigger loop for both Patient and Caregiver
   useEffect(() => {
-    if (session.role !== 'patient' || !data.dashboard?.logs) return;
+    if (!data.dashboard?.logs) return;
 
     const checkDueAlarm = () => {
       const now = new Date();
@@ -49,21 +49,65 @@ export function Workspace({ onLogout }) {
     };
 
     checkDueAlarm();
-    const timer = setInterval(checkDueAlarm, 15_000);
+    const timer = setInterval(checkDueAlarm, 5_000);
     return () => clearInterval(timer);
-  }, [data.dashboard, session.role, alarmDose]);
+  }, [data.dashboard, alarmDose]);
+
+  // Synchronized Alarm Dismissal: If alarm is currently ringing for a dose,
+  // and that dose is marked taken/skipped in logs (e.g. by patient on their phone),
+  // stop the alarm immediately across all connected caregiver and patient screens!
+  useEffect(() => {
+    if (!alarmDose || !data.dashboard?.logs) return;
+    const currentLog = data.dashboard.logs.find((l) => l.id === alarmDose.id);
+    if (currentLog && currentLog.status !== 'pending') {
+      setAlarmDose(null);
+      if (session.role === 'caregiver') {
+        const pName = data.dashboard?.patient?.name || 'Patient';
+        const medName = alarmMedication?.name || 'Medication';
+        notify(
+          i18n.language === 'hi'
+            ? `${pName} जी ने ${medName} ले ली है। अलार्म बंद कर दिया गया।`
+            : `${pName} has ${currentLog.status === 'taken' ? 'taken' : 'skipped'} ${medName}. Alarm stopped.`
+        );
+      }
+    }
+  }, [data.dashboard?.logs, alarmDose, session.role, alarmMedication, notify, i18n.language]);
+
+  // Instant Cross-Tab Real-time Synchronized Alarm Stop
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+    const channel = new BroadcastChannel('healthmitra_sync_channel');
+    channel.onmessage = (event) => {
+      if (event.data?.type === 'DOSE_CONFIRMED') {
+        if (alarmDose && (!event.data.doseId || alarmDose.id === event.data.doseId)) {
+          setAlarmDose(null);
+        }
+        data.refresh();
+      }
+    };
+    return () => channel.close();
+  }, [alarmDose, data.refresh]);
 
   const handleAlarmConfirm = async (dose, status) => {
     // 1. Instantly unmount the modal so the alarm stops immediately
     setAlarmDose(null);
 
-    // 2. Handle test alarm demo click gracefully
+    // 2. Broadcast instant stop to all open tabs / caregiver windows
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        const channel = new BroadcastChannel('healthmitra_sync_channel');
+        channel.postMessage({ type: 'DOSE_CONFIRMED', doseId: dose?.id, status });
+        channel.close();
+      } catch (e) {}
+    }
+
+    // 3. Handle test alarm demo click gracefully
     if (!dose?.id || dose.id === 'test-alarm-id') {
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
       return;
     }
 
-    // 3. Persist real scheduled dose confirmation
+    // 4. Persist real scheduled dose confirmation
     try {
       await dosesApi.confirm(dose.id, status, 'alarm');
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
@@ -169,6 +213,7 @@ export function Workspace({ onLogout }) {
             dose={alarmDose}
             medication={alarmMedication}
             patientName={data.dashboard?.patient?.name || session.name}
+            isCaregiver={session.role === 'caregiver'}
             onConfirm={handleAlarmConfirm}
             onSnooze={handleAlarmSnooze}
             onClose={() => setAlarmDose(null)}

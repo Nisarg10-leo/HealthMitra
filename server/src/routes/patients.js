@@ -22,6 +22,7 @@ patientsRouter.post('/links/join', asyncRoute(async (req, res) => res.json(await
 
 patientsRouter.get('/dashboard', asyncRoute(async (req, res) => {
   const patientId = await resolvePatientId(req, req.actor);
+  if (!patientId) return res.json(null);
   await assertCanView(req.actor, patientId);
   res.json(await patientSummary(patientId, req.actor));
 }));

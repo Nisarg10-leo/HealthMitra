@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { checkupApi } from '../../api/index.js';
+import { checkupApi, dosesApi } from '../../api/index.js';
 import { formatTime, isToday } from '../../utils/format.js';
 import { useWorkspace } from '../../workspace/WorkspaceContext.jsx';
 import {
@@ -559,6 +559,33 @@ export function DashboardPage() {
                       {isTaken && <CheckIcon size={12} />}
                       <span>{isTaken ? 'Taken' : 'Pending'}</span>
                     </span>
+
+                    {!isTaken && (
+                      <button
+                        type="button"
+                        className="btn-glass btn-sm"
+                        style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        onClick={async () => {
+                          try {
+                            await dosesApi.confirm(log.id, 'taken', 'caregiver');
+                            notify(`Marked ${medication?.name || 'dose'} as taken for ${activePatient.name}`);
+                            if (typeof BroadcastChannel !== 'undefined') {
+                              try {
+                                const channel = new BroadcastChannel('healthmitra_sync_channel');
+                                channel.postMessage({ type: 'DOSE_CONFIRMED', doseId: log.id, status: 'taken' });
+                                channel.close();
+                              } catch (e) {}
+                            }
+                            refresh();
+                          } catch (err) {
+                            notify(err.message);
+                          }
+                        }}
+                      >
+                        <CheckIcon size={12} />
+                        <span>Mark Taken</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );

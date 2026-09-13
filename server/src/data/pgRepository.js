@@ -283,5 +283,26 @@ export const pgRepository = {
       const table = type === 'doctors' ? 'doctors' : 'chemists';
       return one(await query(...Object.values(buildInsert(table, item))));
     }
+  },
+
+  checkups: {
+    forPatient: async (patientId) => {
+      const uid = cleanUuid(patientId);
+      if (!uid) return [];
+      try {
+        return rows(await query('SELECT * FROM checkups WHERE patient_id = $1 ORDER BY created_at DESC', [uid]));
+      } catch (err) {
+        console.warn('[pgRepository] checkups query failed:', err.message);
+        return [];
+      }
+    },
+    insert: async (item) => {
+      try {
+        return one(await query(...Object.values(buildInsert('checkups', item))));
+      } catch (err) {
+        console.warn('[pgRepository] checkups insert failed:', err.message);
+        return item;
+      }
+    }
   }
 };

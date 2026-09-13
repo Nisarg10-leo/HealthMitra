@@ -7,6 +7,7 @@ export const doseLogsRouter = Router();
 
 doseLogsRouter.get('/dose-logs', asyncRoute(async (req, res) => {
   const patientId = await resolvePatientId(req, req.actor);
+  if (!patientId) return res.json([]);
   await assertCanView(req.actor, patientId);
   res.json(await listDoseLogs(patientId, req.query.range));
 }));

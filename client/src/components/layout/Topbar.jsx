@@ -53,6 +53,25 @@ export function Topbar({ session, patients, selectedPatient, selectedPatientId, 
         )}
 
 
+        <div className="topbar-lang-toggle">
+          <button
+            type="button"
+            className={`topbar-lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage('en')}
+            title="English"
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            className={`topbar-lang-btn ${i18n.language === 'hi' ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage('hi')}
+            title="हिन्दी"
+          >
+            हिन्दी
+          </button>
+        </div>
+
         {session.role === 'patient' && (
           <button
             type="button"

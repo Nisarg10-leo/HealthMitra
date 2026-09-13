@@ -7,6 +7,7 @@ export const safetyRouter = Router();
 
 safetyRouter.get('/safety/advisory', asyncRoute(async (req, res) => {
   const patientId = await resolvePatientId(req, req.actor);
+  if (!patientId) return res.json({ interactions: [], polypharmacy: false, duplicateTherapies: [] });
   await assertCanView(req.actor, patientId);
   const language = req.query.language === 'hi' ? 'hi' : 'en';
   res.json(await getSafetyAdvisory(patientId, language));

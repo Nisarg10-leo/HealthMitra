@@ -13,8 +13,26 @@ import {
   WhatsAppIcon
 } from '../../components/ui/Icons.jsx';
 
-const alertTitle = (type, t) =>
-  type === 'sos' ? t('emergencySos') : type === 'missed-dose' ? t('missedDoseTitle') : t('healthMitra');
+const alertTitle = (type, t) => {
+  switch (type) {
+    case 'sos':
+      return t('emergencySos');
+    case 'missed-dose':
+      return t('missedDoseTitle');
+    case 'dose-taken':
+      return t('doseRecorded') || 'Dose Recorded';
+    case 'dose-skipped':
+      return t('doseSkipped') || 'Dose Skipped';
+    case 'reassurance':
+      return 'Activity Status';
+    case 'checkup':
+      return 'Everyday Checkup';
+    case 'reminder':
+      return 'Medication Reminder';
+    default:
+      return t('healthMitra');
+  }
+};
 
 export function AlertsPage() {
   const { t, i18n } = useTranslation();
@@ -107,8 +125,8 @@ export function AlertsPage() {
                 className={`alert-feed-item ${isSos ? 'alert-item-sos' : 'alert-item-standard'}`}
               >
                 <div className="alert-item-left">
-                  <div className={`alert-type-icon ${isSos ? 'icon-coral' : 'icon-cyan'}`}>
-                    {isSos ? <AlertTriangleIcon size={18} /> : <AlertCircleIcon size={18} />}
+                  <div className={`alert-type-icon ${isSos ? 'icon-coral' : item.type === 'dose-taken' ? 'icon-mint' : 'icon-cyan'}`}>
+                    {isSos ? <AlertTriangleIcon size={18} /> : item.type === 'dose-taken' ? <CheckIcon size={18} /> : <AlertCircleIcon size={18} />}
                   </div>
 
                   <div className="alert-item-content">

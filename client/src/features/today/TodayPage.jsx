@@ -81,6 +81,15 @@ export function TodayPage() {
       notify(status === 'taken' ? t('doseRecorded') : t('doseSkipped'));
       refresh();
 
+      // Instantly notify other tabs (e.g. caregiver tab) to stop alarm and refresh
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          const channel = new BroadcastChannel('healthmitra_sync_channel');
+          channel.postMessage({ type: 'DOSE_CONFIRMED', doseId: log.id, status });
+          channel.close();
+        } catch (e) {}
+      }
+
       if (status === 'taken') {
         const med = medicationById(log.medicationId);
         setCelebratingMed(med?.name || t('medication'));

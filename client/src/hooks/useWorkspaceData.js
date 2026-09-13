@@ -12,10 +12,22 @@ export function useWorkspaceData(session, notify) {
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => setRefreshKey((value) => value + 1), []);
 
-  // Periodic polling every 30s to keep schedule, alerts, and reminders in sync
+  // Periodic polling every 5s to keep schedule, alerts, and reminders in real-time sync
   useEffect(() => {
-    const interval = setInterval(refresh, 30_000);
+    const interval = setInterval(refresh, 5_000);
     return () => clearInterval(interval);
+  }, [refresh]);
+
+  // Real-time multi-tab cross synchronization
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+    const channel = new BroadcastChannel('healthmitra_sync_channel');
+    channel.onmessage = (event) => {
+      if (event.data?.type === 'SYNC_REFRESH' || event.data?.type === 'DOSE_CONFIRMED') {
+        refresh();
+      }
+    };
+    return () => channel.close();
   }, [refresh]);
 
   useEffect(() => {

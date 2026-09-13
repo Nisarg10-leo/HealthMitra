@@ -22,6 +22,17 @@ export async function schedulerTick(now = Date.now()) {
       if (!log.reminderSentAt && now >= scheduledAt) {
         await repository.doseLogs.update(log.id, { reminderSentAt: nowIso() });
         await pushNotification(patient.id, patient.id, 'reminder', `Time for ${medication.name}`, `${medication.dosage} is scheduled now. Tap Taken or say “yes, I took it”.`, { doseLogId: log.id });
+        const caregiverLinks = await repository.links.forPatient(patient.id);
+        for (const link of caregiverLinks) {
+          await pushNotification(
+            link.caregiverId,
+            patient.id,
+            'reminder',
+            `Dose due for ${patient.name}: ${medication.name}`,
+            `${medication.dosage} scheduled now for ${patient.name}.`,
+            { doseLogId: log.id }
+          );
+        }
         schedulerState.remindersSent += 1;
       }
       if (now - scheduledAt > config.reminderWindowMinutes * 60_000) {

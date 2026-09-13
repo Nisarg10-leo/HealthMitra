@@ -10,7 +10,7 @@ import {
 import { formatTime } from '../../utils/format.js';
 import { AlertTriangleIcon, BellIcon, CheckIcon, ClockIcon, ToneIcon, Volume2Icon, VolumeXIcon } from './Icons.jsx';
 
-export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, onSnooze, onClose }) {
+export function MedicineAlarmModal({ dose, medication, patientName, isCaregiver = false, onConfirm, onSnooze, onClose }) {
   const { t, i18n } = useTranslation();
   const [muted, setMuted] = useState(false);
   const [currentTone, setCurrentTone] = useState(() => getSelectedAlarmTone());
@@ -25,8 +25,12 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
     const name = patientName || 'Friend';
 
     const text = i18n.language === 'hi'
-      ? `सावधान! ${name} जी, दवा का आवश्यक समय हो गया है। तुरंत ${medName} ${dosage} लें!`
-      : `URGENT MEDICATION ALARM! Attention ${name}, please take your scheduled dose of ${medName} ${dosage} immediately!`;
+      ? (isCaregiver
+          ? `सावधान! ${name} जी की दवा का समय हो गया है। कृपया सुनिश्चित करें कि उन्होंने ${medName} ${dosage} ले ली है।`
+          : `सावधान! ${name} जी, दवा का आवश्यक समय हो गया है। तुरंत ${medName} ${dosage} लें!`)
+      : (isCaregiver
+          ? `URGENT CAREGIVER ALARM! Attention, scheduled dose for ${name} is due now: ${medName} ${dosage}!`
+          : `URGENT MEDICATION ALARM! Attention ${name}, please take your scheduled dose of ${medName} ${dosage} immediately!`);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = i18n.language === 'hi' ? 'hi-IN' : 'en-IN';
@@ -108,7 +112,7 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
         <div className="alarm-badge-row">
           <span className="alarm-urgent-chip font-mono">
             <AlertTriangleIcon size={14} />
-            <span>URGENT MEDICATION ALARM</span>
+            <span>{isCaregiver ? `CAREGIVER ALARM • ${patientName ? patientName.toUpperCase() : 'PATIENT'}` : 'URGENT MEDICATION ALARM'}</span>
           </span>
 
           <button
@@ -214,7 +218,11 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
             onClick={handleTake}
           >
             <CheckIcon size={20} />
-            <span>{t('taken')} — I Have Taken This Dose</span>
+            <span>
+              {isCaregiver
+                ? (i18n.language === 'hi' ? `${patientName} की खुराक दर्ज करें (ले ली)` : `Record Dose as Taken for ${patientName}`)
+                : `${t('taken')} — I Have Taken This Dose`}
+            </span>
           </button>
 
           <div className="alarm-actions-secondary">
@@ -232,7 +240,11 @@ export function MedicineAlarmModal({ dose, medication, patientName, onConfirm, o
               className="alarm-btn-skip"
               onClick={handleSkip}
             >
-              <span>{t('skipped')}</span>
+              <span>
+                {isCaregiver
+                  ? (i18n.language === 'hi' ? 'खुराक छोड़ दी दर्ज करें' : 'Record as Skipped')
+                  : t('skipped')}
+              </span>
             </button>
           </div>
         </div>

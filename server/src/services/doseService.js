@@ -2,6 +2,7 @@ import { repository } from '../data/repository.js';
 import { badRequest, conflict, forbidden, notFound } from '../lib/httpError.js';
 import { isoAt, nowIso, today } from '../lib/time.js';
 import { accessFor } from './accessService.js';
+import { raiseAlert } from './notificationService.js';
 
 const isActiveOn = (medication, date) => (!medication.startDate || medication.startDate <= date) && (!medication.endDate || medication.endDate >= date);
 
@@ -42,7 +43,7 @@ export async function confirmDose(actor, doseId, { status, method }) {
   if (!['taken', 'skipped'].includes(status)) throw badRequest('Choose taken or skipped.');
   const updated = await repository.doseLogs.update(log.id, { status, respondedAt: nowIso(), responseMethod: method === 'voice' ? 'voice' : 'tap' });
 
-  // Clear any active reminder notifications for this dose log
+  // Clear any active reminder notifications for this dose log (patient and caregivers)
   try {
     const notifs = await repository.notifications.forUser(medication.patientId);
     for (const n of notifs) {
@@ -50,8 +51,42 @@ export async function confirmDose(actor, doseId, { status, method }) {
         await repository.notifications.update(n.id, { readAt: nowIso() });
       }
     }
+    const caregiverLinks = await repository.links.forPatient(medication.patientId);
+    for (const link of caregiverLinks) {
+      const cNotifs = await repository.notifications.forUser(link.caregiverId);
+      for (const n of cNotifs) {
+        if (n.doseLogId === log.id && !n.readAt) {
+          await repository.notifications.update(n.id, { readAt: nowIso() });
+        }
+      }
+    }
   } catch (err) {
     console.warn('[doseService] Could not auto-clear reminder notification:', err.message);
+  }
+
+  // Notify connected caregivers immediately that the dose was taken or skipped
+  try {
+    const patient = await repository.users.findById(medication.patientId);
+    const patientName = patient?.name || 'Patient';
+    const message = status === 'taken'
+      ? `${patientName} has taken their dose of ${medication.name} (${medication.dosage || ''}).`
+      : `${patientName} marked their dose of ${medication.name} as skipped.`;
+
+    await raiseAlert(
+      medication.patientId,
+      status === 'taken' ? 'dose-taken' : 'dose-skipped',
+      message,
+      {
+        doseLogId: log.id,
+        medicationId: medication.id,
+        doseStatus: status,
+        confirmedBy: actor.name || actor.role,
+        responseMethod: method || 'tap'
+      },
+      'caregivers'
+    );
+  } catch (err) {
+    console.warn('[doseService] Could not notify caregivers of dose confirmation:', err.message);
   }
 
   return updated;

@@ -7,6 +7,7 @@ export const medicationsRouter = Router();
 
 medicationsRouter.get('/medications', asyncRoute(async (req, res) => {
   const patientId = await resolvePatientId(req, req.actor);
+  if (!patientId) return res.json([]);
   await assertCanView(req.actor, patientId);
   res.json(await listMedications(patientId));
 }));

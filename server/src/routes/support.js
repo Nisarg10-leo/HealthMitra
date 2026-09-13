@@ -59,6 +59,7 @@ supportRouter.post('/support/scan-prescription', requireUser, express.json({ lim
 for (const type of CONTACT_TYPES) {
   supportRouter.get(`/${type}`, requireUser, asyncRoute(async (req, res) => {
     const patientId = await resolvePatientId(req, req.actor);
+    if (!patientId) return res.json([]);
     await assertCanView(req.actor, patientId);
     res.json(await listContacts(type, patientId));
   }));

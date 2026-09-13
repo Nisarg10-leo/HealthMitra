@@ -21,9 +21,10 @@ export function ContactsPage() {
   const session = useSession();
   const { dashboard, openModal, notify } = useWorkspace();
   const [contacts, setContacts] = useState({ doctors: [], chemists: [] });
-  const patientId = dashboard.patient.id;
+  const patientId = dashboard?.patient?.id || session?.id;
 
   useEffect(() => {
+    if (!patientId) return;
     Promise.all(SECTIONS.map(({ type }) => contactsApi.list(type, patientId)))
       .then(([doctors, chemists]) => setContacts({ doctors, chemists }))
       .catch((error) => notify(error.message));
@@ -56,7 +57,7 @@ export function ContactsPage() {
               <span>{t('linkCaregiver')}</span>
             </button>
           )}
-          {dashboard.permissions?.canEdit && (
+          {(dashboard?.permissions?.canEdit ?? (session.role === 'patient')) && (
             <button
               type="button"
               className="btn-cyber"

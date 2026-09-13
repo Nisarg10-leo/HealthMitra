@@ -46,7 +46,7 @@ export function HistoryPage() {
 
         <div className="history-stream-stack">
           {logs.map((log) => {
-            const medication = dashboard.medications?.find((item) => item.id === log.medicationId);
+            const medication = dashboard?.medications?.find((item) => item.id === log.medicationId);
             const isTaken = log.status === 'taken';
 
             return (
