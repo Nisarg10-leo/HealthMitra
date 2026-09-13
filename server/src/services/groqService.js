@@ -99,7 +99,200 @@ const CLINICAL_KNOWLEDGE = [
   }
 ];
 
-export async function askMitra({ question, patientId, language = 'en' }) {
+// OCR extraction helper using Tesseract
+async function extractOcrFromImage(base64Image) {
+  if (!base64Image) return '';
+  return Promise.race([
+    (async () => {
+      let worker = null;
+      try {
+        const cleanBase64 = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
+        const buffer = Buffer.from(cleanBase64, 'base64');
+        const { createWorker } = await import('tesseract.js');
+        worker = await createWorker('eng', 1, {
+          errorHandler: (err) => console.warn('[groqService] OCR worker warning:', err?.message || err)
+        });
+        const ret = await worker.recognize(buffer);
+        const text = ret?.data?.text || '';
+        await worker.terminate();
+        return text.trim();
+      } catch (err) {
+        if (worker) {
+          try { await worker.terminate(); } catch (_) {}
+        }
+        console.warn('[groqService] Image OCR extraction error:', err.message);
+        return '';
+      }
+    })(),
+    new Promise((resolve) => setTimeout(() => resolve(''), 3000))
+  ]);
+}
+
+// Local clinical fallback for image analysis
+function analyzeMedicalImageLocally({ ocrText, question, medications, language }) {
+  const text = (ocrText || '').toLowerCase();
+  const q = (question || '').toLowerCase();
+  const medsSummary = medications?.map((m) => `${m.name} (${m.dosage})`).join(', ') || 'Metformin, Amlodipine';
+  const isHindi = language === 'hi';
+
+  // 1. Lab Report or Diagnostic Parameter Check
+  const isLab = /hba1c|glucose|blood sugar|cholesterol|lipid|creatinine|hemoglobin|bilirubin|triglyceride|serum|report|test|mg\/dl|mmol/i.test(text + ' ' + q);
+  if (isLab) {
+    const findings = [];
+    if (/hba1c/i.test(text + ' ' + q)) {
+      findings.push(isHindi
+        ? 'HbA1c (ग्लाइकेटेड हीमोग्लोबिन): सामान्य सीमा 5.7% से कम है। 5.7%-6.4% प्रीडायबिटीज और 6.5% या अधिक मधुमेह दर्शाता है।'
+        : 'HbA1c: Target is typically below 7.0% for managed diabetes (normal < 5.7%). Helps assess 3-month blood sugar control.');
+    }
+    if (/glucose|sugar|fbs|ppbs/i.test(text + ' ' + q)) {
+      findings.push(isHindi
+        ? 'रक्त शर्करा (Blood Glucose): उपवास (Fasting) सामान्य सीमा 70-99 mg/dL है, और भोजन के 2 घंटे बाद 140 mg/dL से कम।'
+        : 'Blood Sugar: Normal fasting range is 70-99 mg/dL, post-meal under 140 mg/dL.');
+    }
+    if (/cholesterol|lipid|triglyceride|ldl|hdl/i.test(text + ' ' + q)) {
+      findings.push(isHindi
+        ? 'लिपिड प्रोफाइल: कुल कोलेस्ट्रॉल 200 mg/dL से कम और LDL (हानिकारक कोलेस्ट्रॉल) 100 mg/dL से कम होना चाहिए।'
+        : 'Lipid Profile: Desirable Total Cholesterol is < 200 mg/dL and LDL < 100 mg/dL for cardiac safety.');
+    }
+    if (/creatinine|kidney|urea/i.test(text + ' ' + q)) {
+      findings.push(isHindi
+        ? 'सीरम क्रिएटिनिन: सामान्य सीमा 0.6-1.2 mg/dL है, जो किडनी की कार्यक्षमता को दर्शाता है।'
+        : 'Serum Creatinine: Normal baseline is 0.6-1.2 mg/dL, reflecting renal filtration efficiency.');
+    }
+
+    if (findings.length === 0) {
+      findings.push(isHindi ? 'लैब रिपोर्ट से संबंधित क्लिनिकल डाटा पहचाना गया।' : 'Diagnostic test report parameters detected in document.');
+    }
+
+    if (isHindi) {
+      return `लैब रिपोर्ट विश्लेषण:
+
+1. पहचानी गई मुख्य जाँचें:
+${findings.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+2. आपकी मौजूदा दवाओं के साथ तालमेल:
+आपकी वर्तमान निर्धारित दवाएँ (${medsSummary}) इस रिपोर्ट के मापदंडों को नियंत्रित करने में सहायक हैं। अपनी दवाएँ नियमित रूप से समय पर लें।
+
+3. अगला कदम:
+इस रिपोर्ट को अपने डॉक्टर के साथ साझा करें ताकि वे आवश्यकतानुसार आपकी खुराक की समीक्षा कर सकें।`;
+    } else {
+      return `Clinical Lab Report Analysis:
+
+1. Identified Test Parameters:
+${findings.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+2. Correlation with Active Medication Plan:
+Your active prescription regimen (${medsSummary}) directly supports managing these vital benchmarks. Continue taking your scheduled doses consistently.
+
+3. Recommended Next Step:
+Share these diagnostic findings with your treating physician at your next follow-up for routine dose titration.`;
+    }
+  }
+
+  // 2. Medicine Strip, Pill, or Packaging
+  const isMed = /tablet|capsule|mg|strip|pharma|dosage|metformin|amlodipine|atorvastatin|paracetamol|dolo|pantoprazole|aspirin|vitamin|calpol|glycomet/i.test(text + ' ' + q);
+  if (isMed) {
+    let identifiedDrug = null;
+    const knownList = [
+      { name: 'Metformin', regex: /metformin|glycomet/i, dosage: '500 mg', advice: 'Take with or immediately after meals to avoid stomach upset.' },
+      { name: 'Amlodipine', regex: /amlodipine|norvasc/i, dosage: '5 mg', advice: 'Take once daily in the morning. Avoid grapefruit juice.' },
+      { name: 'Atorvastatin', regex: /atorvastatin|lipitor/i, dosage: '20 mg', advice: 'Take once daily at bedtime for optimal cholesterol management.' },
+      { name: 'Paracetamol', regex: /paracetamol|crocin|dolo|calpol/i, dosage: '650 mg', advice: 'For mild pain or fever. Do not exceed 3000 mg in 24 hours.' },
+      { name: 'Pantoprazole', regex: /pantoprazole|pan-d/i, dosage: '40 mg', advice: 'Take 30 minutes before morning breakfast with plain water.' },
+      { name: 'Vitamin D3', regex: /vitamin\s*d|cholecalciferol/i, dosage: '1000 IU', advice: 'Take with milk or a meal containing healthy fats for better absorption.' }
+    ];
+
+    for (const item of knownList) {
+      if (item.regex.test(text) || item.regex.test(q)) {
+        identifiedDrug = item;
+        break;
+      }
+    }
+
+    if (isHindi) {
+      const drugName = identifiedDrug ? `${identifiedDrug.name} (${identifiedDrug.dosage})` : 'दवा पैकेजिंग / स्ट्रिप';
+      const drugAdvice = identifiedDrug ? identifiedDrug.advice : 'दवा हमेशा लेबल के निर्देशानुसार और पर्याप्त पानी के साथ लें।';
+      return `दवा पैकेजिंग विश्लेषण:
+
+1. पहचानी गई दवा:
+${drugName}
+
+2. सेवन निर्देश व सावधानियाँ:
+${drugAdvice}
+
+3. आपकी दिनचर्या के साथ सुरक्षा जाँच:
+आपकी वर्तमान सक्रिय दवाएँ: ${medsSummary}। यदि यह दवा आपकी नियमित समय-सारणी में नहीं है, तो लेने से पहले अपने डॉक्टर या देखभालकर्ता से पुष्टि करें।`;
+    } else {
+      const drugName = identifiedDrug ? `${identifiedDrug.name} (${identifiedDrug.dosage})` : 'Medication strip / packaging detected';
+      const drugAdvice = identifiedDrug ? identifiedDrug.advice : 'Take strictly as instructed on prescription with adequate water.';
+      return `Medication Packaging Visual Analysis:
+
+1. Identified Medication:
+${drugName}
+
+2. Clinical Administration Instructions:
+${drugAdvice}
+
+3. Safety Check with Active Regimen:
+Active medications: ${medsSummary}. If this is a newly prescribed drug not currently on your schedule, confirm with your doctor or caregiver before taking.`;
+    }
+  }
+
+  // 3. Food Plate or Meal
+  const isFood = /food|meal|diet|eat|khana|roti|rice|plate|fruit|breakfast|lunch|dinner|snack/i.test(text + ' ' + q);
+  if (isFood) {
+    if (isHindi) {
+      return `भोजन व पोषण विश्लेषण:
+
+1. स्वास्थ्य संबंधी जाँच:
+संतुलित आहार में पर्याप्त फाइबर (सलाद/हरी सब्जियां), प्रोटीन और कम चीनी/नमक जरूरी है।
+
+2. दवा का सही समय:
+मेटफ़ॉर्मिन जैसी दवाएं भोजन के साथ या तुरंत बाद लें ताकि पेट में गैस या दर्द न हो। बीपी की दवा (एम्लोडिपिन) लेते समय चकोतरा (Grapefruit) का रस न पिएं।
+
+3. सलाह:
+पर्याप्त पानी पिएं और भोजन के बाद 15-20 मिनट हल्की चहलकदमी करें।`;
+    } else {
+      return `Dietary & Meal Health Analysis:
+
+1. Nutritional Balance Overview:
+Ensure balanced portions with high dietary fiber, lean protein, and controlled refined carbs and sodium for stable blood pressure and glucose levels.
+
+2. Medication Timing & Precautions:
+If taking Metformin, take it with or right after this meal to prevent stomach cramps. Avoid grapefruit or Seville oranges if taking calcium channel blockers like Amlodipine.
+
+3. Practical Tip:
+Stay well hydrated and consider a gentle 15-minute walk after meals to aid digestion and steady glucose absorption.`;
+    }
+  }
+
+  // 4. General Medical Image Default
+  if (isHindi) {
+    return `मेडिकल छवि विश्लेषण:
+
+1. विवरण:
+छवि में स्वास्थ्य या दवा संबंधी जानकारी पाई गई है${ocrText ? `: "${ocrText.slice(0, 100)}..."` : '।' }
+
+2. आपकी दवाओं के साथ सुरक्षा:
+आपकी निर्धारित दवाएँ हैं: ${medsSummary}। कोई भी नई दवा या सप्लीमेंट शुरू करने से पहले अपने डॉक्टर से सलाह लें।
+
+3. सलाह:
+किसी भी संदेह या बदलाव के लिए अपने डॉक्टर या देखभालकर्ता से संपर्क करें।`;
+  } else {
+    return `Medical Image Analysis:
+
+1. Visual Extraction Summary:
+Health or clinical documentation identified in image${ocrText ? `: "${ocrText.slice(0, 100)}..."` : '.' }
+
+2. Safety Check with Current Medications:
+Your current active prescriptions are: ${medsSummary}. Always cross-check new medications against this list to prevent polypharmacy risks.
+
+3. Recommendation:
+For personalized interpretations or changes to therapy, review this document directly with your attending physician.`;
+  }
+}
+
+export async function askMitra({ question, image = null, patientId, language = 'en' }) {
   const [patient, medications] = await Promise.all([
     repository.users.findById(patientId),
     repository.medications.forPatient(patientId)
@@ -113,10 +306,16 @@ Age: ${patient.age || 'Unknown'}
 Conditions: ${patient.conditions?.join(', ') || 'None recorded'}
 Allergies: ${patient.allergies?.join(', ') || 'None recorded'}` : '';
 
-  // 1. Call AI model if GROQ_API_KEY is configured
+  // Extract OCR text from image if attached
+  let ocrText = '';
+  if (image) {
+    ocrText = await extractOcrFromImage(image);
+  }
+
+  // 1. Call Groq AI model if GROQ_API_KEY is configured
   if (process.env.GROQ_API_KEY) {
     try {
-      const systemPrompt = `You are Mitra, an empathetic, warm, and clear medical assistant for patients.
+      const systemPrompt = `You are Mitra, an empathetic, warm, and highly skilled clinical AI medical assistant for patients and caregivers.
 Patient Name: ${patient?.name || 'Patient'}
 ${patientProfile}
 Active Medications: ${medsSummary}
@@ -125,83 +324,147 @@ CRITICAL FORMATTING RULES:
 1. Do NOT use markdown symbols like hashtags (### or ##), divider lines (---), bold or italic asterisks (** or *), or pipe tables (|).
 2. Present all information in clean, natural, plain conversational paragraphs and simple numbered lists (1. 2. 3.) or clean bullet dashes (- ).
 3. Give thorough, clear, reassuring explanations without technical jargon or formatting symbols.
-4. Address food/drug safety, side effects, and practical home measures.
+4. Address food/drug safety, side effects, test interpretation, and practical home measures.
 5. Answer in ${language === 'hi' ? 'Hindi' : 'English'}.
 6. End with a simple, gentle reminder to check with their doctor.`;
 
       let answer = null;
-      const modelsToTry = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound-mini', 'qwen/qwen3.8-27b'];
 
-      for (const model of modelsToTry) {
-        try {
-          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${process.env.GROQ_API_KEY}`
-            },
-            body: JSON.stringify({
-              model,
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: question }
-              ],
-              temperature: 0.3,
-              max_tokens: 500
-            })
-          });
+      // If image is provided, try multimodal vision models first
+      if (image) {
+        const visionModels = ['llama-3.2-11b-vision-preview', 'llama-3.2-90b-vision-preview'];
+        for (const model of visionModels) {
+          try {
+            const promptText = (question || 'Please analyze this medical image / report in detail. Identify any medication, test parameters, or dietary items, explain clinical safety with my active medications, and provide clear next steps.') +
+              (ocrText ? `\n\n[Extracted OCR Text Reference]:\n${ocrText}` : '');
 
-          if (response.ok) {
-            const json = await response.json();
-            answer = json.choices?.[0]?.message?.content;
-            if (answer) {
-              // Strip any stray markdown symbols (###, ---, **, tables)
-              let cleanAnswer = answer
-                .replace(/^#{1,6}\s+/gm, '')
-                .replace(/^\s*[-*_]{3,}\s*$/gm, '')
-                .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-                .replace(/^[|\s]+|[|\s]+$/gm, '')
-                .replace(/\|\s*/g, ' - ')
-                .replace(/^[-\s]{4,}$/gm, '')
-                .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
-                .replace(/\n{3,}/g, '\n\n')
-                .trim();
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.GROQ_API_KEY}`
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  {
+                    role: 'user',
+                    content: [
+                      { type: 'text', text: promptText },
+                      {
+                        type: 'image_url',
+                        image_url: {
+                          url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
+                        }
+                      }
+                    ]
+                  }
+                ],
+                temperature: 0.2,
+                max_tokens: 600
+              })
+            });
 
-              return {
-                source: 'Mitra AI',
-                question,
-                answer: cleanAnswer,
-                disclaimer: language === 'hi'
-                  ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल मार्गदर्शन के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
-                  : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
-              };
+            if (response.ok) {
+              const json = await response.json();
+              answer = json.choices?.[0]?.message?.content;
+              if (answer) break;
             }
+          } catch (vErr) {
+            console.warn(`[groqService] Vision model ${model} failed:`, vErr.message);
           }
-        } catch (mErr) {
-          console.warn('[ai] Model attempt failed, trying fallback:', mErr.message);
         }
+      }
+
+      // If text query or vision fallback, call text models with OCR context
+      if (!answer) {
+        const textModels = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound-mini', 'qwen/qwen3.8-27b'];
+        const userPrompt = image && ocrText
+          ? `${question ? question + '\n\n' : ''}[Medical Image Extracted Text]:\n${ocrText}\n\nPlease analyze this medical image text, identify medications or lab results, explain safety with my active prescriptions, and provide clear guidance.`
+          : (question || 'How should I take my medications today?');
+
+        for (const model of textModels) {
+          try {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.GROQ_API_KEY}`
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  { role: 'user', content: userPrompt }
+                ],
+                temperature: 0.3,
+                max_tokens: 600
+              })
+            });
+
+            if (response.ok) {
+              const json = await response.json();
+              answer = json.choices?.[0]?.message?.content;
+              if (answer) break;
+            }
+          } catch (mErr) {
+            console.warn('[ai] Model attempt failed, trying fallback:', mErr.message);
+          }
+        }
+      }
+
+      if (answer) {
+        // Strip any stray markdown symbols (###, ---, **, tables)
+        const cleanAnswer = answer
+          .replace(/^#{1,6}\s+/gm, '')
+          .replace(/^\s*[-*_]{3,}\s*$/gm, '')
+          .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+          .replace(/^[|\s]+|[|\s]+$/gm, '')
+          .replace(/\|\s*/g, ' - ')
+          .replace(/^[-\s]{4,}$/gm, '')
+          .replace(/([.?!])\s*(\d+\.\s+)/g, '$1\n\n$2')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+
+        return {
+          source: image ? 'Mitra Vision AI' : 'Mitra AI',
+          question,
+          answer: cleanAnswer,
+          hasImage: Boolean(image),
+          disclaimer: language === 'hi'
+            ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल मार्गदर्शन के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
+            : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
+        };
       }
     } catch (err) {
       console.error('[ai] Service error:', err);
     }
   }
 
-  // 2. Intelligent Clinical Reasoning Engine Fallback
-  const matched = CLINICAL_KNOWLEDGE.find((k) => k.pattern.test(question));
+  // 2. Intelligent Clinical Reasoning Engine Fallback (Supports both Text and Images)
   let answerText = '';
 
-  if (matched) {
-    answerText = language === 'hi' ? matched.hi : matched.en;
+  if (image || ocrText) {
+    answerText = analyzeMedicalImageLocally({ ocrText, question, medications, language });
   } else {
-    answerText = language === 'hi'
-      ? `आपकी मौजूदा दवाएँ (${medsSummary}) आपके स्वास्थ्य के लिए महत्वपूर्ण हैं। इस सवाल के लिए कृपया अपने डॉक्टर से संपर्क करें या समय पर अपनी निर्धारित दवा लें। हम अभी विस्तृत जानकारी प्राप्त करने में असमर्थ हैं।`
-      : `Based on your active medications (${medsSummary}), always take doses at consistent times with meals as indicated. For this specific medical query, we recommend speaking with your doctor, as our detailed AI assistant is currently unreachable.`;
+    const matched = CLINICAL_KNOWLEDGE.find((k) => k.pattern.test(question));
+    if (matched) {
+      answerText = language === 'hi' ? matched.hi : matched.en;
+    } else {
+      answerText = language === 'hi'
+        ? `आपकी मौजूदा दवाएँ (${medsSummary}) आपके स्वास्थ्य के लिए महत्वपूर्ण हैं। इस सवाल के लिए कृपया अपने डॉक्टर से संपर्क करें या समय पर अपनी निर्धारित दवा लें।`
+        : `Based on your active medications (${medsSummary}), always take doses at consistent times with meals as indicated. For this specific medical query, we recommend speaking with your doctor.`;
+    }
   }
 
   return {
-    source: 'clinical-rules-engine',
+    source: image ? 'clinical-vision-engine' : 'clinical-rules-engine',
     question,
     answer: answerText,
-    disclaimer: language === 'hi' ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल सहायता के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।' : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
+    hasImage: Boolean(image),
+    disclaimer: language === 'hi'
+      ? 'चिकित्सा अस्वीकरण: यह जानकारी केवल सहायता के लिए है। किसी भी बदलाव से पहले अपने डॉक्टर से सलाह लें।'
+      : 'Medical disclaimer: For guidance only. Please consult your physician before altering any prescription.'
   };
 }

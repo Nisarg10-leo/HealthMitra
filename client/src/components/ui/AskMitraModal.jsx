@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { guidanceApi } from '../../api/index.js';
 import { useSpeechInput } from '../../hooks/useSpeech.js';
 import {
+  CameraIcon,
   CrossMedicalIcon,
   MicrophoneIcon,
   SparklesIcon,
@@ -29,29 +30,81 @@ export function AskMitraModal({ onClose }) {
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversation, setConversation] = useState([]);
+  const [attachedImage, setAttachedImage] = useState(null); // { base64, name, size }
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [enlargedImage, setEnlargedImage] = useState(null);
   const chatBottomRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
   const listen = useSpeechInput((msg) => alert(msg));
 
-  const handleAsk = async (queryToAsk) => {
-    const q = (queryToAsk || question).trim();
-    if (!q) return;
+  const processImageFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      alert(i18n.language === 'hi' ? 'कृपया एक मान्य छवि फ़ाइल चुनें।' : 'Please select a valid image file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert(i18n.language === 'hi' ? 'छवि का आकार 10MB से कम होना चाहिए।' : 'Image must be under 10MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      setAttachedImage({
+        base64,
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + ' KB'
+      });
+      setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
 
+  const handleImageSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (file) processImageFile(file);
+  };
+
+  const handleClearImage = () => {
+    setAttachedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleAsk = async (queryToAsk) => {
+    const hasImage = Boolean(attachedImage?.base64);
+    let q = (queryToAsk || question).trim();
+
+    if (!q && !hasImage) return;
+
+    if (!q && hasImage) {
+      q = i18n.language === 'hi'
+        ? 'कृपया इस मेडिकल छवि (दवा, लैब रिपोर्ट या भोजन) का विश्लेषण करें।'
+        : 'Please analyze this medical image (medication, lab report, or meal) in detail.';
+    }
+
+    const currentImage = attachedImage?.base64 || null;
     const userMsg = {
       role: 'user',
       text: q,
+      image: currentImage,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
+
     setConversation((prev) => [...prev, userMsg]);
     setQuestion('');
+    handleClearImage();
     setLoading(true);
 
     try {
-      const result = await guidanceApi.askMitra(q, i18n.language);
+      const result = await guidanceApi.askMitra(q, i18n.language, currentImage);
+      const isVision = Boolean(result?.hasImage || result?.source?.toLowerCase().includes('vision'));
       const aiMsg = {
         role: 'mitra',
         text: cleanText(result?.answer || 'I could not generate an answer at this time.'),
-        source: 'Mitra Clinical AI',
+        source: isVision ? 'Mitra Vision AI' : (result?.source || 'Mitra Clinical AI'),
+        isVision,
         disclaimer: result?.disclaimer,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -89,7 +142,37 @@ export function AskMitraModal({ onClose }) {
   const handleResetChat = () => {
     setConversation([]);
     setQuestion('');
+    handleClearImage();
     inputRef.current?.focus();
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processImageFile(file);
+  };
+
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        const blob = item.getAsFile();
+        if (blob) processImageFile(blob);
+        break;
+      }
+    }
   };
 
   return (
@@ -104,7 +187,23 @@ export function AskMitraModal({ onClose }) {
       <div
         className="ask-mitra-dialog"
         onClick={(e) => e.stopPropagation()}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onPaste={handlePaste}
       >
+        {/* Drag & Drop Visual Dropzone Overlay */}
+        {isDragging && (
+          <div className="ask-mitra-drop-overlay">
+            <CameraIcon size={36} />
+            <span>
+              {i18n.language === 'hi'
+                ? 'एआई विश्लेषण के लिए छवि यहाँ छोड़ें'
+                : 'Drop image here for AI Clinical Vision Analysis'}
+            </span>
+          </div>
+        )}
+
         {/* Top Header Bar */}
         <header className="ask-mitra-header">
           <div className="ask-mitra-brand">
@@ -117,8 +216,8 @@ export function AskMitraModal({ onClose }) {
               </h2>
               <span className="ask-mitra-subtitle">
                 {i18n.language === 'hi'
-                  ? 'दवा समय, भोजन परस्पर प्रभाव व सुरक्षा मार्गदर्शन'
-                  : 'Prescription guidance, food interactions, and safety advice'}
+                  ? 'दवा समय, पर्चा व लैब रिपोर्ट विश्लेषण व सुरक्षा मार्गदर्शन'
+                  : 'Prescription guidance, lab reports, image analysis & safety'}
               </span>
             </div>
           </div>
@@ -159,29 +258,70 @@ export function AskMitraModal({ onClose }) {
 
               <p className="ask-mitra-empty-desc">
                 {i18n.language === 'hi'
-                  ? 'अपनी दवाओं के समय, खाने के साथ परहेज़, दुष्प्रभावों या सामान्य स्वास्थ्य सावधानियों के बारे में पूछें।'
-                  : 'Ask clinical questions regarding food interactions, medicine timings, dietary precautions, or missed doses.'}
+                  ? 'अपनी दवाओं, खुराक, लैब रिपोर्ट या भोजन की फोटो अपलोड करें और तुरंत क्लिनिकल सलाह पाएं।'
+                  : 'Ask clinical questions or attach a photo of your medicine strip, diagnostic lab report, food plate, or prescription for instant AI analysis.'}
               </p>
 
+              {/* Visual Prompt Suggestions */}
               <div className="ask-mitra-suggestions">
-                {(i18n.language === 'hi' ? [
-                  'क्या मैं दवा दूध के साथ ले सकता हूँ?',
-                  'अगर खुराक छूट जाए तो क्या करूँ?',
-                  'पैरासिटामोल के सामान्य दुष्प्रभाव क्या हैं?'
-                ] : [
-                  'Can I take Metformin with milk?',
-                  'What should I do if I miss my dose?',
-                  'Are there food interactions with my medicines?'
-                ]).map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={() => handleAsk(suggestion)}
-                    className="ask-mitra-suggestion-pill"
-                  >
-                    "{suggestion}"
-                  </button>
-                ))}
+                {attachedImage ? (
+                  // Suggestions when an image is attached
+                  (i18n.language === 'hi' ? [
+                    'इस दवा के पत्ते की जांच करें',
+                    'इस लैब रिपोर्ट की व्याख्या करें',
+                    'क्या यह भोजन मेरी दवाइयों के साथ सुरक्षित है?',
+                    'डॉक्टर का पर्चा पढ़ें और समय समझाएं'
+                  ] : [
+                    'Analyze this medicine packaging',
+                    'Explain this lab test report',
+                    'Is this food safe with my medicines?',
+                    'Read doctor prescription & schedule'
+                  ]).map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => handleAsk(suggestion)}
+                      className="ask-mitra-suggestion-pill chip-mint"
+                    >
+                      "{suggestion}"
+                    </button>
+                  ))
+                ) : (
+                  // Standard suggestions when no image is attached
+                  <>
+                    {(i18n.language === 'hi' ? [
+                      'क्या मैं दवा दूध के साथ ले सकता हूँ?',
+                      'अगर खुराक छूट जाए तो क्या करूँ?',
+                      'पैरासिटामोल के सामान्य दुष्प्रभाव क्या हैं?'
+                    ] : [
+                      'Can I take Metformin with milk?',
+                      'What should I do if I miss my dose?',
+                      'Are there food interactions with my medicines?'
+                    ]).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => handleAsk(suggestion)}
+                        className="ask-mitra-suggestion-pill"
+                      >
+                        "{suggestion}"
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="ask-mitra-suggestion-pill ask-mitra-attach-suggestion"
+                    >
+                      <CameraIcon size={14} />
+                      <span>
+                        {i18n.language === 'hi'
+                          ? 'दवा का पत्ता या रिपोर्ट स्कैन करें'
+                          : 'Scan medicine packaging or lab report'}
+                      </span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -193,11 +333,26 @@ export function AskMitraModal({ onClose }) {
               className={`ask-msg-row ${msg.role === 'user' ? 'msg-user-row' : 'msg-mitra-row'}`}
             >
               <div className={`ask-msg-bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-mitra'}`}>
+                {/* Attached Image Thumbnail in User Bubble */}
+                {msg.image && (
+                  <div
+                    className="ask-msg-image-wrap"
+                    onClick={() => setEnlargedImage(msg.image)}
+                    title={i18n.language === 'hi' ? 'बड़ा देखने के लिए क्लिक करें' : 'Click to enlarge image'}
+                  >
+                    <img src={msg.image} alt="Uploaded medical document or medicine" className="ask-msg-image" />
+                    <span className="ask-msg-image-hint">
+                      <CameraIcon size={12} />
+                      <span>{i18n.language === 'hi' ? 'बड़ा देखें' : 'View Full Image'}</span>
+                    </span>
+                  </div>
+                )}
+
                 {msg.role === 'mitra' && (
                   <div className="ask-msg-mitra-top">
-                    <span className="chip-telemetry chip-mint">
-                      <SparklesIcon size={12} />
-                      <span>Mitra AI</span>
+                    <span className={`chip-telemetry ${msg.isVision ? 'chip-amber' : 'chip-mint'}`}>
+                      {msg.isVision ? <CameraIcon size={12} /> : <SparklesIcon size={12} />}
+                      <span>{msg.source || 'Mitra AI'}</span>
                     </span>
                     <button
                       type="button"
@@ -232,7 +387,11 @@ export function AskMitraModal({ onClose }) {
             <div className="ask-msg-row msg-mitra-row">
               <div className="ask-msg-bubble bubble-mitra bubble-loading">
                 <span className="loading-dot" />
-                <span>Consulting clinical knowledge base…</span>
+                <span>
+                  {attachedImage || conversation[conversation.length - 1]?.image
+                    ? (i18n.language === 'hi' ? 'छवि का क्लिनिकल विज़न विश्लेषण किया जा रहा है…' : 'Analyzing medical image with clinical vision…')
+                    : (i18n.language === 'hi' ? 'क्लिनिकल डेटाबेस से परामर्श लिया जा रहा है…' : 'Consulting clinical knowledge base…')}
+                </span>
               </div>
             </div>
           )}
@@ -240,15 +399,66 @@ export function AskMitraModal({ onClose }) {
           <div ref={chatBottomRef} />
         </div>
 
+        {/* Image Attachment Preview Bar */}
+        {imagePreview && (
+          <div className="ask-mitra-preview-bar">
+            <div
+              className="ask-mitra-preview-thumb-wrap"
+              onClick={() => setEnlargedImage(imagePreview)}
+              title={i18n.language === 'hi' ? 'बड़ा देखें' : 'Click to preview'}
+            >
+              <img src={imagePreview} alt="Attached preview" className="ask-mitra-preview-thumb" />
+            </div>
+            <div className="ask-mitra-preview-meta">
+              <span className="ask-mitra-preview-name">{attachedImage?.name || 'Attached Image'}</span>
+              <span className="ask-mitra-preview-size font-mono">{attachedImage?.size}</span>
+            </div>
+            <div className="ask-mitra-preview-actions">
+              <span className="chip-telemetry chip-mint">
+                <CameraIcon size={11} />
+                <span>Vision Ready</span>
+              </span>
+              <button
+                type="button"
+                className="ask-mitra-preview-clear-btn"
+                onClick={handleClearImage}
+                title="Remove attachment"
+                aria-label="Remove attachment"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Input Bar */}
         <div className="ask-mitra-input-bar">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleImageSelected}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            title={i18n.language === 'hi' ? 'छवि या पर्चा जोड़ें' : 'Attach medicine strip, lab report, or prescription'}
+            className={`ask-mitra-attach-btn ${attachedImage ? 'is-attached' : ''}`}
+          >
+            <CameraIcon size={18} />
+          </button>
           <input
             ref={inputRef}
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAsk(); }}
-            placeholder={i18n.language === 'hi' ? 'अपनी समस्या या दवा के बारे में पूछें…' : 'Ask about your medicines, timings, or diet…'}
+            placeholder={
+              attachedImage
+                ? (i18n.language === 'hi' ? 'छवि के बारे में कोई विशिष्ट सवाल पूछें या सीधे भेजें…' : 'Ask a question about this image or press Ask…')
+                : (i18n.language === 'hi' ? 'अपनी समस्या, दवा या रिपोर्ट के बारे में पूछें…' : 'Ask about your medicines, timings, or diet…')
+            }
             className="ask-mitra-input"
             autoFocus
           />
@@ -263,12 +473,39 @@ export function AskMitraModal({ onClose }) {
           <button
             type="button"
             className="ask-mitra-send-btn"
-            disabled={loading || !question.trim()}
+            disabled={loading || (!question.trim() && !attachedImage)}
             onClick={() => handleAsk()}
           >
             {loading ? '…' : (i18n.language === 'hi' ? 'भेजें' : 'Ask')}
           </button>
         </div>
+
+        {/* Enlarged Image Lightbox Overlay */}
+        {enlargedImage && (
+          <div
+            className="ask-mitra-lightbox-overlay"
+            onClick={() => setEnlargedImage(null)}
+          >
+            <div
+              className="ask-mitra-lightbox-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="ask-mitra-lightbox-close"
+                onClick={() => setEnlargedImage(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              <img
+                src={enlargedImage}
+                alt="Enlarged medical document preview"
+                className="ask-mitra-lightbox-img"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

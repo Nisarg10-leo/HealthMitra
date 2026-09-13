@@ -17,10 +17,26 @@ export async function scanPrescriptionImage(base64Image, optionalText = '') {
       const cleanBase64 = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
       const buffer = Buffer.from(cleanBase64, 'base64');
 
-      const worker = await createWorker('eng');
-      const ret = await worker.recognize(buffer);
-      extractedText = ret.data.text || '';
-      await worker.terminate();
+      extractedText = await Promise.race([
+        (async () => {
+          let worker = null;
+          try {
+            worker = await createWorker('eng', 1, {
+              errorHandler: (err) => console.warn('[vision] OCR worker warning:', err?.message || err)
+            });
+            const ret = await worker.recognize(buffer);
+            const text = ret?.data?.text || '';
+            await worker.terminate();
+            return text;
+          } catch (wErr) {
+            if (worker) {
+              try { await worker.terminate(); } catch (_) {}
+            }
+            throw wErr;
+          }
+        })(),
+        new Promise((resolve) => setTimeout(() => resolve(''), 3000))
+      ]);
     } catch (ocrErr) {
       console.warn('[vision] Tesseract OCR failed:', ocrErr.message);
     }

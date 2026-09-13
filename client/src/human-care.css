@@ -2576,6 +2576,244 @@ input:focus, select:focus, textarea:focus {
   cursor: not-allowed !important;
 }
 
+.ask-mitra-attach-btn {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border-medium) !important;
+  background: var(--cream) !important;
+  color: var(--ink) !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  transition: all 140ms ease !important;
+  flex-shrink: 0 !important;
+}
+
+.ask-mitra-attach-btn:hover {
+  border-color: var(--leaf) !important;
+  color: var(--leaf) !important;
+  background: #ffffff !important;
+}
+
+.ask-mitra-attach-btn.is-attached {
+  border-color: var(--leaf) !important;
+  color: #ffffff !important;
+  background: var(--leaf) !important;
+  box-shadow: 0 2px 6px rgba(45, 122, 88, 0.25) !important;
+}
+
+.ask-mitra-preview-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  margin-top: 10px !important;
+  background: var(--cream) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 14px !important;
+  animation: slideUpFade 160ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ask-mitra-preview-thumb-wrap {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-subtle) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  background: #000 !important;
+}
+
+.ask-mitra-preview-thumb {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 160ms ease !important;
+}
+
+.ask-mitra-preview-thumb-wrap:hover .ask-mitra-preview-thumb {
+  transform: scale(1.08) !important;
+}
+
+.ask-mitra-preview-meta {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.ask-mitra-preview-name {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.ask-mitra-preview-size {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+}
+
+.ask-mitra-preview-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.ask-mitra-preview-clear-btn {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border-medium) !important;
+  background: #ffffff !important;
+  color: var(--text-secondary) !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  display: grid !important;
+  place-items: center !important;
+  transition: all 140ms ease !important;
+}
+
+.ask-mitra-preview-clear-btn:hover {
+  border-color: #dc2626 !important;
+  color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.08) !important;
+}
+
+.ask-mitra-attach-suggestion {
+  border-style: dashed !important;
+  background: rgba(45, 122, 88, 0.06) !important;
+  color: var(--leaf) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  border-color: rgba(45, 122, 88, 0.35) !important;
+}
+
+.ask-mitra-attach-suggestion:hover {
+  background: rgba(45, 122, 88, 0.12) !important;
+  border-color: var(--leaf) !important;
+}
+
+.ask-msg-image-wrap {
+  margin-bottom: 10px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(45, 122, 88, 0.22) !important;
+  max-width: 260px !important;
+  cursor: pointer !important;
+  position: relative !important;
+  background: #000 !important;
+}
+
+.ask-msg-image {
+  display: block !important;
+  width: 100% !important;
+  max-height: 200px !important;
+  object-fit: cover !important;
+  transition: transform 180ms ease !important;
+}
+
+.ask-msg-image-wrap:hover .ask-msg-image {
+  transform: scale(1.03) !important;
+}
+
+.ask-msg-image-hint {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  padding: 4px 8px !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+.ask-mitra-drop-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 50 !important;
+  background: rgba(245, 243, 238, 0.92) !important;
+  border: 2.5px dashed var(--leaf) !important;
+  border-radius: inherit !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  color: var(--leaf) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  backdrop-filter: blur(4px) !important;
+  pointer-events: none !important;
+}
+
+.ask-mitra-lightbox-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(10, 15, 14, 0.82) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  backdrop-filter: blur(6px) !important;
+  animation: fadeIn 150ms ease !important;
+}
+
+.ask-mitra-lightbox-content {
+  position: relative !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+  background: #000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ask-mitra-lightbox-img {
+  display: block !important;
+  max-width: 100% !important;
+  max-height: 85vh !important;
+  object-fit: contain !important;
+}
+
+.ask-mitra-lightbox-close {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  font-size: 20px !important;
+  cursor: pointer !important;
+  display: grid !important;
+  place-items: center !important;
+  transition: all 140ms ease !important;
+  z-index: 10 !important;
+}
+
+.ask-mitra-lightbox-close:hover {
+  background: rgba(220, 38, 38, 0.85) !important;
+}
+
 /* ═════════════════════════════════════════════════════════════════
    HUMAN CARE DESIGN SYSTEM — SECONDARY FEATURE MODULES & SOS
    ═════════════════════════════════════════════════════════════════ */

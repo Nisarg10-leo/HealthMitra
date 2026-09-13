@@ -38,6 +38,7 @@ supportRouter.post('/support/ask-mitra', requireUser, asyncRoute(async (req, res
   await assertCanView(req.actor, patientId);
   const result = await askMitra({
     question: req.body?.question || '',
+    image: req.body?.image || null,
     patientId,
     language: req.body?.language || 'en'
   });
