@@ -72,11 +72,11 @@ export function AdherenceChart({ logs = [] }) {
   const benchmarkY = padTop + chartH - 0.8 * chartH; // 80% line
 
   return (
-    <div className="telemetry-chart-card">
+    <div className="telemetry-chart-card hm-card">
       <div className="telemetry-chart-header">
         <div>
-          <span className="telemetry-chart-kicker">7-Day Adherence Telemetry</span>
-          <h3 className="telemetry-chart-title">{t('weeklyAdherence')}</h3>
+          <span className="telemetry-chart-kicker font-mono">7-Day Adherence Telemetry</span>
+          <h3 className="telemetry-chart-title font-display">{t('weeklyAdherence')}</h3>
         </div>
 
         <div className="telemetry-chart-stats">
@@ -86,7 +86,7 @@ export function AdherenceChart({ logs = [] }) {
           </div>
           <div className="stat-pill">
             <span className="stat-pill-label">Benchmark</span>
-            <strong className="stat-pill-value font-mono">80% Target</strong>
+            <strong className="stat-pill-value font-mono color-white">80% Target</strong>
           </div>
         </div>
       </div>
@@ -99,8 +99,8 @@ export function AdherenceChart({ logs = [] }) {
         >
           <defs>
             <linearGradient id="adherenceGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#2D7A58" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#2D7A58" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -114,7 +114,7 @@ export function AdherenceChart({ logs = [] }) {
                   y1={y}
                   x2={width - padRight}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.06)"
+                  stroke="rgba(28, 40, 38, 0.08)"
                   strokeDasharray="3 3"
                 />
                 <text
@@ -137,9 +137,9 @@ export function AdherenceChart({ logs = [] }) {
             y1={benchmarkY}
             x2={width - padRight}
             y2={benchmarkY}
-            stroke="rgba(16, 185, 129, 0.4)"
+            stroke="var(--apricot)"
             strokeDasharray="4 4"
-            strokeWidth="1.2"
+            strokeWidth="1.5"
           />
 
           {/* Spline Area Fill */}
@@ -149,7 +149,7 @@ export function AdherenceChart({ logs = [] }) {
           <path
             d={linePath}
             fill="none"
-            stroke="#10b981"
+            stroke="var(--leaf)"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
@@ -173,7 +173,7 @@ export function AdherenceChart({ logs = [] }) {
                     y1={padTop}
                     x2={pt.x}
                     y2={padTop + chartH}
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="rgba(45, 122, 88, 0.3)"
                     strokeDasharray="2 2"
                   />
                 )}
@@ -183,10 +183,10 @@ export function AdherenceChart({ logs = [] }) {
                   x={pt.x}
                   y={height - 8}
                   textAnchor="middle"
-                  fill={isHovered ? '#ffffff' : 'var(--text-secondary)'}
+                  fill={isHovered ? 'var(--ink)' : 'var(--text-secondary)'}
                   fontSize="11"
-                  fontFamily="Geist, sans-serif"
-                  fontWeight={isHovered ? '600' : '400'}
+                  fontFamily="JetBrains Mono, monospace"
+                  fontWeight={isHovered ? '700' : '500'}
                 >
                   {weekday}
                 </text>
@@ -196,9 +196,9 @@ export function AdherenceChart({ logs = [] }) {
                   cx={pt.x}
                   cy={pt.y}
                   r={isHovered ? 6 : 4}
-                  fill={pt.score >= 80 ? '#10b981' : pt.score > 0 ? '#f59e0b' : '#64748b'}
-                  stroke="#080b11"
-                  strokeWidth="2"
+                  fill={pt.score >= 80 ? 'var(--leaf)' : pt.score > 0 ? 'var(--apricot)' : 'var(--border-medium)'}
+                  stroke="#FFFFFF"
+                  strokeWidth="2.5"
                   style={{ transition: 'r 0.15s ease' }}
                 />
               </g>

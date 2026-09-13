@@ -4301,6 +4301,156 @@ button.danger:hover, .btn-danger:hover, .btn-emergency:hover {
   color: var(--text-secondary) !important;
 }
 
+/* ── 7-Day Adherence Telemetry Chart ── */
+.telemetry-chart-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 20px !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 1px 4px rgba(28, 40, 38, 0.03) !important;
+  margin-bottom: 24px !important;
+}
+
+.telemetry-chart-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 18px !important;
+}
+
+.telemetry-chart-kicker {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--leaf) !important;
+  background: var(--mist) !important;
+  padding: 3px 10px !important;
+  border-radius: 9999px !important;
+  margin-bottom: 6px !important;
+}
+
+.telemetry-chart-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.telemetry-chart-stats {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.stat-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 14px !important;
+  background: var(--cream) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 9999px !important;
+}
+
+.stat-pill-label {
+  font-size: 11.5px !important;
+  color: var(--text-muted) !important;
+  font-weight: 500 !important;
+}
+
+.stat-pill-value {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+}
+
+.telemetry-svg-container {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 180px !important;
+  margin: 8px 0 14px !important;
+}
+
+.telemetry-svg {
+  width: 100% !important;
+  height: 180px !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+.chart-tooltip {
+  position: absolute !important;
+  top: -8px !important;
+  transform: translateX(-50%) !important;
+  background: var(--ink) !important;
+  color: #FFFFFF !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  font-size: 11.5px !important;
+  box-shadow: 0 4px 16px rgba(28, 40, 38, 0.2) !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+  white-space: nowrap !important;
+}
+
+.tooltip-date {
+  font-size: 10.5px !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  margin-bottom: 2px !important;
+}
+
+.tooltip-val {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+}
+
+.tooltip-val strong {
+  font-size: 13px !important;
+  color: var(--leaf) !important;
+}
+
+.telemetry-chart-legend {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 18px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  margin-top: 6px !important;
+}
+
+.legend-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+}
+
+.legend-pip {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+}
+
+.legend-pip.bg-mint {
+  background-color: var(--leaf) !important;
+}
+
+.legend-pip.bg-target {
+  background-color: var(--apricot) !important;
+}
+
 /* ── Medication Alarm Tone Modal & Sound Settings ── */
 .alarm-tone-modal-card {
   background: var(--paper) !important;
