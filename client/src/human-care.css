@@ -645,6 +645,64 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer !important;
 }
 
+.timeline-dose-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.empty-schedule-card {
+  background: var(--paper) !important;
+  border: 1px dashed var(--border-medium) !important;
+  border-radius: 20px !important;
+  padding: 36px 28px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  margin-top: 8px !important;
+}
+
+.empty-schedule-card.empty-meds-view {
+  margin-top: 16px !important;
+  padding: 44px 32px !important;
+}
+
+.empty-schedule-icon {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 50% !important;
+  background: var(--mist) !important;
+  color: var(--leaf) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.empty-schedule-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.empty-schedule-title, .empty-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.empty-schedule-desc, .empty-desc {
+  font-size: 13.5px !important;
+  color: var(--text-secondary) !important;
+  max-width: 46ch !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
 .dose-card {
   background: var(--paper) !important;
   border: 1px solid var(--border-subtle) !important;
@@ -908,42 +966,43 @@ input:focus, select:focus, textarea:focus {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  background: var(--paper) !important;
-  border: 1.5px solid rgba(217, 119, 70, 0.3) !important;
-  border-left: 4px solid var(--apricot) !important;
-  border-radius: 18px !important;
-  padding: 16px 20px !important;
-  margin: 0 0 24px 0 !important;
-  box-shadow: 0 4px 20px rgba(217, 119, 70, 0.08), 0 1px 3px rgba(28, 40, 38, 0.04) !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 70, 0.35) !important;
+  border-left: 6px solid var(--apricot) !important;
+  border-radius: 20px !important;
+  padding: 22px 28px !important;
+  margin: 0 0 28px 0 !important;
+  box-shadow: 0 8px 30px rgba(217, 119, 70, 0.12), 0 2px 6px rgba(28, 40, 38, 0.04) !important;
   animation: fadeIn 200ms ease !important;
-  gap: 16px !important;
+  gap: 20px !important;
 }
 
 @media (max-width: 640px) {
-  .reminder-banner-card {
+  .reminder-banner-card, .reminder-banner {
     flex-direction: column !important;
     align-items: flex-start !important;
-    padding: 14px 16px !important;
+    padding: 18px 20px !important;
+    gap: 16px !important;
   }
   .reminder-actions-row {
     width: 100% !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
   }
 }
 
 .reminder-banner-left {
   display: flex !important;
-  align-items: flex-start !important;
-  gap: 14px !important;
+  align-items: center !important;
+  gap: 16px !important;
   flex: 1 !important;
   min-width: 0 !important;
 }
 
 .reminder-icon-badge {
-  width: 38px !important;
-  height: 38px !important;
-  border-radius: 12px !important;
-  background: rgba(217, 119, 70, 0.12) !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  background: rgba(217, 119, 70, 0.14) !important;
   color: var(--apricot) !important;
   display: grid !important;
   place-items: center !important;
@@ -953,7 +1012,7 @@ input:focus, select:focus, textarea:focus {
 .reminder-content-stack {
   display: flex !important;
   flex-direction: column !important;
-  gap: 3px !important;
+  gap: 4px !important;
   min-width: 0 !important;
 }
 
@@ -969,34 +1028,39 @@ input:focus, select:focus, textarea:focus {
   font-weight: 700 !important;
   letter-spacing: 0.06em !important;
   color: var(--apricot) !important;
-  background: rgba(217, 119, 70, 0.1) !important;
+  background: rgba(217, 119, 70, 0.12) !important;
   padding: 2px 8px !important;
   border-radius: 9999px !important;
 }
 
 .reminder-time-text {
-  font-size: 11px !important;
+  font-size: 11.5px !important;
   color: var(--text-muted) !important;
+  font-family: var(--font-mono) !important;
 }
 
 .reminder-title {
-  font-size: 15px !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.25rem !important;
   font-weight: 700 !important;
   color: var(--ink) !important;
   margin: 0 !important;
+  line-height: 1.25 !important;
 }
 
 .reminder-body-text {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--text-secondary) !important;
   margin: 0 !important;
-  line-height: 1.45 !important;
+  line-height: 1.5 !important;
 }
 
 .reminder-actions-row {
   display: flex !important;
   align-items: center !important;
+  gap: 10px !important;
   flex-shrink: 0 !important;
+  flex-wrap: wrap !important;
 }
 
 .reminder-dismiss-btn {
@@ -1004,14 +1068,15 @@ input:focus, select:focus, textarea:focus {
   align-items: center !important;
   gap: 6px !important;
   padding: 8px 16px !important;
-  border-radius: 10px !important;
+  border-radius: 9999px !important;
   background: var(--cream) !important;
   border: 1px solid var(--border-medium) !important;
   color: var(--ink) !important;
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 140ms ease !important;
+  white-space: nowrap !important;
 }
 
 .reminder-dismiss-btn:hover {
@@ -1123,8 +1188,20 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ── General Cards across all feature pages ── */
+.page-shell-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+  width: 100% !important;
+}
+
 .page-intro-header {
-  margin-bottom: 24px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 0 !important;
 }
 
 .page-intro-badges {
@@ -1142,12 +1219,20 @@ input:focus, select:focus, textarea:focus {
   margin: 0 !important;
 }
 
+.page-intro-desc {
+  font-size: 14px !important;
+  color: var(--text-secondary) !important;
+  margin: 6px 0 0 0 !important;
+  line-height: 1.5 !important;
+  max-width: 54ch !important;
+}
+
 .card, .hm-card, .glass-matrix, .dashboard-panel {
   background: var(--paper) !important;
   border: 1px solid var(--border-subtle) !important;
   border-radius: 20px !important;
-  padding: 22px !important;
-  box-shadow: 0 1px 3px rgba(28, 40, 38, 0.02) !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 1px 4px rgba(28, 40, 38, 0.03) !important;
   color: var(--ink) !important;
 }
 
@@ -3898,6 +3983,322 @@ button.danger:hover, .btn-danger:hover, .btn-emergency:hover {
   width: 10px !important;
   height: 10px !important;
   border-radius: 50% !important;
+}
+
+/* Multi-patient Selector Bar */
+.patient-selector-scroll {
+  display: flex !important;
+  gap: 12px !important;
+  overflow-x: auto !important;
+  padding-bottom: 6px !important;
+  margin-bottom: 16px !important;
+}
+
+.patient-tab-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 10px 18px !important;
+  background: var(--paper) !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  transition: all 150ms ease !important;
+  white-space: nowrap !important;
+}
+
+.patient-tab-btn:hover {
+  border-color: var(--leaf) !important;
+  transform: translateY(-1px) !important;
+}
+
+.patient-tab-btn.patient-tab-active {
+  border-color: var(--leaf) !important;
+  background: rgba(45, 122, 88, 0.05) !important;
+  box-shadow: 0 2px 8px rgba(45, 122, 88, 0.1) !important;
+}
+
+.patient-tab-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  background: var(--mist) !important;
+  color: var(--leaf) !important;
+  display: grid !important;
+  place-items: center !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+.patient-tab-info {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+}
+
+.patient-tab-name {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+}
+
+.patient-tab-adherence {
+  font-size: 11px !important;
+  color: var(--leaf) !important;
+  font-weight: 600 !important;
+}
+
+/* Caregiver Dashboard Section Cards */
+.compliance-highlight-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 20px !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 1px 4px rgba(28, 40, 38, 0.03) !important;
+  margin-bottom: 24px !important;
+}
+
+.compliance-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 18px !important;
+}
+
+.compliance-headline {
+  font-family: var(--font-display) !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.section-eyebrow {
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+.compliance-stats-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.compliance-stat-cell {
+  background: var(--cream) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px !important;
+  padding: 16px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.compliance-stat-label {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+}
+
+.compliance-stat-num {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  line-height: 1.2 !important;
+}
+
+.compliance-stat-sub {
+  font-size: 11.5px !important;
+  color: var(--text-muted) !important;
+  margin-top: 2px !important;
+}
+
+/* Clinical Safety & Polypharmacy Card */
+.clinical-safety-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 20px !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 1px 4px rgba(28, 40, 38, 0.03) !important;
+  margin-bottom: 24px !important;
+}
+
+.clinical-safety-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 16px !important;
+}
+
+.clinical-safety-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.clinical-safety-sub {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  margin-top: 4px !important;
+  display: block !important;
+}
+
+.safety-verified-box {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 16px 20px !important;
+  background: rgba(45, 122, 88, 0.07) !important;
+  border: 1px solid rgba(45, 122, 88, 0.2) !important;
+  border-radius: 14px !important;
+  color: var(--leaf) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+.safety-alerts-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.safety-alert-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 14px 18px !important;
+  background: rgba(217, 119, 70, 0.07) !important;
+  border: 1px solid rgba(217, 119, 70, 0.25) !important;
+  border-radius: 12px !important;
+}
+
+.safety-alert-icon {
+  color: var(--apricot) !important;
+  flex-shrink: 0 !important;
+  margin-top: 2px !important;
+}
+
+.safety-alert-title {
+  color: var(--ink) !important;
+  font-size: 13.5px !important;
+}
+
+.safety-alert-msg {
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+}
+
+/* Live Medication Schedule Card */
+.live-schedule-card {
+  background: var(--paper) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 20px !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 1px 4px rgba(28, 40, 38, 0.03) !important;
+  margin-bottom: 24px !important;
+}
+
+.live-schedule-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 18px !important;
+}
+
+.live-schedule-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+
+.live-schedule-sub {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  margin-top: 4px !important;
+  display: block !important;
+}
+
+.live-schedule-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.live-schedule-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 14px 18px !important;
+  background: var(--cream) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px !important;
+  transition: all 140ms ease !important;
+}
+
+.live-schedule-item:hover {
+  background: #FAF5ED !important;
+  border-color: var(--border-medium) !important;
+}
+
+.live-schedule-item.item-taken {
+  background: rgba(45, 122, 88, 0.04) !important;
+  border-color: rgba(45, 122, 88, 0.2) !important;
+}
+
+.live-item-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.live-item-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.live-med-pip {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+.live-med-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  display: block !important;
+}
+
+.live-med-dosage {
+  font-size: 12px !important;
+  color: var(--text-muted) !important;
+}
+
+.live-med-time {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
 }
 
 /* ── Medication Alarm Tone Modal & Sound Settings ── */

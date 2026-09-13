@@ -55,10 +55,10 @@ export function ReminderBanner({ notification, onDismissed }) {
   };
 
   return (
-    <aside className="reminder-banner-card reminder-banner" role="alert">
+    <aside className="reminder-banner-card reminder-banner hm-card" role="alert">
       <div className="reminder-banner-left">
         <div className="reminder-icon-badge" aria-hidden="true">
-          <ClockIcon size={18} />
+          <ClockIcon size={20} />
         </div>
         <div className="reminder-content-stack">
           <div className="reminder-header-row">
@@ -69,7 +69,7 @@ export function ReminderBanner({ notification, onDismissed }) {
               {formatTime(notification.createdAt, i18n.language)}
             </span>
           </div>
-          <strong className="reminder-title font-sans">{notification.title}</strong>
+          <strong className="reminder-title font-display">{notification.title}</strong>
           <p className="reminder-body-text">{notification.body}</p>
         </div>
       </div>

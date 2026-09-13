@@ -153,7 +153,11 @@ export function Workspace({ onLogout }) {
             </div>
           ) : (
             <>
-              {dueReminder && <ReminderBanner notification={dueReminder} onDismissed={data.refresh} />}
+              {dueReminder && (
+                <div className="workspace-reminder-container" style={{ marginBottom: '28px' }}>
+                  <ReminderBanner notification={dueReminder} onDismissed={data.refresh} />
+                </div>
+              )}
               <Screen />
             </>
           )}
