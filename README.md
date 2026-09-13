@@ -195,37 +195,35 @@ Create a **Table** or **Board** GitHub Project named `HealthMitra - Digital Assi
 
 ```text
 .
-├── client/                          # React + Vite + i18next accessible web client
+├── frontend/                        # React + Vite + i18next accessible web client
 │   └── src/
 │       ├── App.jsx                  # Session gate: AuthPage or Workspace
 │       ├── api/                     # fetch wrapper + one function per backend capability
 │       ├── hooks/                   # useSession, useWorkspaceData, useSpeech, useToast, useAsyncAction
 │       ├── components/ui|layout/    # SectionHeading, ModalShell, Sidebar, Topbar, ReminderBanner…
 │       ├── workspace/               # Shell, WorkspaceContext, screens + modal registries, navigation
-│       ├── features/<screen>/       # auth, today, dashboard, medications, history, alerts, symptoms, contacts, sos, linking
+│       ├── features/<screen>/       # auth, today, dashboard, medications, history, alerts, symptoms, contacts, sos, linking, profile
 │       ├── utils/format.js          # Intl date/time helpers (en-IN / hi-IN)
 │       ├── i18n.js                  # English/Hindi copy
 │       └── styles.css               # Responsive, high-contrast interface
-├── server/
+├── backend/
 │   ├── src/
 │   │   ├── index.js                 # Bootstrap: createApp + startScheduler + listen
 │   │   ├── app.js                   # Express assembly (public routers → requireUser → protected routers)
 │   │   ├── config.js                # Environment → frozen config object
 │   │   ├── routes/                  # Thin HTTP adapters per resource
 │   │   ├── middleware/              # requireUser, errorHandler/asyncRoute
-│   │   ├── services/                # Business rules (access, dose, medication, notification, sos…)
+│   │   ├── services/                # Business rules (access, dose, medication, vision, groq, notification, sos…)
 │   │   ├── data/                    # repository.js (async interface) + memoryStore.js (seeded prototype)
 │   │   ├── notifications/           # Delivery channels ({ name, deliver() })
 │   │   ├── scheduler/               # node-cron reminder / missed-dose tick
 │   │   └── lib/                     # time, password, httpError helpers
 │   └── sql/schema.sql               # PostgreSQL production data model
-├── docs/
-│   ├── design/                      # DA2: diagrams (drawio + png), UI screens, design README, SDD PDF
-│   ├── architecture/                # DA1 Draw.io diagram + preview
-│   ├── wireframes/                  # Figma-importable six-screen board
-│   ├── github/                      # 25 stories and publishing guide
-│   └── evidence/                    # Screenshot checklist and capture notes
-├── docker-compose.yml               # Client + API + PostgreSQL local stack
+├── other/
+│   ├── docs/                        # Design, diagrams, architecture, wireframes, user stories, report
+│   ├── stitch_vitalis_ai_healthcare_platform/ # Design guidelines & Stitch platform assets
+│   ├── docker-compose.yml           # Backend + Frontend + PostgreSQL container stack
+│   └── HANDOFF.txt                  # Full implementation handoff record
 └── README.md
 ```
 

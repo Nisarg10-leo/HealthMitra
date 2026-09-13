@@ -30,8 +30,8 @@ export function createApp() {
   // Protected: everything that reads or changes patient data.
   app.use('/api', requireUser, profileRouter, patientsRouter, medicationsRouter, doseLogsRouter, alertsRouter, sosRouter, safetyRouter);
 
-  // Serve production client build if present
-  const clientDist = path.resolve(__dirname, '../../client/dist');
+  // Serve production frontend build if present
+  const clientDist = path.resolve(__dirname, '../../frontend/dist');
   if (fs.existsSync(clientDist)) {
     app.use(express.static(clientDist));
     app.get('*', (req, res, next) => {

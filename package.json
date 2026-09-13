@@ -2,11 +2,11 @@
   "name": "healthmitra",
   "private": true,
   "version": "1.0.0",
-  "workspaces": ["client", "server"],
+  "workspaces": ["frontend", "backend"],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
-    "build": "npm run build --workspace=client",
-    "start": "npm run start --workspace=server"
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=backend"
   },
   "devDependencies": { "concurrently": "^9.1.2" },
   "packageManager": "npm@11.6.2"

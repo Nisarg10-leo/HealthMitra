@@ -1,5 +1,5 @@
 {
-  "name": "healthmitra-server",
+  "name": "healthmitra-backend",
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
