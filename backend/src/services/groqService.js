@@ -1,5 +1,27 @@
 import { repository } from '../data/repository.js';
 
+// Non-health query detection to restrict Mitra AI strictly to health and medical assistance
+const NON_HEALTH_PATTERNS = [
+  // Coding, programming, software & algorithms
+  /\b(linked\s*list|binary\s*(?:search|tree)|algorithm|leetcode|data\s*structure|python|javascript|typescript|c\+\+|c#|golang|rust\b|html|css|php\b|sql\s+(?:query|table)|database\s+schema|git\s+(?:commit|push|pull|branch)|write\s+(?:a\s+)?(?:code|program|script|function|class)|compile|debug\s+(?:code|program)|recursion|stack\s*overflow|regex|regular\s*expression|bubble\s*sort|quick\s*sort|merge\s*sort|reverse\s+(?:a\s+)?(?:string|array|list|number|pointer))\b/i,
+  // General non-health topics
+  /\b(capital\s+of|who\s+(?:is|was)\s+(?:the\s+)?(?:president|prime\s+minister|king|queen|governor|actor|actress|ceo)|movie\s+review|box\s+office|cricket\s+score|ipl\s+match|football\s+match|fifa\s+world\s+cup|write\s+(?:an?\s+)?essay|write\s+(?:a\s+)?poem|tell\s+me\s+a\s+joke|stock\s+market|cryptocurrency|bitcoin|ethereum|forex|solve\s+(?:the\s+)?equation|calculate\s+\d+|derivative\s+of|integral\s+of)\b/i
+];
+
+export function isExplicitlyNonHealth(q) {
+  if (!q || typeof q !== 'string') return false;
+  const trimmed = q.trim();
+  if (!trimmed) return false;
+  return NON_HEALTH_PATTERNS.some((pattern) => pattern.test(trimmed));
+}
+
+export function getNonHealthRefusal(language = 'en') {
+  if (language === 'hi') {
+    return 'मैं मित्रा हूँ, आपकी समर्पित स्वास्थ्य और चिकित्सा सहायक। मैं केवल स्वास्थ्य, दवाओं, बीमारी के लक्षणों, लैब रिपोर्ट और आहार संबंधी प्रश्नों में आपकी मदद कर सकती हूँ। कृपया अपने स्वास्थ्य या दवाओं से जुड़ा कोई प्रश्न पूछें।';
+  }
+  return "I am Mitra, your dedicated health and medical assistant. I can only assist with health-related topics such as medications, physical symptoms, lab reports, diet, and wellness advice. Please feel free to ask me anything about your medicines, health conditions, or symptoms!";
+}
+
 // Local clinical knowledge fallback for common geriatric queries
 const CLINICAL_KNOWLEDGE = [
   {
@@ -134,6 +156,11 @@ function analyzeMedicalImageLocally({ ocrText, question, medications, language }
   const q = (question || '').toLowerCase();
   const medsSummary = medications?.map((m) => `${m.name} (${m.dosage})`).join(', ') || 'Metformin, Amlodipine';
   const isHindi = language === 'hi';
+
+  // Check if user's question or extracted OCR text is explicitly non-health
+  if (isExplicitlyNonHealth(q) || isExplicitlyNonHealth(text)) {
+    return getNonHealthRefusal(language);
+  }
 
   // 1. Lab Report or Diagnostic Parameter Check
   const isLab = /hba1c|glucose|blood sugar|cholesterol|lipid|creatinine|hemoglobin|bilirubin|triglyceride|serum|report|test|mg\/dl|mmol/i.test(text + ' ' + q);
@@ -416,6 +443,19 @@ async function callOpenRouterVision({ apiKey, image, question, systemPrompt, lan
 }
 
 export async function askMitra({ question, image = null, patientId, language = 'en' }) {
+  // 0. Immediately refuse explicitly non-health queries if no image is attached
+  if (!image && isExplicitlyNonHealth(question)) {
+    return {
+      source: 'Mitra AI',
+      question,
+      answer: getNonHealthRefusal(language),
+      hasImage: false,
+      disclaimer: language === 'hi'
+        ? 'चिकित्सा अस्वीकरण: मित्रा केवल स्वास्थ्य व दवा संबंधी जानकारी प्रदान करता है।'
+        : 'Medical disclaimer: Mitra is dedicated exclusively to health and medical assistance.'
+    };
+  }
+
   const [patient, medications] = await Promise.all([
     repository.users.findById(patientId),
     repository.medications.forPatient(patientId)
@@ -435,10 +475,25 @@ Allergies: ${patient.allergies?.join(', ') || 'None recorded'}` : '';
     ocrText = await extractOcrFromImage(image);
   }
 
-  const systemPrompt = `You are Mitra, an empathetic, highly skilled Clinical AI Medical Assistant for patients and caregivers.
+  const systemPrompt = `You are Mitra, an empathetic, highly skilled Clinical AI Medical Assistant for patients and caregivers at HealthMitra.
 Patient Name: ${patient?.name || 'Patient'}
 ${patientProfile}
 Active Medications: ${medsSummary}
+
+STRICT DOMAIN ENFORCEMENT - HEALTHCARE & MEDICINE ONLY:
+- You are strictly and exclusively a Clinical Medical & Health Assistant.
+- You MUST ONLY answer questions or evaluate images directly related to:
+  1. Medications, prescriptions, dosages, food timing, side effects, and drug interactions.
+  2. Physical illnesses, diseases, medical conditions, and bodily symptoms.
+  3. Diagnostic lab tests, medical reports, and vitals (blood sugar, BP, pulse, creatinine, etc.).
+  4. Clinical nutrition, healthy diet, hydration, sleep, and physical wellness.
+  5. Emergency red-flag symptoms, first aid, and doctor consultation advice.
+
+MANDATORY REFUSAL FOR ALL NON-HEALTH TOPICS:
+- If the user's question or uploaded image is NOT about health, medicine, bodily symptoms, diet, or clinical care (for example: computer programming, coding, algorithms, software development, data structures like linked lists, mathematics, general knowledge, history, politics, sports, gaming, entertainment, finance, essay writing, etc.):
+- You MUST STRICTLY REFUSE to answer the non-health query.
+- Do NOT provide even a partial answer, summary, code, or hint for non-health topics.
+- Politely explain in ${language === 'hi' ? 'Hindi' : 'English'} that you are Mitra, an AI dedicated solely to health and medical assistance, and invite the user to ask any questions regarding their health, medications, symptoms, or diet instead.
 
 CLINICAL VISION GUIDELINES FOR IMAGE ANALYSIS:
 1. Physical Condition / Disease / Symptoms (e.g. skin rash, swelling, lesion, discoloration, eye inflammation, wound):
@@ -575,6 +630,8 @@ CRITICAL FORMATTING RULES:
     const matched = CLINICAL_KNOWLEDGE.find((k) => k.pattern.test(question));
     if (matched) {
       answerText = language === 'hi' ? matched.hi : matched.en;
+    } else if (isExplicitlyNonHealth(question)) {
+      answerText = getNonHealthRefusal(language);
     } else {
       answerText = language === 'hi'
         ? `आपकी मौजूदा दवाएँ (${medsSummary}) आपके स्वास्थ्य के लिए महत्वपूर्ण हैं। इस सवाल के लिए कृपया अपने डॉक्टर से संपर्क करें या समय पर अपनी निर्धारित दवा लें।`

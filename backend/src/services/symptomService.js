@@ -1,4 +1,5 @@
 import { repository } from '../data/repository.js';
+import { isExplicitlyNonHealth } from './groqService.js';
 
 // Comprehensive clinical fallback guidelines for offline / fallback mode
 const EXTENDED_CLINICAL_GUIDANCE = {
@@ -63,6 +64,22 @@ export async function symptomGuidance({ symptom, language = 'en', severe = false
       triage: 'safe',
       suggestion: lang === 'hi' ? 'कृपया विश्लेषण के लिए कोई लक्षण चुनें या लिखें।' : 'Please select or enter a symptom to analyze.',
       disclaimer: lang === 'hi' ? 'चिकित्सा अस्वीकरण: यह केवल स्वास्थ्य मार्गदर्शन के लिए है।' : 'Medical disclaimer: For guidance only.'
+    };
+  }
+
+  // Refuse non-health input in symptom checker
+  if (isExplicitlyNonHealth(cleanSymptom)) {
+    return {
+      symptom: cleanSymptom,
+      safe: true,
+      triage: 'safe',
+      suggestion: lang === 'hi'
+        ? 'मैं मित्रा हूँ, आपकी स्वास्थ्य सहायक। कृपया केवल शारीरिक स्वास्थ्य लक्षण (जैसे सिरदर्द, बुखार, खाँसी, जोड़ों का दर्द) दर्ज करें।'
+        : 'I am Mitra, your health companion. Please describe physical health symptoms or discomforts (e.g., headache, fever, cough, joint pain) so I can assist you.',
+      source: 'Mitra Clinical AI',
+      disclaimer: lang === 'hi'
+        ? 'चिकित्सा अस्वीकरण: यह केवल स्वास्थ्य मार्गदर्शन के लिए है।'
+        : 'Medical disclaimer: For guidance only.'
     };
   }
 
