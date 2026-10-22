@@ -16,7 +16,7 @@ export function Sidebar({ session, items, activeTab, onSelect, unreadAlerts, onL
         </div>
         <div className="sidebar-brand-text">
           <span className="sidebar-brand-title">HealthMitra</span>
-          <span className="sidebar-brand-subtitle">Clinical Platform</span>
+          <span className="sidebar-brand-subtitle">Care, close by</span>
         </div>
       </div>
 

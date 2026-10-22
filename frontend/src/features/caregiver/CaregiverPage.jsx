@@ -540,7 +540,7 @@ export function CaregiverPage() {
           </button>
 
           <a
-            href={`https://wa.me/?text=${encodeURIComponent(`Hi, please connect to my HealthMitra profile using invite code: ${connectCode}. Visit http://localhost:5173/ to join my care circle.`)}`}
+            href={`https://wa.me/?text=${encodeURIComponent(`Hi, please connect to my HealthMitra profile using invite code: ${connectCode}. Visit ${window.location.origin}/ to join my care circle.`)}`}
             target="_blank"
             rel="noreferrer"
             className="btn-glass"

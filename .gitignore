@@ -15,4 +15,8 @@ outputs/
 *.local_store.json
 local_store.json
 *.traineddata
+__pycache__/
+*.pyc
+*.mp4
+*.mov
 

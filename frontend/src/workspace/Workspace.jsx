@@ -17,6 +17,11 @@ import { WorkspaceContext } from './WorkspaceContext.jsx';
 import { defaultTabFor, navigationFor } from './navigation.js';
 import { SCREENS } from './screens.js';
 
+// Keep in sync with the backend's REMINDER_WINDOW_MINUTES default. A dose that
+// has been overdue longer than this is handled as missed, not as a fresh alarm
+// when the dashboard refreshes (for example, after adding a medicine).
+const ALARM_REMINDER_WINDOW_MS = 15 * 60_000;
+
 // The signed-in shell: navigation, top bar, data loading, active screen, and real-time medicine alarm.
 export function Workspace({ onLogout }) {
   const { t, i18n } = useTranslation();
@@ -43,7 +48,8 @@ export function Workspace({ onLogout }) {
         if (log.status !== 'pending' || !isToday(log.scheduledTime)) return false;
         if (handledAlarmIdsRef.current.has(log.id)) return false;
         const sched = new Date(log.scheduledTime);
-        return now >= sched;
+        const overdueMs = now.getTime() - sched.getTime();
+        return overdueMs >= 0 && overdueMs <= ALARM_REMINDER_WINDOW_MS;
       });
 
       if (dueDose && !alarmDose) {

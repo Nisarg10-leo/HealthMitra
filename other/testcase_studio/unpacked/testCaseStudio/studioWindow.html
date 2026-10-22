@@ -1,0 +1,762 @@
+<!-- Created by sanjay kumar on 25/06/2020. -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>TestCase Studio</title>
+    <link rel="stylesheet" type="text/css" href="studio.css" type="text/css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="integrations.css" media="screen" />
+    <style rel="stylesheet" id="animation-style"></style>
+    <style rel="stylesheet" id="animation-style-offer"></style>
+    <meta name="theme-color" content="#5fba7d">
+    <script type="text/javascript" src="jquery.js" defer></script>
+
+</head>
+
+<body>
+    <!--
+        insert modal
+    -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <h2 class="screen_name"></h2>
+        <img class="modal-content" id="img01">
+        <div class="chevrons">
+            <img id="previous" class="controls" />
+            <img id="next" class="controls" />
+        </div>
+
+    </div>
+
+    <!-- Video Modal Start -->
+    <div id="video_modal" class="modal">
+        <span class="close" id="video_modal_close">&times;</span>
+        <h2 class="screen_name video_title">Recorded Video</h2>
+        <video id="full_video" controls class="modal-content" />
+    </div>
+    <!-- Video Modal End -->
+
+    <div class="modal" id="video_limit_modal">
+        <div class="modal_wrapper">
+            <h2>Video Recording Limit</h2>
+            <p>Unlock unlimited Screen Recording by upgrading to TestCase Studio Pro. Free version offers only 5-mins recording.</p>
+            <div class="modal_btns">
+                <a class="modal_btn upgrade" href="https://www.selectorshub.com/testcase-studio-pro/plans/" target="_blank" rel="noopener">upgrade</a>
+                <button class="modal_btn cancel">cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration daily-limit upgrade popup -->
+    <div class="modal" id="integration_limit_modal">
+        <div class="modal_wrapper">
+            <h2 class="modal_title">Daily Limit Reached</h2>
+            <p class="modal_message"></p>
+            <div class="modal_btns">
+                <a class="modal_btn upgrade" href="https://www.selectorshub.com/testcase-studio-pro/plans/" target="_blank" rel="noopener">upgrade</a>
+                <button class="modal_btn cancel">cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration pickers -->
+    <div id="testrail-modal" class="hideElement">
+        <div class="modal__wrapper">
+            <h3 class="title">Select Project</h3>
+            <div class="close__icon"></div>
+            <div class="testrail__alert hideElement"></div>
+            <div class="testrail__instructions__error hideElement">
+                <p>
+                    <span class="bold">Something Went Wrong,</span> Please check this <a href="https://youtu.be/qgeu528Ppes" target="_blank">tutorial</a> to fix the issue.
+                </p>
+            </div>
+            <div class="testrail__loading lds-ring hideElement"><div></div><div></div><div></div><div></div></div>
+            <div class="testrail__projects">No Projects Found</div>
+            <div class="testrail__sections hideElement"></div>
+            <div class="testrail__templates hideElement"></div>
+            <div class="testrail__suites hideElement"></div>
+            <div class="modal__action">
+                <button class="cancel" data-step="0">Cancel</button>
+                <button class="next" data-step="0">Next</button>
+                <button class="upload-with-screen" style="display: none;">Upload with Screenshots</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="slack-modal" class="hideElement">
+        <div class="modal__wrapper">
+            <h3 class="title">Select Slack Channel</h3>
+            <div class="close__icon"></div>
+            <div class="slack__alert hideElement"></div>
+            <div class="slack__instructions__error hideElement">
+                <p>
+                    <span class="bold">Something Went Wrong,</span> Please check your Slack Bot Token in Settings (<a href="https://api.slack.com/apps" target="_blank">your Slack apps</a>) or watch this <a href="https://youtu.be/Eb9HwOLT98E" target="_blank">tutorial</a>.
+                </p>
+            </div>
+            <div class="slack__loading lds-ring hideElement"><div></div><div></div><div></div><div></div></div>
+            <input type="text" class="slack__search" placeholder="Search channels" style="display: none;">
+            <div class="slack__projects">No Channels Found</div>
+            <div class="modal__action">
+                <button class="cancel" data-step="0">Cancel</button>
+                <button class="next" data-step="0">Send</button>
+                <button class="upload-with-screen" style="display: none;">Send with Screenshots</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="jira-modal" class="hideElement">
+        <div class="modal__wrapper">
+            <h3 class="title">Select Project</h3>
+            <div class="close__icon"></div>
+            <div class="jira__alert hideElement"></div>
+            <div class="jira__instructions__error hideElement">
+                <p>
+                    <span class="bold">Something Went Wrong,</span> Please check this <a href="https://youtu.be/Jy5CrqxuE2E" target="_blank">tutorial</a> to fix the issue.
+                </p>
+            </div>
+            <div class="jira__loading lds-ring hideElement"></div>
+            <div class="jira__projects">No Projects Found</div>
+            <div class="jira__sections hideElement"></div>
+            <div class="modal__action">
+                <button class="cancel-jira" data-step="0">Cancel</button>
+                <button class="next-jira" data-step="0">Upload</button>
+                <button class="upload-with-screen-jira" style="display: none;">Upload with Screenshots</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bugasura-modal" class="hideElement">
+        <div class="modal__wrapper">
+            <h3 class="title">Select Project</h3>
+            <div class="close__icon"></div>
+            <div class="bugasura__alert hideElement"></div>
+            <div class="bugasura__instructions__error hideElement">
+                <p>
+                    <span class="bold">Something Went Wrong,</span> Please check your Bugasura API Key in Settings (<a href="https://my.bugasura.io/account/userprofile" target="_blank">find your API key</a>).
+                </p>
+            </div>
+            <div class="bugasura__loading lds-ring hideElement"><div></div><div></div><div></div><div></div></div>
+            <div class="bugasura__projects">No Projects Found</div>
+            <div class="bugasura-options hideElement">
+                <div class="bugasura-field">
+                    <label for="bugasura-sprint-select">Sprint</label>
+                    <select id="bugasura-sprint-select"></select>
+                </div>
+                <div class="bugasura-field">
+                    <label for="bugasura-severity-select">Severity</label>
+                    <select id="bugasura-severity-select"></select>
+                </div>
+                <div class="bugasura-note"></div>
+            </div>
+            <div class="modal__action">
+                <button class="cancel" data-step="0">Cancel</button>
+                <button class="next" data-step="0">Upload</button>
+                <button class="upload-with-screen" style="display: none;">Upload with Screenshots</button>
+            </div>
+        </div>
+    </div>
+
+    <div id='showList'>
+        <div style="
+                display: flex;
+                flex-direction: row;
+                overflow: hidden;
+            ">
+
+            <div id="collapseWindow">
+                <div class="lowerContainerDiv">
+                    <div id="testCase-container" class="leftContainerDiv">
+                        <button style="position: relative; left: -35px;" class="headerGearIcon">
+                            <i class="fas fa-plus" aria-hidden="true"
+                               style=" color: #291818; font-size: 1.2em; padding-left: 8px; "></i>
+                            <span class="monserrat"
+                                  style="text-transform: capitalize;color: #4D4D4D;line-height: 27px;">New Case</span>
+                        </button>
+                        <div class="searchBoxContainer">
+                            <input id="filterTestCases" type="text" placeholder="Search">
+                        </div>
+                    </div>
+                    <div class="main__section">
+                        <div id="command-container" class="rightContainerDiv left__section">
+                            <div id="downloadFileName">
+                                <input type="text" maxlength="255" placeholder="Set the TestCase Name here" title="Edit test case name" />
+
+                                <!-- Test-case actions, driver toggle and Upgrade live on this row so the
+                                     toolbar below is left entirely to the run / script controls. -->
+                                    <div class="tcs-action-group">
+                                        <div class="tcs-action">
+                                            <button class="uiConfigBtn">
+                                                <span class="config toolTip">Click to add/remove columns.</span>
+                                            </button>
+                                            <p class="tcs-action__label">Customize</p>
+                                        </div>
+                                        <div class="tcs-action">
+                                            <button class="attrFilterBtn inactive">
+                                                <span class="filter toolTip">Set attribute for XPath &amp; cssSelector.</span>
+                                            </button>
+                                            <p class="tcs-action__label">Filter</p>
+                                        </div>
+                                        <div class="tcs-action">
+                                            <button id='clearTestCase' class="iconContainer">
+                                                <span class="deleteBtn toolTip">Clear all recorded steps.</span>
+                                            </button>
+                                            <p class="tcs-action__label">Delete</p>
+                                        </div>
+                                        <div class="tcs-action" id="record">
+                                            <button id='recordIcon' class="iconContainer">
+                                                <span class="pauseBtn toolTip">Click to stop recording.</span>
+                                            </button>
+                                            <p class="tcs-action__label" id="recordLabel">Recording</p>
+                                        </div>
+                                        <!-- Help: opens the tutorial videos. An <a>, so panelLayout.js's
+                                             click-forwarding (which looks for a <button>) skips it. -->
+                                        <a class="tcs-action tcs-action--tutorial" href="https://www.selectorshub.com/testcase-studio/#tutorial" target="_blank" rel="noopener">
+                                            <span class="tutorialIcon" aria-hidden="true"></span>
+                                            <span class="tutorialTip toolTip">Stuck? Watch the TestCase Studio tutorials.</span>
+                                            <p class="tcs-action__label">Tutorial</p>
+                                        </a>
+                                    </div>
+
+                                <div id='debugTestStepName'>
+                                    <!-- Laid out like the header action tiles: switch on top, label below.
+                                         #inputToggle keeps its id and active/inactive classes (captureEvents.js). -->
+                                    <div class="tcs-driver-cmd" title="">
+                                        <div id='inputToggle' class="toggle-btn inactive" role="switch" aria-checked="false" aria-label="Set driver command" tabindex="0">
+                                            <div class="toggle-circle"></div>
+                                        </div>
+                                        <span class="toggle toolTip">Click to set driver command.</span>
+                                        <span class="tcs-driver-cmd__text">Driver Command</span>
+                                    </div>
+                                </div>
+
+                                <!-- Upgrade lifted out of the driver-command block and pinned to the
+                                     top-right corner of the toolbar, so both have room. -->
+                                <a class="upgradeBtn" target="_blank" href="https://selectorshub.com/testcase-studio-pro/plans/">
+                                    <span class="proFeature1 toolTip">Unlimited steps, integrations, BDD and no ads</span>
+                                    Get Pro
+                                </a>
+                            </div>
+                            <div class="rightContainerUpper" id='right_Upper_sub_Container'>
+                                <div id="iconsContainer" class="testCaseActionIcons">
+                                    <!-- ── Replay Controls ── -->
+                                    <div class="tcs-replay-controls" id="tcs-replay-controls">
+                                        <button id="tcs-run-btn" class="tcs-replay-btn tcs-run" title="Run recorded test case in the browser">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                                            Run
+                                        </button>
+                                        <button id="tcs-pause-btn" class="tcs-replay-btn tcs-pause" title="Pause / Resume replay" disabled>
+                                            ⏸ Pause
+                                        </button>
+                                        <button id="tcs-stop-btn" class="tcs-replay-btn tcs-stop" title="Stop replay" disabled>
+                                            ⏹ Stop
+                                        </button>
+                                        <select id="tcs-speed-select" class="tcs-speed-select" title="Delay between steps">
+                                            <option value="300">Fast (0.3s)</option>
+                                            <option value="800" selected>Normal (0.8s)</option>
+                                            <option value="1500">Slow (1.5s)</option>
+                                            <option value="3000">Very Slow (3s)</option>
+                                        </select>
+                                        <!-- ── Close-window toggle ── -->
+                                        <label class="tcs-close-win-label" title="Choose what happens to the browser window after the run finishes">
+                                            <span class="tcs-close-win-text">After run:</span>
+                                            <select id="tcs-close-win-select" class="tcs-close-win-select">
+                                                <option value="close">Close window</option>
+                                                <option value="keep" selected>Keep window open</option>
+                                            </select>
+                                        </label>
+                                        <div class="tcs-toolbar-divider"></div>
+                                        <button id="tcs-export-script-btn" class="tcs-toolbar-btn tcs-export-btn" title="Export steps as a Playwright script you can run locally">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5v-2z"/></svg>
+                                            Export
+                                        </button>
+                                        <button id="tcs-import-script-btn" class="tcs-toolbar-btn tcs-import-btn" title="Upload a .spec.js script and run it">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8l5 5h-3v7H10v-7H7l5-5zm-7 13h14v2H5v-2z"/></svg>
+                                            Import
+                                        </button>
+                                        <button id="tcs-rate-btn" class="tcs-toolbar-btn tcs-rate-btn" title="Rate TestCase Studio">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>
+                                            Rate Us
+                                        </button>
+                                    </div>
+
+                                   <!--  <div class="top_ads__viewer">
+                                        <div class="top_ads__navigation__btn top_navigate__prev__btn"></div>
+                                        <div class="top_ads__container"></div>
+                                        <div class="top_ads__navigation__btn top_navigate__next__btn"></div>
+                                    </div> -->
+    
+                                    <div id="saveBtnForDebug" class="iconContainer" style="display:none; cursor: pointer;
+                                            cursor: pointer;
+                                            width: 23px;
+                                            height: 23px;
+                                            border-radius: 50px;
+                                            border: 2px solid #3b91df;
+                                            text-align: center;
+                                            margin-left: 5px;
+                                            " title="Save">
+                                        <i class="fa fa-save" style="font-size: 17px;"></i>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="attributeFilter">
+                                <h4 class="tcs-section__title">Set Attribute for XPath / CSS</h4>
+                                <label><input class="chooseAttr textXpath" type="checkbox" title="xpath with text or without text." checked>text</label>
+                                <label><input class="chooseAttr id" type="checkbox" name="id" title="Uncheck to generate XPath/cssSelector without id" checked />id</label>
+                                <label><input class="chooseAttr class" type="checkbox" name="class" title="Uncheck to generate XPath/cssSelector without class" checked />class</label>
+                                <label><input class="chooseAttr name" type="checkbox" name="name" title="Uncheck to generate XPath/cssSelector without name" checked />name</label>
+                                <label><input class="chooseAttr placeholder" type="checkbox" name="placeholder" title="Uncheck to generate XPath/cssSelector without placeholder" checked />placeholder</label>
+                            </div>
+                            <div class="settings__container">
+                                <div class="columns tcs-columns-row">
+                                    <h4 class="tcs-section__title">Customize Columns</h4>
+                                    <label><input class="chooseColumns data" type="checkbox" name="data" title="Uncheck to delete Data column" checked />Data</label>
+                                    <label><input class="chooseColumns expResult" type="checkbox" name="expResult" title="Uncheck to delete Exp Result column" checked />Exp Result</label>
+                                    <label><input class="chooseColumns actResult" type="checkbox" name="actResult" title="Uncheck to delete Act Result column" checked />Act Result</label>
+                                    <label><input class="chooseColumns xpath" type="checkbox" name="xpath" title="Uncheck to delete XPath column" checked />XPath</label>
+                                    <label><input class="chooseColumns cssSelector" type="checkbox" name="cssSelector" title="Uncheck to delete cssSelector column" checked />cssSelector</label>
+                                    <label><input class="chooseColumns Screenshoot" type="checkbox" name="Screenshot" title="Uncheck to delete screenshot column" checked />Screenshot</label>
+                                    <label><input class="chooseColumns playwright" type="checkbox" name="playwright" title="Uncheck to hide Playwright Locator column" checked />Playwright</label>
+                                </div>
+                                <div class="tcs-integrations">
+                                    <div class="tcs-integrations__head">
+                                        <h4>Integrations</h4>
+                                        <!-- The Jira / TestRail footer-button picker used to sit here. All
+                                             buttons are now shown in the footer, so there is nothing to pick. -->
+                                        <p class="tcs-integrations__limit">
+                                            <strong>3 uploads per day</strong> for each tool &middot; counted on this device, resets daily &middot;
+                                            <a href="https://www.selectorshub.com/testcase-studio-pro/plans/" target="_blank">Upgrade to Pro</a> for unlimited
+                                        </p>
+                                    </div>
+
+                                    <div class="tcs-integrations__grid">
+                                        <div class="tcs-card jira__settings">
+                                            <div class="tcs-card__title"><span class="tcs-card__dot tcs-dot-jira"></span>Jira</div>
+                                            <div class="jira__block jira__hostname">
+                                                <label for="jira-hostname">Hostname</label>
+                                                <input type="text" name="jira-hostname" id="jira-hostname" placeholder="https://example.atlassian.net">
+                                            </div>
+                                            <div class="jira__block jira__username">
+                                                <label for="jira-username">Username</label>
+                                                <input type="text" name="jira-username" id="jira-username" placeholder="Atlassian email (Cloud)">
+                                            </div>
+                                            <div class="jira__block jira__apikey">
+                                                <label for="jira-apikey">API Token</label>
+                                                <input type="text" name="jira-apikey" id="jira-apikey" placeholder="API token or personal access token">
+                                            </div>
+                                            <a href="https://youtu.be/Jy5CrqxuE2E" target="_blank" class="jira__tutorial tcs-card__help">
+                                                <span>Watch how to link your Jira account</span>
+                                            </a>
+                                        </div>
+
+                                        <div class="tcs-card testrail__settings">
+                                            <div class="tcs-card__title"><span class="tcs-card__dot tcs-dot-testrail"></span>TestRail</div>
+                                            <div class="testrail__block testrail__hostname">
+                                                <label for="testrail-hostname">Hostname</label>
+                                                <input type="text" name="testrail-hostname" id="testrail-hostname" placeholder="https://example.testrail.com">
+                                            </div>
+                                            <div class="testrail__block testrail__username">
+                                                <label for="testrail-username">Username</label>
+                                                <input type="text" name="testrail-username" id="testrail-username" placeholder="Username / Email">
+                                            </div>
+                                            <div class="testrail__block testrail__apikey">
+                                                <label for="testrail-apikey">Api Key</label>
+                                                <input type="text" name="testrail-apikey" id="testrail-apikey" placeholder="Api Key">
+                                            </div>
+                                            <a href="https://youtu.be/qgeu528Ppes" target="_blank" class="testrail__tutorial tcs-card__help">
+                                                <span>Watch how to link your TestRail account</span>
+                                            </a>
+                                        </div>
+
+                                        <div class="tcs-card slack__settings">
+                                            <div class="tcs-card__title"><span class="tcs-card__dot tcs-dot-slack"></span>Slack</div>
+                                            <div class="slack__block slack__apikey">
+                                                <label for="slack-token">Bot Token</label>
+                                                <input type="text" name="slack-token" id="slack-token" placeholder="xoxb-…">
+                                            </div>
+                                            <button type="button" id="slack-copy-manifest" class="slack__manifest-btn" title="Copy the Slack app manifest for one-paste setup">Copy Slack app manifest</button>
+                                            <ol class="slack__steps">
+                                                <li>Go to <a href="https://api.slack.com/apps?new_app=1" target="_blank">api.slack.com/apps</a>, click <b>Create New App</b> &rarr; <b>From a manifest</b></li>
+                                                <li>Pick your workspace, paste the copied manifest &rarr; <b>Create</b></li>
+                                                <li><b>Install to Workspace</b> &rarr; copy the Bot User OAuth Token (xoxb-…) and paste it above</li>
+                                            </ol>
+                                            <a href="https://youtu.be/Eb9HwOLT98E" target="_blank" class="slack__tutorial tcs-card__help">
+                                                <span>Watch how to link your Slack account</span>
+                                            </a>
+                                        </div>
+                                        <div class="tcs-card bugasura__settings">
+                                            <div class="tcs-card__title"><span class="tcs-card__dot tcs-dot-bugasura"></span>Bugasura</div>
+                                            <div class="bugasura__block bugasura__apikey">
+                                                <label for="bugasura-apikey">API Key</label>
+                                                <input type="text" name="bugasura-apikey" id="bugasura-apikey" placeholder="Bugasura API key">
+                                            </div>
+                                            <ol class="slack__steps bugasura__steps">
+                                                <li>Open <a href="https://my.bugasura.io/account/userprofile" target="_blank">Bugasura &rarr; User Settings</a></li>
+                                                <li>Copy the <b>API Key</b> and paste it above</li>
+                                                <li>Issues are filed in a <b>sprint</b> &mdash; make sure your project has one</li>
+                                            </ol>
+                                            <a href="https://bugasura.io/api/" target="_blank" class="bugasura__help tcs-card__help">
+                                                <span>About the Bugasura API</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="columns steps-sentences-settings">
+                                    <div class="top-section">
+                                      <h4 class="tcs-section__title">Steps Sentences</h4>
+                                      <button class="bdd-format">Change to BDD Format</button>
+                                    </div>
+                                    <div class="error__container hideElement"></div>
+                                    <div id="sentences"></div>
+                                </div>
+                            </div>
+    
+                            <div class="inputFeildContainer">
+                                <input type="text" id='xpathInput' placeholder="keep xpathvalue as keyword in command." autocomplete="off" autocorrect="off" title='You can change this command, just keep xpathvalue as keyword where you want to have xpath value in command. For ex- FindBy(xpath="xpathvalue") or if xpath is not inside double quotes then FindBy(xpath=xpathValue)' spellcheck="false" value='driver.findElement(By.xpath("xpathvalue"))'>
+                                <span id='helperText'></span>
+                            </div>
+    
+                            
+                            <div id="sys-info-wrapper">
+                                <table id="system-information">
+                                  <thead>
+                                    <th class="system-information-text"></th>
+                                  </thead>
+                                </table>
+                                <div class="copy-sys-info">
+                                  <span class="copy-sys-info-tooltip hideElement">Copied</span>
+                                </div>
+                            </div>
+    
+    
+                            <div class="rightContainerLower" id='sub_content'>
+                                <table id="command-grid" class="tablesorter" cellspacing="0">
+                                    <thead class="fixed">
+                                        <tr>
+                                            <th style="box-shadow: none !important; width: 30px">
+                                                <div>
+                                                    #
+                                                </div>
+                                            </th>
+                                            <th style="box-shadow: none !important; ">
+                                                <div class="header">
+                                                    Steps
+                                                    <button class="copyAllButton">
+                                                        <span class="copyAllSteps toolTip">Click to copy all Test Steps.</span>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            <th id="dataHeader" style="box-shadow: none !important; ">
+                                                <div class="header">
+                                                    Data
+                                                    <button class="copyAllData">
+                                                        <span class="copyAllStepsData toolTip">Click to copy all step's Data.</span>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            <th id="expResHeader" style="box-shadow: none !important; ">
+                                                <div class="header">
+                                                    Exp Result
+                                                    <button class="copyAllExpRes">
+                                                        <span class="copyAllExpRes toolTip">Click to copy all Expected Result.</span>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            <th id="actResHeader" style="box-shadow: none !important; ">
+                                                <div class="header">
+                                                    Act Result
+                                                    <button class="copyAllActRes">
+                                                        <span class="copyAllActRes toolTip">Click to copy all Actual Result.</span>
+                                                    </button>
+                                                    <span class="tcs-col-info" tabindex="0" aria-label="How Act Result is filled">
+                                                        <span class="tcs-col-info__tip">Filled automatically when you click <b>Run</b>: each step gets <b>“Step executed successfully.”</b> or <b>“Failed: &lt;reason&gt;”</b>. Replay only confirms the action ran — it does not check the Expected Result. You can type your own result in any cell, and it will never be overwritten.</span>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th id="xpathHeader" style="box-shadow: none !important;">
+                                                <div class="header">
+                                                    <span id="toggleHeader">XPath</span>
+                                                    <button id='updatetitle' class="copyAllXpath">
+                                                        <span class="copyAllCommand toolTip">Click to copy all commands/xpaths.</span>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            <th id="cssSelectorHeader" style="box-shadow: none !important;">
+                                                <div class="header">
+                                                    <span id="toggleHeader">cssSelector</span>
+                                                    <button id='updatetitle' class="copyAllCss">
+                                                        <span class="copyAllCommand toolTip">Click to copy all cssSelector.</span>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            <th id="playwrightHeader" style="box-shadow: none !important;">
+                                                <div class="header pw-header-flex">
+                                                    <span>Playwright</span>
+                                                    <button class="copyAllPlaywright" title="Copy all Playwright Locators">
+                                                        <span class="copyAllCommand toolTip">Click to copy all Playwright Locators.</span>
+                                                    </button>
+                                                    <label class="pw-await-label" title="Prefix locators with await keyword">
+                                                        <input type="checkbox" id="pwAwaitToggle" checked />await
+                                                    </label>
+                                                </div>
+                                            </th>
+                                            <th id="screenshotHeader" style="box-shadow: none !important;">
+                                                <div class="header">
+                                                    <span id="toggleHeader">Screenshots</span>
+                                                    <div id="screenshotToggle" class="toggle-btn inactive">
+                                                        <div class="toggle-circle"></div>
+    
+                                                    </div>
+                                                </div>
+                                            </th>
+    
+                                            <th style="box-shadow: none !important; width: 80px">
+                                                <a class="undo" href="https://selectorshub.com/testcase-studio-pro/plans/" target="_blank">
+                                                    <span class="undo-btn toolTip">Upgrade to Pro for Undo feature</span>
+                                                    <span class="undo-icon"></span>
+                                                </a>
+                                            </th>
+    
+    
+    
+                                        </tr>
+                                    </thead>
+                                    <tbody id="records-grid">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tablePlaceholder">
+                            </div>
+
+                            <!-- ── Replay Status Bar ── -->
+                            <div class="tcs-replay-bar" id="tcs-replay-status" style="display:none;">
+                                <div class="tcs-replay-progress-track">
+                                    <div class="tcs-replay-progress-fill" id="tcs-replay-progress-fill"></div>
+                                </div>
+                                <span id="tcs-replay-status-text">Ready</span>
+                            </div>
+
+                            <div class="rightContainerFooter" id='save_sub_content'>
+                                <!-- <div id="snackbar"></div> -->
+                                <button data-tip="Download test case with screenshots" id="save_btn" class="saveTestCaseBtn">
+                                    <div class="download"></div>
+                                    <p>Test Case</p>
+                                    <div class="loader" id="loader"></div>
+                                </button>
+
+                                <a role="button" tabindex="0" data-tip="Upload test case to Jira as an issue" class="saveTestCaseBtn remote-upload-btn footer-button default-upload-btn" id="remote_save">
+                                    <div class="upload"></div>
+                                    <p class="footer-button-text">Jira</p>
+                                    <span class="tcs-quota-badge" data-tool="jira"></span>
+                                </a>
+                                <a role="button" tabindex="0" data-tip="Upload test case to TestRail as a case" class="saveTestCaseBtn remote-upload-btn footer-button default-upload-btn" id="save_btn_testrail">
+                                    <div class="upload"></div>
+                                    <p class="footer-button-text">TestRail</p>
+                                    <span class="tcs-quota-badge" data-tool="testrail"></span>
+                                </a>
+                                <a role="button" tabindex="0" data-tip="Upload test case to Bugasura as an issue" class="saveTestCaseBtn remote-upload-btn footer-button default-upload-btn" id="save_btn_bugasura">
+                                    <div class="upload"></div>
+                                    <p class="footer-button-text">Bugasura</p>
+                                    <span class="tcs-quota-badge" data-tool="bugasura"></span>
+                                </a>
+                                <a role="button" tabindex="0" data-tip="Send test case steps and screenshots to a Slack channel" class="saveTestCaseBtn footer-button slack-btn" id="save_btn_slack">
+                                    <div class="upload"></div>
+                                    <p class="footer-button-text">Slack</p>
+                                    <span class="tcs-quota-badge" data-tool="slack"></span>
+                                </a>
+
+                                <button data-tip="Run these steps as code on testRigor" id="execute_btn" class="executeTestCaseBtn">
+                                    <!-- <a class="testRigorLink" href="https://testrigor.com/?utm_source=selectorshub&utm_medium=tcs" target="_blank">Execute this Test on testRigor</a> -->
+                                    <a class="testRigorLink" href="https://testrigor.com/?utm_source=selectorshub&utm_medium=tcs&eid=LYFcml" target="_blank">Execute Steps in English as Code</a>
+                                </button>
+                                <button data-tip="Record a screen video of your test run" class="proFeatureRecording record__screen">
+                                    <!-- <span class="proFeature3 toolTip">Upgrade to Pro version to access this feature</span> -->
+                                    Record Screen
+                                </button>
+                                <div id="video_container">
+                                    <div id="video_overlay">
+                                      <div id="video_play_btn" title="Resume video recording" class="video_icon video_play_icon"></div>
+                                      <div id="video_pause_btn" title="Pause video recording" class="video_icon video_pause_icon"></div>
+                                      <div id="video_stop_btn" title="Stop video recording" class="video_icon video_stop_icon"></div>
+                                      <div id="video_display_btn" title="Watch recorded video" class="video_icon video_display_icon"></div>
+                                      <div id="video_delete_btn" title="Delete recorded video" class="video_icon video_delete_icon"></div>
+                                      <div id="download_video_btn" title="Download recorded video" class="video_icon video_download_icon"></div>
+                                    </div>
+                                    <div class="recording-circle"></div>
+                                </div>
+    
+                                <!-- <a class="proFeatureFile" target="_blank" href="https://selectorshub.com/testcase-studio-pro/">
+                                        <span class="proFeature1 toolTip">Upgrade to Pro, just $2.5/month</span>
+                                        Upgrade
+                                    </button>
+                                </a> -->
+                                <a target="_blank" href="https://selectorshub.com/testcase-studio-pro/plans/">
+                                    <button data-tip="Record several test cases in one session — Pro only" class="proFeatureScreenshot">
+                                        <span class="proFeature2 toolTip">Upgrade to Pro version to access this feature.</span>
+                                        <!-- <div class="download"></div> -->
+                                        Record Multi Test Cases
+                                    </button>
+                                </a>
+                                <!-- The "Jira | TestRail" Pro teaser button used to sit here. Removed in 2.0.7:
+                                     both integrations now work in the free version, so the live Jira / TestRail
+                                     buttons above replace it. -->
+                                <a target="_blank" href="https://selectorshub.com/testcase-studio-pro/plans/">
+                                    <button data-tip="Add your own columns to the grid — Pro only" class="proFeatureScreenshot">
+                                        <span class="proFeature2 toolTip">Upgrade to Pro version to access this feature.</span>
+                                        <!-- <div class="download"></div> -->
+                                        Add Columns
+                                    </button>
+                                </a>
+                            </div>
+    
+                            <div class="infoBlock">
+                                <!-- Pro-only features grouped in one capsule: last test case, network logs, dark theme -->
+                                <span class="pro-capsule">
+                                    <a class="requestHeader pro" href="https://selectorshub.com/testcase-studio-pro/plans/" target="_blank">
+                                        <span class="download"></span>
+                                        <span class="proFeature1 toolTip">Upgrade to Pro for these features</span>
+                                        <span class="pro-teaser-item">Last Test Case</span>
+                                        <span class="download"></span><span class="pro-teaser-item">Network Logs</span>
+                                    </a>
+                                    <a class="theme-toggle" href="https://selectorshub.com/testcase-studio-pro/plans/" target="_blank">
+                                        <span class="dark-theme toolTip">Upgrade to Pro for dark theme</span>
+                                        <span class="theme"></span>
+                                    </a>
+                                </span>
+                                <div class="ads__viewer">
+                                    <div class="ads__navigation__btn navigate__prev__btn"></div>
+                                    <div class="ads__container"></div>
+                                    <div class="ads__navigation__btn navigate__next__btn"></div>
+                                </div>
+                                <!-- Removed to free space for footer ads: ads info icon, "Issue" link and version.
+                                     captureEvents.js null-checks all three. -->
+                                <span class="profile-hide"> | </span>
+                                <a class="requestHeader profile" title="Your plan">
+                                    Profile
+                                </a>
+                                <span class="login-hide login-btn-divider"> | </span>
+                                <a class="requestHeader login-btn" title="Login">
+                                    Login
+                                </a>
+                                <!-- More SelectorsHub tools: opens #sh-tools-panel (see moreTools.js) -->
+                                <button type="button" class="sh-tools-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="sh-tools-panel">
+                                    <img class="sh-tools-logo" src="../icons/tools/selectorshub.png" alt="" width="16" height="16">
+                                    <span class="sh-tools-label">More Free Tools</span>
+                                    <span class="sh-tools-dot hideElement"></span>
+                                </button>
+                                <div class="popup__actions__container hideElement">
+                                    <a href="#" class="popup__action keep__ads">Keep ads</a>
+                                    <a href="https://selectorshub.com/testcase-studio-pro/plans/" target="_blank" class="popup__action go__ad__free">Remove ads with Pro</a>
+                                </div>
+                            </div>
+                            <!-- Snackbar -->
+                            <div id="snackbar"></div>
+    
+                        </div>
+                        <div class="right__section hideElement">
+                            <div class="ads">
+                                <div>
+                                    <div class="ads__label">Sponsored</div>
+                                    <div id="offer-countdown-ads" class="hideElement">
+                                        <div class="offer__timer">
+                                            <span class="offer__text"></span>
+                                            <span class="offer__countdown"></span>
+                                        </div>
+                                        <div class="offer__ads__viewer">
+                                            <div class="offer__ads__navigation__btn offer__navigate__prev__btn"></div>
+                                            <div class="offer__ads__container"></div>
+                                            <div class="offer__ads__navigation__btn offer__navigate__next__btn"></div>
+                                        </div>
+                                    </div>
+                                    <div id="image-ads" class="image__ad hideElement">
+                                        <div class="prev__ad__img"></div>
+                                        <div class="images__container"></div>
+                                        <div class="next__ad__img"></div>
+                                    </div>
+                                    <!-- v3.0.4: removing ads is a Pro benefit; links straight to Pro plans. -->
+                                    <a class="ads__remove" href="https://selectorshub.com/testcase-studio-pro/plans/" target="_blank" rel="noopener">Remove ads with Pro &rarr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <br>
+
+    </div>
+    </div>
+
+    <div id="upgrade-popup" class="hideElement">
+        <div class="upgrade__popup__content">
+            <p class="upgrade__popup__message">Thanks for trying out TestCase Studio. This is a free version, and although this is free forever but Pro version must be used for business use. Would you like to take a free trial of the Pro version?</p>
+            <div class="upgrade__popup__btns">
+                <a id="upgrade-confirm" href="https://selectorshub.com/testcase-studio-pro/plans" target="_blank" class="upgrade__popup__btn upgrade__confirm">Take Free Trial</a>
+                <a id="upgrade-cancel" href="#" class="upgrade__popup__btn upgrade__cancel">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="license-popup" class="hideElement">
+        <div class="license__popup__content">
+            <h4>End User License Agreement</h4>
+            <div class="license__popup__btns">
+                <div class="accept__block">
+                    <input type="radio" name="license-option" id="accept-input" checked>
+                    <label for="accept-input">Using it for personal and learning</label>
+                </div>
+                <div class="upgrade__block">
+                    <input type="radio" name="license-option" id="upgrade-input">
+                    <label for="upgrade-input">If using it for business</li>
+                </div>
+                <div class="actions">
+                    <a id="license-accept" href="#" class="license__popup__btn license__accept">Accept</a>
+                    <a id="license-upgrade" href="#" target="_blank" class="license__popup__btn license__upgrade disabled">Upgrade</a>
+                </div>
+                <a href="https://selectorshub.com/terms-of-service" target="_blank" id="terms-and-services">Terms And Services</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../extension/deps/idb-file-storage.js"></script>
+    <!-- Screenshot bytes live in IndexedDB, not in the steps array. Must load
+         before captureEvents.js, which records and renders through it. -->
+    <script src="../extension/screenshotStore.js"></script>
+    <script src="../extension/saveFile.js"></script>
+    <script src="../extension/script.js"></script>
+    <script src="../extension/countries.js"></script>
+    <script src="../extension/platform.js"></script>
+    <script src="../content-script/playwrightnew.js"></script>
+    <script src="../extension/captureEvents.js"></script>
+    <script src="../extension/scriptExporter.js"></script>
+    <script src="../extension/scriptImporter.js"></script>
+    <script src="../extension/replayEngine.js"></script>
+    <script src="../extension/rateUs.js"></script>
+    <!-- Coordinates the Customize / Filter / driver-command strips. Must load
+         after captureEvents.js so it has the final say on layout. -->
+    <script src="../extension/panelLayout.js"></script>
+    <!-- Expected / Actual Result generation (ported from Pro). expectedResults.js
+         fills Exp Result while recording; actualResults.js fills Act Result on Run. -->
+    <script src="../extension/expectedResults.js"></script>
+    <script src="../extension/actualResults.js"></script>
+    <!-- Integrations: bridge first (it defines testCases/screenshotDb/quota), then the tools. -->
+    <script src="../extension/integrationBridge.js"></script>
+    <script src="../extension/testrail.js"></script>
+    <script src="../extension/jira.js"></script>
+    <script src="../extension/slack.js"></script>
+    <script src="../extension/bugasura.js"></script>
+    <!-- Eye (show / mask) and copy buttons inside every credential field. -->
+    <script src="../extension/fieldTools.js"></script>
+    <!-- Footer "More tools by SelectorsHub" panel (cross-promotion of sister tools). -->
+    <script src="../extension/moreTools.js"></script>
+    <script src="jquery.js"></script>
+    <script src="login-script.js"></script>
+</body>
+
+</html>

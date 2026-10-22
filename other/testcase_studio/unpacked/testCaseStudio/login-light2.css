@@ -1,0 +1,229 @@
+/* =========================================================
+   TestCase Studio login / sign-up window (v3.0.4)
+   One view at a time: Log in (has a key) or Sign up (free key).
+   Pro is a single quiet line at the bottom of each view.
+   ========================================================= */
+html, body { margin: 0; height: 100%; }
+body { background: #faf8f5; }
+
+#register_form {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #faf8f5 0%, #f5efe4 100%);
+  color: #1a2332;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding-bottom: 44px;
+  box-sizing: border-box;
+}
+#register_form * { box-sizing: border-box; }
+#register_form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+#register_form input { font-family: inherit; }
+#register_form input[type="button"] { -webkit-appearance: none; appearance: none; }
+
+/* ---------- Views ---------- */
+#register_form #login-container,
+#register_form .register-container {
+  padding: 44px 28px 0;
+}
+#register_form .register-container { display: none; }
+
+#register_form .view-head { text-align: center; margin-bottom: 22px; }
+#register_form .view-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+#register_form .view-sub {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4f5869;
+}
+
+/* ---------- Key row (login + forgot key) ---------- */
+#register_form .have-key-section { padding: 0; }
+#register_form .email-container { display: none; }
+#register_form .key-input-row { display: flex; gap: 8px; }
+
+#register_form #licence,
+#register_form #email,
+#register_form .re-inputs {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #d8d2c4;
+  background: #ffffff;
+  border-radius: 9px;
+  padding: 12px 13px;
+  font-size: 14px;
+  color: #1a2332;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#register_form #licence:focus,
+#register_form #email:focus,
+#register_form .re-inputs:focus {
+  outline: none;
+  border-color: #ca7702;
+  box-shadow: 0 0 0 3px rgba(202, 119, 2, 0.15);
+}
+
+#register_form #submit_btn,
+#register_form .forgetbtn {
+  background: #1a2332;
+  color: #ffffff;
+  border: none;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#register_form #submit_btn:hover,
+#register_form .forgetbtn:hover { background: #2a3447; }
+
+/* ---------- Sign-up fields ---------- */
+#register_form .signup-fields { display: flex; flex-direction: column; gap: 10px; }
+
+#register_form .re-actions {
+  width: 100%;
+  margin-top: 4px;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: #a3560f;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#register_form .re-actions:hover { background: #8a480b; }
+#register_form .re-actions:disabled { opacity: 0.6; cursor: default; }
+#register_form .re-actions--secondary {
+  display: none;
+  margin-top: 0;
+  background: #ffffff;
+  color: #1a2332;
+  border: 1px solid #d8d2c4;
+  font-size: 14px;
+  padding: 11px;
+}
+#register_form .re-actions--secondary:hover { background: #faf5ec; }
+
+#register_form .fine-print {
+  text-align: center;
+  font-size: 12.5px;
+  color: #5a6478;
+}
+
+#register_form .server-message { display: none; font-size: 13px; line-height: 1.4; text-align: center; }
+
+/* ---------- Switch line ("No key yet? Sign up free") ---------- */
+#register_form .switch-line {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: #4f5869;
+}
+#register_form .switch-line a { color: #8a480b; font-weight: 600; text-decoration: none; }
+#register_form .switch-line a:hover { text-decoration: underline; }
+
+/* ---------- Pro line (single, quiet) ---------- */
+#register_form .pro-line {
+  margin-top: 28px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #ece3d3;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #3d4554;
+}
+#register_form .pro-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8a480b;
+  background: #f6eadb;
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+#register_form .get-pro-link {
+  color: #8a480b;
+  font-weight: 700;
+  text-decoration: none;
+}
+#register_form .get-pro-link:hover { text-decoration: underline; }
+
+/* ---------- Status messages ---------- */
+#register_form .s-mess { display: none; font-size: 12.5px; margin: 6px 0 0; color: #b42318; }
+
+/* ---------- Footer ---------- */
+#register_form #registration_footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f1e9db;
+  padding: 11px 16px;
+  border-top: 1px solid rgba(20, 30, 50, 0.06);
+}
+#register_form .footer_support_links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#register_form .footer-link {
+  font-size: 12px;
+  color: #5a6478;
+  cursor: pointer;
+  font-weight: 500;
+}
+#register_form .footer-link:hover { color: #8a480b; }
+#register_form .open-login.footer-link { display: none; }
+
+/* ---------- Three-device modal (unchanged behaviour) ---------- */
+#three-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, .5);
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  display: none;
+}
+.three_modal_content {
+  background-color: #ffffff;
+  position: relative;
+  padding: 1rem 2rem;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  margin: 50px 10% 0;
+  max-width: 550px;
+  border: 1px solid #ffe0a6;
+  text-align: left;
+}
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+.device-item { flex: 1; text-align: left; }
+.device-close { flex: 0; color: red; cursor: pointer; text-align: right; }
+.close-modal { text-align: right; cursor: pointer; }

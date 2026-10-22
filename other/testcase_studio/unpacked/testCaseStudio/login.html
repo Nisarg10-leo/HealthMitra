@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; connect-src 'self' https://tcs.selectorshub.info https://selectorshub.info; style-src 'self' 'unsafe-inline'; object-src 'self';">
+    <title>TestCase Studio Login</title>
+    <link rel="stylesheet" type="text/css" id="global-styles" href="login-light2.css" media="screen"/>
+    <meta name="theme-color" content="#ca7702" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+<body>
+
+    <form role="form" id="register_form">
+
+        <!-- ═══ LOGIN VIEW: for people who already have a key ═══ -->
+        <div id="login-container">
+            <div class="view-head">
+                <h1 class="view-title">Log in</h1>
+                <p class="view-sub">Enter the key we emailed you.</p>
+            </div>
+
+            <div class="have-key-section licence-container">
+                <fieldset class="have-a-key">
+                    <div class="key-input-row">
+                        <input type="text" name="licence" id="licence" placeholder="Paste your key" aria-label="Your key">
+                        <input type="button" id="submit_btn" value="Log in">
+                    </div>
+                    <span class="subscription-status s-mess"></span>
+                    <span class="invalid-error invalid-credentails s-mess"></span>
+                </fieldset>
+            </div>
+
+            <div class="have-key-section email-container">
+                <fieldset class="have-a-key">
+                    <div class="key-input-row">
+                        <input type="email" name="email" id="email" placeholder="Your email" aria-label="Your email" />
+                        <input type="button" class="forgetbtn" value="Send key">
+                    </div>
+                    <span class="user-status s-mess"></span>
+                </fieldset>
+            </div>
+
+            <p class="switch-line">No key yet? <a href="#" class="switch-to-signup">Sign up free</a></p>
+
+            <div class="pro-line">
+                <span class="pro-tag">Pro</span>
+                <span>Unlimited steps, integrations, BDD and no ads, for good.</span>
+                <a href="#" class="get-pro-link">Get TestCase Studio Pro &rarr;</a>
+            </div>
+        </div>
+
+        <!-- ═══ SIGN-UP VIEW: shown automatically on day X ═══ -->
+        <div class="register-container">
+            <div class="view-head">
+                <h1 class="view-title">Remove ads, free</h1>
+                <p class="view-sub">Sign up and we'll email you a free key that turns off ads for a limited time.</p>
+            </div>
+
+            <div class="signup-fields">
+                <input class="re-inputs" type="text" name="full_name" id="re-full-name" placeholder="Full name" aria-label="Full name" />
+                <input class="re-inputs" type="email" name="re_email" id="re-email" placeholder="Email" aria-label="Email" />
+
+                <span class="subscription-status s-mess"></span>
+                <span class="invalid-error invalid-credentails s-mess"></span>
+                <div class="server-message"></div>
+
+                <input type="button" id="register_btn" class="re-actions" value="Sign up free">
+                <input type="button" id="resend_btn" class="re-actions re-actions--secondary" value="Resend email">
+                <span class="fine-print">No credit card needed.</span>
+            </div>
+
+            <p class="switch-line">Already have a key? <a href="#" class="open-login-inline">Log in</a></p>
+
+            <div class="pro-line">
+                <span class="pro-tag">Pro</span>
+                <span>Unlimited steps, integrations, BDD and no ads, for good.</span>
+                <a href="#" class="get-pro-link">Get TestCase Studio Pro &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Three-device modal (preserved) -->
+        <div id="three-modal">
+            <div class="three_modal_content">
+            <div class="close-modal">×</div>
+            <h4 class="three-warning">You're signed in on multiple devices. Click × to sign out from one.</h4>
+            <div class="item-row"><div class="device-item">Device 1</div><div data-num="1" class="device-close">×</div></div>
+            <div class="item-row"><div class="device-item">Device 2</div><div data-num="2" class="device-close">×</div></div>
+            <div class="item-row"><div class="device-item">Device 3</div><div data-num="3" class="device-close">×</div></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="registration_footer">
+            <div class="footer_support_links">
+            <span id="registration_tutorial" class="footer-link" title="Learn how to use the key">Tutorial</span>
+            <span id="forgot_pass" class="open-forgot-password footer-link" title="Recover your key">Forgot key</span>
+            <span id="open_login" class="open-login footer-link" title="Log in with your key">Log in</span>
+            </div>
+        </div>
+    </form>
+</body>
+   <script src="jquery.js"></script>
+   <script src="login.js"></script>
+</html>

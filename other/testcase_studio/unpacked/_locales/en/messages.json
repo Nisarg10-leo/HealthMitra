@@ -1,0 +1,15 @@
+{
+  "language": {
+    "message": "en"
+  },
+  "extName": {
+    "message": "TestCase Studio"
+  },
+  "extDescription": {
+    "message": "TestCase Studio record the user actions performed on a web application in English Sentences. Best alternative for Selenium IDE"
+  },
+  "extDefaultTitle": {
+    "message": "TestCase Studio record the user actions performed on a web application in English Sentences. Best alternative for Selenium IDE"
+  }
+  
+}

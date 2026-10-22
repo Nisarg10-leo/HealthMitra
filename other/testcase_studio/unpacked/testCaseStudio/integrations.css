@@ -1,0 +1,2140 @@
+/*
+ * TestCase Studio (Free) — Integration styles
+ * Jira / TestRail / Slack settings blocks, pickers and the daily-limit popup.
+ * Kept in its own file so studio.css stays untouched by the integration port.
+ */
+
+:root {
+  --tcs-amber: #ca7702;
+  --tcs-amber-soft: #fbb945;
+  --tcs-border: #d8d8d8;
+  --tcs-text: #2b2b2b;
+  --tcs-muted: #6b6b6b;
+}
+
+/* ── Settings panel ───────────────────────────────────────────────────────
+   The panel is absolutely positioned under the toolbar with no height limit,
+   so the integration blocks pushed its content past the bottom of the window
+   with no way to reach it. Cap it to the space below the toolbar and scroll. */
+
+.settings__container {
+  /* top and max-height are measured at open time by integrationBridge.js;
+     these are the fallbacks if that script hasn't run yet. */
+  max-height: calc(100vh - 83px);
+  overflow-y: auto;
+  overscroll-behavior: contain;   /* don't scroll the grid behind it */
+  padding-bottom: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.settings__container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.settings__container::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: #c9c9c9;
+}
+
+.settings__container::-webkit-scrollbar-thumb:hover {
+  background: #adadad;
+}
+
+.settings__container::-webkit-scrollbar-track {
+  background: #f3f3f3;
+}
+
+/* ── Panel sections: one shared treatment ────────────────────────────────
+   Customize Columns, Set Attribute and Steps Sentences used the same amber
+   .columns / .attributeFilter fill. They now match the Integrations block:
+   pale background, a small bold title, and the options as white chips. */
+
+/* Note: .attributeFilter's visibility is driven by an inline style on the
+   element, so nothing here touches `display` for it — only how it looks. */
+.settings__container > .columns,
+.attributeFilter {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  width: auto;
+  padding: 11px 16px;
+  background: #fffaf2;
+  border: none;
+  border-top: 1px solid #ebad60;
+  justify-content: flex-start;
+  font-family: sans-serif;
+  font-size: 12px;
+  color: var(--tcs-text);
+}
+
+.settings__container > .columns {
+  display: flex;
+}
+
+/* The attribute strip sits on its own between the toolbar and the grid, so it
+   gets a full border to separate it, and its content is centred to sit under
+   the middle of the table rather than trailing off at the left. */
+.attributeFilter {
+  justify-content: center;
+  gap: 8px 14px;
+  padding: 9px 16px;
+  border: 1px solid #ebad60;
+  border-left: none;
+  border-right: none;
+  background: #fffaf2;
+  box-shadow: inset 0 -1px 0 rgba(235, 173, 96, 0.35);
+}
+
+.attributeFilter .tcs-section__title {
+  min-width: 0;               /* no reserved gutter; it centres with the chips */
+  margin-right: 4px;
+}
+
+.tcs-section__title {
+  margin: 0;
+  min-width: 128px;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--tcs-text);
+}
+
+/* Checkbox options as chips, so the row reads as a set rather than
+   text scattered across the full width. */
+.settings__container > .columns > label,
+.attributeFilter > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid #ecd9bb;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 11.5px;
+  color: var(--tcs-text);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.settings__container > .columns > label:hover,
+.attributeFilter > label:hover {
+  border-color: var(--tcs-amber);
+  background: #fffaf2;
+}
+
+.settings__container > .columns > label input,
+.attributeFilter > label input {
+  margin: 0;
+  accent-color: var(--tcs-amber);
+  cursor: pointer;
+}
+
+/* Steps Sentences keeps its own stacked layout, minus the amber fill. */
+.settings__container > .columns.steps-sentences-settings {
+  display: block;
+  padding: 12px 16px 14px;
+}
+
+.steps-sentences-settings .top-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+
+.steps-sentences-settings .top-section .bdd-format {
+  padding: 4px 11px;
+  border: none;
+  border-radius: 5px;
+  background: #2b2b2b;
+  color: #ffe0a6;
+  font-family: sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.steps-sentences-settings .top-section .bdd-format:hover {
+  background: #444;
+}
+
+/* ── Upgrade: top-right of the toolbar, large and bold ───────────────── */
+
+.upgradeBtn {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  margin: 0 12px 0 14px;
+  padding: 6px 18px;
+  width: auto;
+  height: auto;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffb027 0%, var(--tcs-amber) 100%);
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex: none;
+  box-shadow: 0 1px 3px rgba(202, 119, 2, 0.35);
+  transition: filter 0.12s ease, transform 0.12s ease;
+}
+
+.upgradeBtn:hover {
+  /* colours come from the shared footer-hover rule below; just the lift here */
+  transform: translateY(-1px);
+}
+
+/* Anchored to the button, opening inwards from the window's right edge. */
+.upgradeBtn {
+  position: relative;
+}
+
+/* studio.css positions this one with margins inside a :hover rule, which
+   outranks a plain selector — so this has to carry :hover too. */
+.upgradeBtn .proFeature1.toolTip,
+.upgradeBtn:hover .proFeature1.toolTip {
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  margin: 0;
+  width: max-content;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* The toolbar row is now only the run / script controls, so let them start at
+   the left and use the full width instead of sitting centred. */
+.rightContainerUpper {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  justify-content: flex-start;
+  /* The run controls and the system-information bar are both framed now, so a
+     full-width rule cutting between them just adds noise. */
+  border-bottom: none;
+}
+
+#iconsContainer {
+  width: 100%;
+  padding: 0;                 /* so the % offset below lines up with #system-information */
+}
+
+/*
+ * The run / script controls are framed like the system-information bar below
+ * the grid: same 80% width at the same 9% offset, same 1px amber rounded
+ * border, with the buttons centred inside it.
+ */
+.tcs-replay-controls {
+  width: 80%;
+  margin: 9px 0 0 9%;        /* matches the system-information bar's spacing */
+  padding: 4px 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  box-sizing: border-box;
+  border: 1px solid #ffe0a6;
+  border-radius: 6px;
+}
+
+/* "Set driver command" now has the space the Upgrade button was taking. */
+.tcs-driver-cmd {
+  position: relative;        /* anchors the toggle's tooltip to the control */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Same fix as the action tooltips: studio.css pins this one with
+   `top: 79px; margin-left: -116px` against a distant positioned ancestor,
+   so it drifted away from the toggle. Anchor it to the control itself. */
+.tcs-driver-cmd .toggle.toolTip,
+#inputToggle:hover .toggle.toolTip {
+  top: calc(100% + 6px);
+  bottom: auto;
+  left: auto;
+  right: 0;
+  margin: 0;
+  width: max-content;
+  max-width: 230px;
+  line-height: 1.4;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.tcs-driver-cmd__text {
+  font-family: sans-serif;
+  font-size: 12px;
+  color: var(--tcs-text);
+}
+
+/* studio.css widens this one toggle to 44px, but the knob only travels 14px,
+   so it stopped well short of the right end and the control looked oversized.
+   Back to the standard 30px, where the travel matches. */
+#debugTestStepName .toggle-btn {
+  width: 30px;
+}
+
+#debugTestStepName {
+  align-items: center;
+  flex: none;
+}
+
+/* ── Test-case name row ──────────────────────────────────────────────────
+   Holds the name field (left, compact, bordered — as in Pro), then the
+   test-case actions, the driver toggle and Upgrade. Keeping them here frees
+   the row below for the run / script controls alone. */
+
+#downloadFileName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  padding: 5px 12px;
+  /* Keeps studio.css's 1px #ebad60 rule under the name row. */
+}
+
+#downloadFileName > input {
+  flex: 0 1 300px;            /* compact, and never stretches across the row */
+  width: 300px;
+  min-width: 170px;
+  margin: 0;
+  padding: 5px 11px;
+  text-align: left;           /* was centred */
+  font-family: sans-serif;
+  font-size: 12.5px;
+  color: var(--tcs-text);
+  background: #fff;
+  border: 1px solid #d9c6a5;  /* visible edge so the field reads as editable */
+  border-radius: 20px;
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+#downloadFileName > input::placeholder {
+  color: #a98e63;
+  opacity: 1;
+}
+
+#downloadFileName > input:hover {
+  border-color: var(--tcs-amber);
+}
+
+#downloadFileName > input:focus {
+  border-color: var(--tcs-amber);
+  box-shadow: 0 0 0 2px rgba(202, 119, 2, 0.14);
+}
+
+/* ── Test-case actions: Customize / Filter / Delete / Recording ──────────
+   Grouped and labelled the way they are in Pro. */
+
+/* The replay group was clamped to a fixed 410px while its buttons needed more,
+   so they spilled out and collided with anything placed after them. Let it take
+   its natural width and let the row wrap when the window is too narrow. */
+#iconsContainer {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.tcs-replay-controls {
+  min-width: 0;
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+.tcs-action-group {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-left: auto;          /* pushes the group to the right edge */
+  margin-right: 14px;         /* clear of the "Set driver command" toggle */
+  padding-left: 12px;
+  border-left: 1px solid #ebad60;
+  flex: none;                 /* never squeezed by the replay controls */
+}
+
+.tcs-action {
+  position: relative;        /* anchors this action's tooltip to itself */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  /* Wide enough for the longest label ("Recording"), so the group doesn't
+     shift when it changes to "Paused". */
+  min-width: 78px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+/* The whole box is the hit area — icon, label and the padding around them. */
+.tcs-action:hover {
+  background: #fdf0d9;
+}
+
+.tcs-action:active {
+  background: #fae4c2;
+}
+
+/* ── Tooltips ────────────────────────────────────────────────────────────
+   studio.css positions these with `position: absolute; top: 76px` against
+   whatever distant ancestor happens to be positioned, which is why they
+   appeared far from their icons once the actions moved. Anchoring them to
+   the action box puts each one directly under its own icon. */
+
+.tcs-action .toolTip {
+  top: calc(100% + 6px);
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 230px;
+  margin: 0;
+  line-height: 1.4;
+  white-space: normal;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* Hovering anywhere in the box shows it, not just the icon itself. */
+.tcs-action:hover .toolTip {
+  visibility: visible;
+}
+
+/* The first and last actions would push their tooltip past the window edge. */
+.tcs-action:last-child .toolTip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* Tooltips hang below the row, so nothing above may clip them. */
+#downloadFileName,
+.tcs-action-group {
+  overflow: visible;
+}
+
+/* The icon buttons keep their own background-image from studio.css;
+   only the box around them changes. */
+.tcs-action > button {
+  margin: 0;
+  flex: none;
+}
+
+.tcs-action__label {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #4a4a4a;
+  white-space: nowrap;
+  pointer-events: none;       /* clicks belong to the button above */
+}
+
+.tcs-action:hover .tcs-action__label {
+  color: var(--tcs-text);
+}
+
+.tcs-action__label.is-recording {
+  color: #d0342c;
+}
+
+
+/* ── Settings panel: Integrations section ────────────────────────────────
+   Deliberately not using .columns here — that class is a full-width amber
+   flex row, which fought the stacked field layout and left the dead space
+   on the right. This is a self-contained section instead. */
+
+.tcs-integrations {
+  padding: 12px 16px 14px;
+  border-top: 1px solid #ebad60;
+  background: #fffaf2;
+}
+
+.tcs-integrations__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-bottom: 12px;
+}
+
+.tcs-integrations__head h4 {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tcs-text);
+  letter-spacing: 0.2px;
+}
+
+.tcs-integrations__picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 10px;
+  border: 1px solid #ebad60;
+  border-radius: 20px;
+  background: #fff;
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+.tcs-integrations__picker > span {
+  color: var(--tcs-muted);
+}
+
+.tcs-integrations__picker label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--tcs-text);
+}
+
+.tcs-integrations__picker input {
+  margin: 0;
+  accent-color: var(--tcs-amber);
+  cursor: pointer;
+}
+
+.tcs-integrations__limit {
+  margin: 0;
+  margin-left: auto;          /* sits at the right of the header row */
+  font-family: sans-serif;
+  font-size: 11.5px;
+  color: var(--tcs-muted);
+}
+
+.tcs-integrations__limit strong {
+  color: var(--tcs-text);
+}
+
+.tcs-integrations__limit a {
+  color: var(--tcs-amber);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tcs-integrations__limit a:hover {
+  text-decoration: underline;
+}
+
+/* Three cards side by side; they wrap on a narrow window instead of
+   stretching one field across the full width. */
+.tcs-integrations__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.tcs-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 12px;
+  border: 1px solid #ecd9bb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.tcs-card__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--tcs-text);
+}
+
+.tcs-card__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.tcs-dot-jira     { background: #2684ff; }
+.tcs-dot-testrail { background: #65c179; }
+.tcs-dot-slack    { background: #611f69; }
+.tcs-dot-bugasura { background: #c2080a; }
+
+/* Field rows — label above input, so long placeholders never get squeezed. */
+.jira__block,
+.testrail__block,
+.slack__block,
+.bugasura__block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+.jira__block label,
+.testrail__block label,
+.slack__block label,
+.bugasura__block label {
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tcs-muted);
+}
+
+.jira__block input,
+.testrail__block input,
+.slack__block input,
+.bugasura__block input {
+  width: 100%;
+  padding: 5px 8px;
+  font-family: sans-serif;
+  font-size: 12px;
+  color: var(--tcs-text);
+  background: #fff;
+  border: 1px solid #d5d5d5;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.jira__block input::placeholder,
+.testrail__block input::placeholder,
+.slack__block input::placeholder,
+.bugasura__block input::placeholder {
+  color: #a9a9a9;
+}
+
+.jira__block input:focus,
+.testrail__block input:focus,
+.slack__block input:focus,
+.bugasura__block input:focus {
+  outline: none;
+  border-color: var(--tcs-amber);
+  box-shadow: 0 0 0 2px rgba(202, 119, 2, 0.12);
+}
+
+/* ── Credential fields: eye (show / mask) + copy, added by fieldTools.js ── */
+
+.tcs-field {
+  position: relative;
+  width: 100%;
+}
+
+/* room on the right for the two buttons; beats the width/padding rule above */
+.tcs-field > input {
+  padding-right: 58px !important;
+}
+
+/* Masked without type="password", so the browser's password manager stays out. */
+.tcs-field > input.tcs-masked {
+  -webkit-text-security: disc;
+  text-security: disc;
+  letter-spacing: 1px;
+}
+
+.tcs-field > input.tcs-masked::placeholder {
+  letter-spacing: normal;
+}
+
+.tcs-field__tools {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2px;
+}
+
+.tcs-field__btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #8a8a8a;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.tcs-field__btn svg {
+  pointer-events: none;      /* the click target is always the button */
+}
+
+.tcs-field__btn:hover {
+  background: #fdf0d9;
+  color: var(--tcs-amber);
+}
+
+.tcs-field__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(202, 119, 2, 0.35);
+}
+
+.tcs-field__btn.is-copied,
+.tcs-field__btn.is-copied:hover {
+  color: #1c8a3f;
+  background: #e9f7ed;
+}
+
+.tcs-card__help {
+  margin-top: auto;           /* pins the help line to the bottom of the card */
+  padding-top: 6px;
+  font-family: sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--tcs-amber);
+  text-decoration: none;
+}
+
+.tcs-card__help:hover {
+  text-decoration: underline;
+}
+
+.slack__manifest-btn {
+  align-self: flex-start;
+  margin: 2px 0 6px;
+  padding: 4px 10px;
+  font-family: sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  background: #611f69;
+  color: #fff;
+  cursor: pointer;
+}
+
+.slack__manifest-btn:hover {
+  background: #4a1750;
+}
+
+.slack__steps {
+  margin: 0 0 2px;
+  padding-left: 16px;
+  font-family: sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--tcs-muted);
+}
+
+.slack__steps li + li {
+  margin-top: 2px;
+}
+
+.slack__steps a {
+  color: var(--tcs-amber);
+  text-decoration: none;
+}
+
+.slack__steps a:hover {
+  text-decoration: underline;
+}
+
+.slack__steps b {
+  font-weight: 600;
+  color: var(--tcs-text);
+}
+
+/* ── Checkboxes ───────────────────────────────────────────────────────────
+   studio.css draws these with `appearance: none`, a #fbf8f8 fill and a WHITE
+   border, so an unchecked box was invisible against any pale background — the
+   only cue was the label next to it. Give them a visible edge; the checked
+   state keeps its tick image from studio.css. */
+
+input[type=checkbox] {
+  background-color: #fff;
+  border: 1px solid #b9b2a6;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+input[type=checkbox]:hover {
+  border-color: var(--tcs-amber);
+}
+
+/* checkbox.svg draws its own square outline around the tick, so keeping a CSS
+   border here would show two nested outlines. The border is only needed to make
+   the EMPTY box visible. */
+input[type=checkbox]:checked {
+  border-color: transparent;
+  background-color: #fff;
+}
+
+input[type=checkbox]:checked:hover {
+  border-color: transparent;
+}
+
+input[type=checkbox]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(202, 119, 2, 0.25);
+}
+
+/* ── Snackbar ─────────────────────────────────────────────────────────────
+   Was a fixed 210px box pinned near the top of the window at z-index 1, so
+   longer messages ("No Test Cases to Upload") were cramped and it could sit
+   behind the pickers. Centred in the window, sized to its text, above them. */
+
+#snackbar {
+  left: 50%;
+  top: 50%;
+  bottom: auto;              /* the later studio.css block pins it to the bottom */
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;              /* that block also forces height: 20px, which with
+                                border-box clipped the text inside the padding */
+  min-width: 0;
+  max-width: min(420px, 80vw);
+  margin-left: 0;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background-color: rgba(34, 34, 34, 0.94);
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.32);
+  z-index: 20;               /* above the Jira / TestRail / Slack pickers */
+  pointer-events: none;
+}
+
+/*
+ * studio.css fades it in by animating `top` from 0 to 30px, which fought the
+ * centring and left the text sitting low in the box. Fade opacity instead and
+ * leave the position alone.
+ */
+#snackbar.show {
+  -webkit-animation: tcs-snack-in 0.25s ease, tcs-snack-out 0.4s ease 2.1s;
+  animation: tcs-snack-in 0.25s ease, tcs-snack-out 0.4s ease 2.1s;
+}
+
+@keyframes tcs-snack-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes tcs-snack-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Footer buttons ───────────────────────────────────────────────────── */
+
+.footer-button {
+  display: none;             /* the bridge shows the selected one */
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  padding: 4px 10px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.footer-button.slack-btn {
+  display: flex;             /* Slack is always available, alongside the picker */
+}
+
+/* ── Footer button hover ──────────────────────────────────────────────────
+   studio.css turns .saveTestCaseBtn and .executeTestCaseBtn pale blue on
+   hover, which is off the brand palette. One black / brand-yellow hover for
+   every amber button in the footer bar, including Upgrade up in the header. */
+
+.saveTestCaseBtn:hover,
+.executeTestCaseBtn:hover,
+.proFeatureRecording:hover,
+.upgradeBtn:hover {
+  background: #1f1f1f;
+  color: #ffe0a6;
+}
+
+.saveTestCaseBtn:hover p,
+.saveTestCaseBtn:hover .footer-button-text,
+.executeTestCaseBtn:hover a,
+.executeTestCaseBtn:hover .testRigorLink {
+  color: #ffe0a6;
+}
+
+/* Upgrade carries a gradient and a lift; keep the lift, drop the gradient. */
+.upgradeBtn:hover {
+  background-image: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/*
+ * The icons are black PNG-style glyphs, invisible on a black button. Recolour
+ * them with a mask rather than swapping in a different file — the yellow icons
+ * that ship with the extension are a different shape, so switching src would
+ * change the glyph on hover.
+ */
+.saveTestCaseBtn:hover .upload,
+.saveTestCaseBtn:hover .download {
+  background-image: none;
+  background-color: #ffe0a6;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.saveTestCaseBtn:hover .upload {
+  -webkit-mask-image: url("../icons/upload_black.svg");
+  mask-image: url("../icons/upload_black.svg");
+}
+
+.saveTestCaseBtn:hover .download {
+  -webkit-mask-image: url("../icons/download-black.svg");
+  mask-image: url("../icons/download-black.svg");
+}
+
+/* Keep the quota pill legible on the dark hover state. */
+.saveTestCaseBtn:hover .tcs-quota-badge {
+  background: rgba(255, 224, 166, 0.18);
+  color: #ffe0a6;
+}
+
+.saveTestCaseBtn:hover .tcs-quota-badge.tcs-quota-empty {
+  background: rgba(255, 138, 128, 0.22);
+  color: #ffb4ab;
+}
+
+.footer-button .footer-button-text {
+  margin: 0;
+  font-size: 13px;
+}
+
+.footer-button .upload {
+  width: 14px;
+  height: 14px;
+  flex: none;                /* never squeezed out when the footer is compact */
+  /* black, matching the download icon on the Test Case button beside it */
+  background: url("../icons/upload_black.svg") no-repeat center / contain;
+}
+
+.tcs-quota-badge {
+  min-width: 26px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
+  background: #efefef;
+  color: var(--tcs-muted);
+}
+
+.tcs-quota-badge.tcs-quota-empty {
+  background: #ffe0e0;
+  color: #b42318;
+}
+
+/* ── Pickers (Jira / TestRail / Slack modals) ─────────────────────────── */
+
+#jira-modal,
+#testrail-modal,
+#slack-modal,
+#bugasura-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+#jira-modal.hideElement,
+#testrail-modal.hideElement,
+#slack-modal.hideElement,
+#bugasura-modal.hideElement {
+  display: none;
+}
+
+#jira-modal .modal__wrapper,
+#testrail-modal .modal__wrapper,
+#slack-modal .modal__wrapper,
+#bugasura-modal .modal__wrapper {
+  position: relative;
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 18px 20px 16px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+#jira-modal .title,
+#testrail-modal .title,
+#slack-modal .title,
+#bugasura-modal .title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: var(--tcs-text);
+}
+
+.close__icon {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  background: url("../icons/close_red.svg") no-repeat center / contain;
+}
+
+.jira__projects,
+.testrail__projects,
+.testrail__sections,
+.testrail__templates,
+.testrail__suites,
+.slack__projects,
+.bugasura__projects {
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  border: 1px solid var(--tcs-border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.jira__project,
+.testrail__project,
+.testrail__section,
+.testrail__template,
+.testrail__suite,
+.slack__project,
+.bugasura__project {
+  padding: 7px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.jira__project:last-child,
+.testrail__project:last-child,
+.slack__project:last-child,
+.bugasura__project:last-child {
+  border-bottom: none;
+}
+
+.jira__project:hover,
+.testrail__project:hover,
+.testrail__section:hover,
+.testrail__template:hover,
+.testrail__suite:hover,
+.slack__project:hover,
+.bugasura__project:hover {
+  background: #fdf3e2;
+}
+
+.jira__project.selected,
+.testrail__project.selected,
+.testrail__section.selected,
+.testrail__template.selected,
+.testrail__suite.selected,
+.slack__project.selected,
+.bugasura__project.selected {
+  background: var(--tcs-amber);
+  color: #fff;
+}
+
+.slack__search {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid var(--tcs-border);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.jira-issuetype {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.jira-issuetype.hideElement {
+  display: none;
+}
+
+.jira-issuetype select {
+  flex: 1;
+  padding: 5px 6px;
+  border: 1px solid var(--tcs-border);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.jira-issuetype-note {
+  flex-basis: 100%;
+  font-size: 11px;
+  color: var(--tcs-muted);
+}
+
+/* Bugasura: team headings in the project list, then the sprint / severity row */
+.bugasura__team {
+  position: sticky;
+  top: 0;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--tcs-muted);
+  background: #f7f3ec;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.bugasura-options {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 6px 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.bugasura-options.hideElement {
+  display: none;
+}
+
+.bugasura-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.bugasura-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tcs-muted);
+}
+
+.bugasura-field select {
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid var(--tcs-border);
+  border-radius: 4px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.bugasura-note {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--tcs-muted);
+}
+
+.bugasura-note:empty {
+  display: none;
+}
+
+.modal__action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal__action button {
+  padding: 6px 14px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--tcs-amber);
+  color: #fff;
+}
+
+.modal__action button.cancel,
+.modal__action button.cancel-jira {
+  background: transparent;
+  border: 1px solid #585858;
+  color: var(--tcs-text);
+}
+
+.modal__action button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Alerts and error notes inside the pickers */
+
+.jira__alert,
+.testrail__alert,
+.slack__alert,
+.bugasura__alert {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  background: #eef6ff;
+  color: #1a4b7a;
+}
+
+.jira__alert.success,
+.testrail__alert.success,
+.slack__alert.success,
+.bugasura__alert.success {
+  background: #e9f7ed;
+  color: #1c6b33;
+}
+
+.jira__alert.error,
+.testrail__alert.error,
+.slack__alert.error,
+.bugasura__alert.error {
+  background: #fdecea;
+  color: #b42318;
+}
+
+.jira__instructions__error,
+.testrail__instructions__error,
+.slack__instructions__error,
+.bugasura__instructions__error {
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #b42318;
+}
+
+.jira__instructions__error .bold,
+.testrail__instructions__error .bold,
+.slack__instructions__error .bold,
+.bugasura__instructions__error .bold {
+  font-weight: 700;
+}
+
+/* Progress rows the integrations inject at upload time
+   (jira.js builds .jira-progress, testrail.js and slack.js build .tr-shot-progress) */
+
+.jira-progress,
+.tr-shot-progress {
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--tcs-muted);
+}
+
+.jira-progress.hideElement,
+.tr-shot-progress.hideElement {
+  display: none;
+}
+
+.jira-progress__label,
+.tr-shot-progress__label {
+  margin-bottom: 4px;
+  color: var(--tcs-text);
+}
+
+.jira-progress__track,
+.tr-shot-progress__track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ececec;
+  overflow: hidden;
+}
+
+.jira-progress__bar,
+.tr-shot-progress__bar {
+  width: 0;
+  height: 100%;
+  background: var(--tcs-amber);
+  transition: width 0.2s ease;
+}
+
+.jira-progress__sub,
+.tr-shot-progress__sub {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+/* Indeterminate run: total not known up front */
+.tr-shot-progress.is-indeterminate .tr-shot-progress__bar {
+  width: 35%;
+  animation: tcs-indeterminate 1.1s ease-in-out infinite;
+}
+
+@keyframes tcs-indeterminate {
+  0%   { margin-left: -35%; }
+  100% { margin-left: 100%; }
+}
+
+/* Spinner */
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  margin: 10px auto;
+}
+
+.lds-ring.hideElement {
+  display: none;
+}
+
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: 4px;
+  border: 3px solid var(--tcs-amber);
+  border-radius: 50%;
+  border-color: var(--tcs-amber) transparent transparent transparent;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+.lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+.lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+
+@keyframes lds-ring {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Daily-limit upgrade popup ────────────────────────────────────────── */
+
+#integration_limit_modal {
+  display: none;
+  place-items: center;
+  padding: 0;
+}
+
+#integration_limit_modal .modal_wrapper {
+  width: 330px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+}
+
+#integration_limit_modal h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--tcs-text);
+}
+
+#integration_limit_modal .modal_message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--tcs-muted);
+}
+
+#integration_limit_modal .modal_btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#integration_limit_modal .modal_btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#integration_limit_modal .upgrade {
+  background-color: var(--tcs-amber-soft);
+}
+
+#integration_limit_modal .upgrade a {
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+#integration_limit_modal .cancel {
+  border: 1px solid #585858;
+  background: transparent;
+}
+
+/* ── Act Result column ────────────────────────────────────────────────────
+   The copy button reuses the Exp Result icon; studio.css styles .copyAllExpRes
+   by class, so the new button needs its own copy of those rules. */
+
+.copyAllActRes {
+  background-image: url(../icons/copy_black.svg);
+  background-repeat: no-repeat;
+  background-size: 13px;
+  background-color: transparent;
+  width: 15px;
+  height: 15px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.copyAllActRes:hover {
+  background-image: url(../icons/copy_blue.svg);
+}
+
+/* Automatic text reads lighter than anything the tester typed, so it is clear
+   at a glance which rows are generated and which were written by hand. */
+.tableData.expRes[data-auto="1"],
+.tableData.actRes[data-auto="1"] {
+  color: #6b6b6b;
+}
+
+/* ── Expected Result auto-fill panel ─────────────────────────────────────
+   Ported from Pro (studio-light.css). The toolbar button and panel markup are
+   built by expectedResults.js, so only the styling is needed here. Poppins is
+   not bundled in the free build, so the font falls back to sans-serif. */
+
+/* ── v2.6.7: Expected Result auto-fill (toolbar button + settings panel) ──── */
+.tcs-expres-btn {
+  position: relative;
+  background: transparent;
+  color: #7a4f00;
+  border: 1.5px solid rgba(200,144,0,0.5);
+}
+
+.tcs-expres-btn:hover { background: rgba(200,144,0,0.08); }
+
+.tcs-expres-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 2px;
+  background: #9ca3af;
+}
+
+.tcs-expres-btn[data-mode="ai"] .tcs-expres-dot { background: #16a34a; }
+
+.tcs-expres-btn[data-mode="rules"] .tcs-expres-dot { background: #c89000; }
+
+.tcs-expres-btn[data-mode="off"] .tcs-expres-dot { background: #9ca3af; }
+
+#tcs-expres-panel {
+  position: fixed;
+  z-index: 9000;
+  width: 320px;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e6dcc2;
+  background: #ffffff;
+  color: #1f1f1f;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+#tcs-expres-panel .tcs-expres-panel__title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+#tcs-expres-panel .tcs-expres-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+#tcs-expres-panel select {
+  flex: 1;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  color: #1f1f1f;
+}
+
+#tcs-expres-panel .tcs-expres-status {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+#tcs-expres-panel button {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background: #ffe0a6;
+  color: #000000;
+}
+
+#tcs-expres-panel button:disabled { opacity: 0.55; cursor: default; }
+
+#tcs-expres-panel .tcs-expres-ai-btn { margin-bottom: 8px; }
+
+#tcs-expres-panel .tcs-expres-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #e6dcc2;
+}
+
+#tcs-expres-panel .tcs-expres-actions .tcs-expres-regen {
+  background: transparent;
+  border: 1px solid rgba(200,144,0,0.45);
+  color: #1f1f1f;
+}
+
+#tcs-expres-panel .tcs-expres-msg {
+  min-height: 14px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a6200;
+}
+
+#tcs-expres-panel .tcs-expres-note {
+  margin-top: 4px;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #666666;
+}
+
+/* ── Column info icon ─────────────────────────────────────────────────────
+   Explains how a column's values get there. The tooltip is anchored to the
+   icon (not positioned absolutely against a distant ancestor, which is what
+   left the older tooltips drifting), and opens on hover or keyboard focus. */
+
+.tcs-col-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #b9b2a6;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 13px;
+  cursor: help;
+  flex: none;
+  vertical-align: middle;
+  transition: background 0.12s ease;
+}
+
+.tcs-col-info::after {
+  content: "i";
+}
+
+.tcs-col-info:hover,
+.tcs-col-info:focus-visible {
+  background: var(--tcs-amber);
+  outline: none;
+}
+
+/*
+ * The column header has overflow:hidden, which clips an absolutely positioned
+ * tooltip. position:fixed escapes that; panelLayout.js sets top/left on hover
+ * because a fixed element can't be placed relative to the icon in CSS alone.
+ */
+.tcs-col-info__tip {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 290px;
+  padding: 9px 11px;
+  border-radius: 5px;
+  background: #3a3a3a;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+  white-space: normal;
+  text-transform: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.tcs-col-info__tip b {
+  color: #ffe0a6;
+  font-weight: 600;
+}
+
+.tcs-col-info:hover .tcs-col-info__tip,
+.tcs-col-info:focus-visible .tcs-col-info__tip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ── Column header copy-button tooltips ──────────────────────────────────
+   Two separate faults here.
+
+   1. Only three of the seven copy buttons had a :hover rule making their
+      tooltip visible (Steps, Data, XPath). Exp Result, Act Result,
+      cssSelector and Playwright had none, so those tooltips never appeared
+      at all. The missing rules are added below.
+
+   2. Each <th> is position: sticky, which makes it a stacking context, so a
+      tooltip was trapped inside its own header cell and painted underneath
+      the header cells and grid rows that follow it in the DOM. Lifting the
+      hovered cell above its siblings lets the tooltip sit over them. */
+
+/* Note the class mismatch: the cssSelector and Playwright buttons both hold a
+   span classed .copyAllCommand, not one named after the button. */
+.copyAllExpRes:hover .copyAllExpRes.toolTip,
+.copyAllActRes:hover .copyAllActRes.toolTip,
+.copyAllCss:hover .copyAllCommand.toolTip,
+.copyAllPlaywright:hover .copyAllCommand.toolTip {
+  visibility: visible;
+}
+
+#command-grid thead th:hover {
+  z-index: 40;
+}
+
+/*
+ * studio.css gives .header `resize: horizontal` with `overflow: hidden`, which
+ * turns every column header into a little resizable, clipping box — that is the
+ * drag handle in the corner of each header cell, and it is what was cutting the
+ * tooltips off. Nothing in the free build reads that resize (there is no
+ * column-resize script), so the box goes and the header just lays out normally.
+ * The sticky positioning stays, so the header still holds while the rows scroll.
+ */
+#command-grid thead .header {
+  resize: none;
+  overflow: visible;
+}
+
+/*
+ * The Exp Result and Act Result tooltips carry the SAME class as their button
+ * (.copyAllExpRes / .copyAllActRes), so they were picking up the button's icon
+ * styling — a 15x15 box with overflow:hidden and a background image — which
+ * squashed the tooltip down to a grey square. Reset that here.
+ */
+#command-grid thead .toolTip {
+  z-index: 41;
+  width: max-content;
+  max-width: 260px;
+  height: auto;
+  overflow: visible;
+  background-image: none;
+  background-color: #6d6b6b;
+  line-height: 1.4;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+/* ── Footer button tooltips ───────────────────────────────────────────────
+   Each footer button carries data-tip with a short description of what it
+   does. Rendered as ::after so no extra markup is needed, and opening upward
+   because these sit at the bottom of the window. The native title attributes
+   were removed so the browser's own slow tooltip doesn't double up. */
+
+.rightContainerFooter [data-tip] {
+  position: relative;
+}
+
+.rightContainerFooter [data-tip]::after {
+  content: attr(data-tip);
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: max-content;
+  max-width: 230px;
+  padding: 6px 9px;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+  text-transform: none;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.rightContainerFooter [data-tip]:hover::after,
+.rightContainerFooter [data-tip]:focus-visible::after {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* The two Pro teasers already carry their own .toolTip span; data-tip replaces
+   it, so hide the old one rather than showing two tooltips at once. */
+.rightContainerFooter [data-tip] .proFeature2.toolTip,
+.rightContainerFooter [data-tip] .proFeature3.toolTip {
+  display: none;
+}
+
+/* The footer must not clip a tooltip that rises above it. */
+.rightContainerFooter {
+  overflow: visible;
+}
+
+/* A centred tooltip runs off the window on the buttons at each end, so those
+   align to their button's edge instead. */
+#save_btn[data-tip]::after {
+  left: 0;
+  transform: none;
+}
+
+.proFeatureScreenshot[data-tip]::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* ── Upgrade button inside a picker's limit alert ─────────────────────── */
+
+.tcs-upgrade-inline {
+  /* The message runs to two lines, so the button gets its own line under it
+     (inline-block would just trail the last word). */
+  display: block;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: var(--tcs-amber);
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.tcs-upgrade-inline:hover {
+  background: #1f1f1f;
+  color: #ffe0a6;
+}
+
+/* ── Upgrade control in the limit popups ──────────────────────────────────
+   These were <a> nested inside <button>, which is invalid HTML: the button
+   took the click unless the pointer landed exactly on the link text, so the
+   popup closed without opening the plans page. They are now a single anchor
+   styled as a button, so the whole control is the link. */
+
+#video_limit_modal .modal_btn.upgrade,
+#integration_limit_modal .modal_btn.upgrade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 5px;
+  background: var(--tcs-amber);
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: lowercase;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+#video_limit_modal .modal_btn.upgrade:hover,
+#integration_limit_modal .modal_btn.upgrade:hover {
+  background: #1f1f1f;
+  color: #ffe0a6;
+}
+
+/* Match the cancel button's height to the anchor. */
+#video_limit_modal .modal_btn.cancel,
+#integration_limit_modal .modal_btn.cancel {
+  padding: 6px 16px;
+  border-radius: 5px;
+  font-family: sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+/* ── Action icon sizing ───────────────────────────────────────────────────
+   studio.css sizes these 16-20px, which reads as small next to their labels.
+   Scaled up here (with background-size following, since each icon is a
+   background image) so the group carries more weight in the header. */
+
+.tcs-action .uiConfigBtn,
+.tcs-action #clearTestCase,
+.tcs-action .attrFilterBtn {
+  width: 22px;
+  height: 22px;
+  background-size: 22px 22px;
+  background-position: center;
+}
+
+.tcs-action #recordIcon {
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px;
+  background-position: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * Responsive toolbar / footer sizing — compact only when the ads panel is up
+ *
+ * The ads panel takes a quarter of the window, and both button rows were
+ * sized for the full width. With the panel open the footer's content came to
+ * ~1290px in ~1090px of space and the labels wrapped onto a second line; the
+ * run / script row lost "Exp Result" to a second line the same way, which
+ * also pushed the grid header up out of view.
+ *
+ * Rather than shrinking both rows permanently, the compact sizing is scoped
+ * to `.main__section.tcs-ads-open`. panelLayout.js adds that class while the
+ * panel is on screen and removes it when the panel is hidden or removed
+ * (ads-free and logged-in users never see it), so those users keep the
+ * original roomier spacing from studio.css untouched.
+ *
+ * The class comes from a MutationObserver rather than `:has()` so it also
+ * works on the older Chrome and Edge builds MV3 still supports, and so it
+ * catches the panel being removed from the DOM as well as merely hidden.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+.right__section {
+  width: 24%;
+}
+
+/*
+ * The left pane takes whatever the ads panel does not. It was a fixed 74%,
+ * which left a quarter of the window blank for anyone whose panel had been
+ * removed; now it fills that space instead.
+ */
+.left__section {
+  width: 76%;
+  flex-grow: 1;
+}
+
+/* ── Unconditional safety rules ───────────────────────────────────────────
+ * These apply in both states. They cost nothing when there is room to spare,
+ * and they are what stops either row from silently growing a second line
+ * again if a label or a control changes later.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+.rightContainerFooter {
+  flex-wrap: nowrap;
+}
+
+.rightContainerFooter > button,
+.rightContainerFooter > a,
+.rightContainerFooter > a > button {
+  white-space: nowrap;
+}
+
+.rightContainerFooter > a {
+  display: inline-flex;
+  align-items: center;
+}
+
+/*
+ * Shrink floors. They do nothing while there is room, and they apply in both
+ * states: with nowrap a very narrow window compresses the row instead of
+ * wrapping it, and without a floor the labels would be squeezed out of their
+ * own buttons.
+ */
+.saveTestCaseBtn {
+  min-width: 78px;
+}
+
+.saveTestCaseBtn.footer-button {
+  min-width: 92px;
+}
+
+.executeTestCaseBtn {
+  min-width: 150px;
+}
+
+/*
+ * Four integration buttons now (Jira, TestRail, Bugasura, Slack). At a fixed
+ * 130px each the row outgrew the widths it used to fit, so they size to their
+ * own icon + label + badge instead. The compact rules below still win when the
+ * ads panel is open.
+ */
+.saveTestCaseBtn.footer-button {
+  width: auto;
+  padding: 0 10px;
+  margin: 0 5px;
+}
+
+.executeTestCaseBtn .testRigorLink {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * nowrap, deliberately. With wrap enabled flex breaks the line before it will
+ * shrink anything, so a few pixels of overflow cost a whole second row. With
+ * nowrap the two selects give up width first (their dropdowns still list every
+ * option in full) and the row holds its single line much further down.
+ */
+.tcs-replay-controls {
+  flex-wrap: nowrap;
+}
+
+.tcs-replay-btn,
+.tcs-toolbar-btn {
+  flex: 0 0 auto;
+}
+
+/* ── Compact: ads panel on screen ─────────────────────────────────────────
+ * ~230px trimmed from the footer and ~75px from the run row, entirely from
+ * padding, margins and fixed widths. No label text changes.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+.tcs-ads-open .rightContainerFooter {
+  padding: 8px 0;
+}
+
+.tcs-ads-open .saveTestCaseBtn {
+  width: 94px;
+  flex: 0 1 auto;
+  margin: 0 4px;
+}
+
+/* Jira / TestRail / Bugasura / Slack carry an upload icon AND a quota badge, so they
+   need more room than the plain Test Case button — at 104px the icon clipped. */
+.tcs-ads-open .saveTestCaseBtn.footer-button {
+  width: 114px;
+}
+
+/* Sized to its own text rather than a fixed width, so the label is only ever
+   shortened when the window is genuinely too narrow for it. */
+.tcs-ads-open .executeTestCaseBtn {
+  width: auto;
+  flex: 0 1 auto;
+  margin: 0 5px 0 0;
+  padding: 0 10px;
+  overflow: hidden;
+}
+
+.tcs-ads-open .proFeatureRecording,
+.tcs-ads-open .proFeatureScreenshot {
+  padding: 0 7px;
+  margin-right: 4px;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcs-ads-open .rightContainerFooter > a {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Run / script row */
+
+.tcs-ads-open .tcs-replay-controls {
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.tcs-ads-open .tcs-replay-btn,
+.tcs-ads-open .tcs-toolbar-btn {
+  padding: 3px 7px;
+  gap: 3px;
+}
+
+.tcs-ads-open .tcs-close-win-label {
+  margin-left: 3px;
+  gap: 3px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Sized under their longest option — the dropdown still shows every option in
+   full, only the closed control is tightened. These also carry the shrink
+   floors that let the row compress instead of wrapping. */
+.tcs-ads-open .tcs-speed-select {
+  padding: 2px 3px;
+  width: 104px;
+  min-width: 62px;
+  flex: 0 1 auto;
+}
+
+.tcs-ads-open .tcs-close-win-select {
+  padding: 2px 3px;
+  width: 132px;
+  min-width: 74px;
+  flex: 0 1 auto;
+}
+
+/* ── Compact + a narrow window ────────────────────────────────────────────
+ * A label cannot shrink past its own text, so past this point the type steps
+ * down rather than the row breaking. Only with the panel open: without it
+ * there is no pressure at these widths.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1340px) {
+  .tcs-ads-open .rightContainerFooter,
+  .tcs-ads-open .saveTestCaseBtn p,
+  .tcs-ads-open .footer-button .footer-button-text,
+  .tcs-ads-open .executeTestCaseBtn .testRigorLink,
+  .tcs-ads-open .proFeatureRecording,
+  .tcs-ads-open .proFeatureScreenshot {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .tcs-ads-open .tcs-replay-btn,
+  .tcs-ads-open .tcs-toolbar-btn,
+  .tcs-ads-open .tcs-close-win-text,
+  .tcs-ads-open .tcs-speed-select,
+  .tcs-ads-open .tcs-close-win-select {
+    font-size: 10px;
+  }
+  .tcs-ads-open .tcs-replay-btn,
+  .tcs-ads-open .tcs-toolbar-btn {
+    padding: 3px 5px;
+  }
+}
+
+/* ── Tutorial action (header) ─────────────────────────────────────────── */
+.tcs-action--tutorial { text-decoration: none; }
+.tcs-action--tutorial .tutorialIcon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: url(../icons/tutorial.svg) center / 22px 22px no-repeat;
+  transition: transform .12s ease;
+}
+.tcs-action--tutorial:hover .tutorialIcon { transform: scale(1.08); }
+
+/* ── Driver command: a header tile (switch on top, label below) ──────────
+   Matches the Customize / Filter / Delete / Recording / Tutorial tiles.
+   #inputToggle keeps its active/inactive classes; only the look changes. */
+.tcs-driver-cmd {
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 96px;
+  height: 100%;
+  padding: 4px 10px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+.tcs-driver-cmd:hover { background: #fdf0d9; }
+.tcs-driver-cmd:active { background: #fae4c2; }
+.tcs-driver-cmd__text {
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  color: #4a4a4a;
+  pointer-events: none;
+}
+.tcs-driver-cmd:hover .tcs-driver-cmd__text { color: var(--tcs-text); }
+
+/* The switch: 36×20 track, 16px knob with a soft shadow */
+#debugTestStepName #inputToggle.toggle-btn {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border-radius: 999px;
+  line-height: normal;
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+#debugTestStepName #inputToggle.toggle-btn.inactive { background-color: #d9d2c5; box-shadow: inset 0 0 0 1px #cbc2b3; }
+#debugTestStepName #inputToggle.toggle-btn.active   { background-color: #16a34a; box-shadow: inset 0 0 0 1px #15803d; }
+#debugTestStepName #inputToggle .toggle-circle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: transform .2s ease;
+}
+#debugTestStepName #inputToggle.active .toggle-circle   { transform: translateX(16px); }
+#debugTestStepName #inputToggle.inactive .toggle-circle { transform: translateX(0); }
+#debugTestStepName #inputToggle:focus-visible { outline: 2px solid #ca7702; outline-offset: 2px; }
+#debugTestStepName #inputToggle::before { content: none; }
+
+/* Tooltip: centred under the tile, like the other actions */
+.tcs-driver-cmd .toggle.toolTip {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+.tcs-driver-cmd:hover .toggle.toolTip { visibility: visible; }
+
+/* ── Equal spacing: Driver Command tile sits in the same rhythm as the
+   action tiles (they're 2px apart; the group used to add 14px more). ── */
+.tcs-action-group { margin-right: -8px; }   /* row gap is 10px → 2px, same as between tiles */
+#debugTestStepName { margin-right: 14px; }
+.tcs-driver-cmd { min-width: 78px; padding: 4px 10px; }
+#debugTestStepName #inputToggle:focus:not(:focus-visible) { outline: none; }
+
+/* ── Test-case name: bigger, darker, clearly editable ─────────────────── */
+#downloadFileName > input {
+  flex: 0 1 340px;
+  width: 340px;
+  height: 36px;
+  box-sizing: border-box;
+  align-self: center;
+  padding: 0 14px 0 36px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2b2b2b;
+  background: #fff url(../icons/pencil_amber.svg) 13px center / 15px 15px no-repeat;
+  border: 1.5px solid #c99a55;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(60, 40, 10, .06);
+}
+#downloadFileName > input::placeholder { color: #8a6a3c; font-weight: 500; }
+#downloadFileName > input:hover { border-color: #b36b00; }
+#downloadFileName > input:focus {
+  border-color: #b36b00;
+  box-shadow: 0 0 0 3px rgba(202, 119, 2, .18);
+}

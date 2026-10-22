@@ -125,7 +125,13 @@ export function TodayPage() {
     if (log) confirm(log, status, 'voice-dialog');
   });
 
-  const today = dashboard?.summary?.today || { taken: 0, total: 0 };
+  const summaryToday = dashboard?.summary?.today;
+  const today = logs.length > 0
+    ? {
+        taken: logs.filter((log) => log.status === 'taken').length,
+        total: logs.length
+      }
+    : summaryToday || { taken: 0, total: 0 };
   const complete = today.total > 0 && today.taken === today.total;
   const pendingDoses = Math.max(0, today.total - today.taken);
   const adherenceScore = today.total > 0 ? Math.round((today.taken / today.total) * 100) : 100;

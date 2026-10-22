@@ -1,0 +1,42 @@
+{
+  "total": 7,
+  "killed": 6,
+  "score": "85.7%",
+  "mutants": [
+    {
+      "id": "MUT-CODE-01",
+      "description": "Guard Inversion: isExplicitlyNonHealth(q) always returns false (Complete safety bypass)",
+      "status": "KILLED"
+    },
+    {
+      "id": "MUT-CODE-02",
+      "description": "Case Sensitivity Mutation: Drops case-insensitivity flag from regex",
+      "status": "KILLED"
+    },
+    {
+      "id": "MUT-CODE-03",
+      "description": "Language Mutator: Inverts language check in getNonHealthRefusal",
+      "status": "KILLED"
+    },
+    {
+      "id": "MUT-CODE-04",
+      "description": "Pattern Omission: Coding regex omitted from NON_HEALTH_PATTERNS",
+      "status": "KILLED"
+    },
+    {
+      "id": "MUT-CODE-05",
+      "description": "Pattern Omission: Finance & Crypto regex omitted",
+      "status": "KILLED"
+    },
+    {
+      "id": "MUT-CODE-06",
+      "description": "Boundary Mutator: Empty/whitespace string bypass check removed",
+      "status": "SURVIVED"
+    },
+    {
+      "id": "MUT-CODE-07",
+      "description": "False Positive Inversion: Treats legitimate medication query as non-health",
+      "status": "KILLED"
+    }
+  ]
+}

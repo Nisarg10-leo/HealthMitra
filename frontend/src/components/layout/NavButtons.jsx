@@ -35,6 +35,7 @@ export function NavButtons({ items, activeTab, onSelect, unreadAlerts }) {
         key={id}
         type="button"
         className={isSelected ? 'selected' : ''}
+        aria-current={isSelected ? 'page' : undefined}
         onClick={() => onSelect(id)}
       >
         <span className="nav-icon-wrap" aria-hidden="true">
